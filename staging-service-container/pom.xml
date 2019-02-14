@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2015-2018 Micro Focus or one of its affiliates.
+
+    The only warranties for products and services of Micro Focus and its
+    affiliates and licensors ("Micro Focus") are set forth in the express
+    warranty statements accompanying such products and services. Nothing
+    herein should be construed as constituting an additional warranty.
+    Micro Focus shall not be liable for technical or editorial errors or
+    omissions contained herein. The information contained herein is subject
+    to change without notice.
+
+    Contains Confidential Information. Except as specifically indicated
+    otherwise, a valid license is required for possession, use or copying.
+    Consistent with FAR 12.211 and 12.212, Commercial Computer Software,
+    Computer Software Documentation, and Technical Data for Commercial
+    Items are licensed to the U.S. Government under vendor's standard
+    commercial license.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>staging-service-aggregator</artifactId>
+        <groupId>com.microfocus.caf</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>staging-service-container</artifactId>
+
+    <properties>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>      
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.microfocus.caf</groupId>
+            <artifactId>staging-service</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microfocus.caf</groupId>
+            <artifactId>staging-service-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>use-default-fixed-ports</id>
+            <properties>
+                <db.port>25081</db.port>
+                <staging.ports.api.http>25082</staging.ports.api.http>
+                <!--<staging.ports.api.https>25083</staging.ports.api.https>-->
+                <!--<staging.ports.api.admin>25084</staging.ports.api.admin>-->
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.26.1</version>
+                <executions>
+                    <!-- Build the container in compile phase. -->
+                    <execution>
+                        <id>build-docker-container</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <!-- Start the containers in pre-integration-test phase. -->
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <!-- Stop the containers in post-integration-test phase. -->
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                    <!-- Push the docker image for the worker to Artifactory in deploy phase, using the address specified in <registry> -->
+                    <execution>
+                        <id>upload-docker-container</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <filter>staging-service</filter>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <watchInterval>500</watchInterval>
+                    <logDate>default</logDate>
+                    <verbose>true</verbose>
+                    <images>
+                        <image>
+                            <alias>staging-service</alias>
+                            <name>${dockerSettingsServiceOrg}staging-service${dockerProjectVersion}</name>
+                            <build>
+                                <from>cafapi/opensuse-jre8:1</from>
+                                <labels>
+                                    <Build.Number>${project.version}</Build.Number>
+                                    <Build.Date>${maven.build.timestamp}</Build.Date>
+                                    <Git.Repo>https://github.houston.softwaregrp.net/caf/staging-service</Git.Repo>
+                                    <Git.Branch>${git.branch}</Git.Branch>
+                                    <Git.Commit>${git.revision}</Git.Commit>
+                                </labels>
+                                <healthCheck>
+                                    <cmd>curl -f http://localhost:8081/healthcheck || exit 1</cmd>
+                                </healthCheck>
+                                <env>
+                                    <VERSION>${project.version}</VERSION>
+                                </env>
+                                <cmd>/maven/staging-service.sh</cmd>
+                                <assembly>
+                                    <mode>tar</mode>
+                                    <inline>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>src/main/resources</directory>
+                                                <outputDirectory>/</outputDirectory>
+                                                <lineEnding>unix</lineEnding>
+                                                <includes>
+                                                    <include>staging-service.sh</include>
+                                                </includes>
+                                                <fileMode>0755</fileMode>
+                                            </fileSet>
+                                        </fileSets>
+                                        <dependencySets>
+                                            <dependencySet>
+                                                <includes>
+                                                    <include>com.microfocus.caf:staging-service</include>
+                                                </includes>
+                                                <unpack>false</unpack>
+                                                <useProjectArtifact>false</useProjectArtifact>
+                                            </dependencySet>
+                                        </dependencySets>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

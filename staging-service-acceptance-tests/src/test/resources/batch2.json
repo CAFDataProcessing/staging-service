@@ -1,0 +1,11 @@
+{
+  "document": {
+    "reference": "batch2.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    }
+  }
+}
