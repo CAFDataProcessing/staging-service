@@ -147,7 +147,15 @@ public class FileSystemDao implements BatchDao {
         final File inProgressBatchFolder = new File(inProgressBatchFolderPath);
         if (!inProgressBatchFolder.exists()) {
             LOGGER.debug("Creating in-progress folder for batch: {}", inProgressBatchFolderPath);
-            inProgressBatchFolder.mkdir();
+            final boolean dirCreated = inProgressBatchFolder.mkdirs();
+            if (dirCreated) {
+                LOGGER.debug("Created in-progress folder for batch: {}", inProgressBatchFolderPath);
+            }
+            else
+            {
+                LOGGER.error("Error creating in-progress folder for batch: {}", inProgressBatchFolderPath);
+                throw new IOException("In-progress folder for batch was not created : " + inProgressBatchFolderPath);
+            }
         }
         final Iterator<StagedFile> stagedFilesIterator = parts.iterator();
         final SubBatchWriter subBatchOutStream = new SubBatchWriter(inProgressBatchFolder, subbatchSize);
@@ -181,6 +189,7 @@ public class FileSystemDao implements BatchDao {
                 throw e;
             }
         }
+        LOGGER.debug("Staged {} files in the in-progress batch folder '{}'", fileNames.size(), inProgressBatchFolderPath);
         subBatchOutStream.closeSubBatchOutputStream();
         //Move in_progress batch folder under the base and rename it
         final String batchFolderName = this.basePath.concat("/").concat(batchId);
