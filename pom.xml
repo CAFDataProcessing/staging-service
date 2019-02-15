@@ -21,7 +21,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.microfocus.caf</groupId>
+    <groupId>com.github.cafdataprocessing</groupId>
     <artifactId>staging-service-aggregator</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
@@ -85,12 +85,12 @@
                 <version>2.8.1</version>
             </dependency>
             <dependency>
-                <groupId>com.microfocus.caf</groupId>
+                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>staging-service</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.microfocus.caf</groupId>
+                <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>staging-service-client</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
