@@ -74,10 +74,6 @@ public class SubBatchWriter implements AutoCloseable {
 
     public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier) throws StagingException, IncompleteBatchException {
 
-        if(outStream==null){
-            createSubBatchOutStream();
-        }
-
         if(count >= subbatchSize)
         {
             //Close the stream for the current subbatch file
@@ -86,6 +82,10 @@ public class SubBatchWriter implements AutoCloseable {
             } catch (Exception e) {
                 throw new StagingException(e);
             }
+        }
+
+        if(outStream==null){
+            createSubBatchOutStream();
         }
 
         try(final InputStream inStream = inputStreamSupplier.get()){
@@ -113,6 +113,7 @@ public class SubBatchWriter implements AutoCloseable {
             outStream.flush();
             outStream.close();
         }
+        outStream = null;
     }
 
 }
