@@ -156,8 +156,6 @@ public class FileSystemDao implements BatchDao {
                 }
                 fileNames.add(normalizedFilename);
             }
-            completeInProgressBatch(inProgressBatchFolderPath, batchId);
-            return fileNames;
         }
         catch (IncompleteBatchException | InvalidBatchException | StagingException ex){
             LOGGER.error("Error saving batch [%s].", ex.getMessage());
@@ -168,6 +166,8 @@ public class FileSystemDao implements BatchDao {
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }
+        completeInProgressBatch(inProgressBatchFolderPath, batchId);
+        return fileNames;
     }
 
     private void cleanupInProgressBatch(final File inProgressBatchFolderPath){

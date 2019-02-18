@@ -15,13 +15,20 @@
  */
 package com.github.cafdataprocessing.services.staging.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,6 +44,36 @@ public class FileSystemDaoTest {
     @Ignore
     public void saveFilesTest() {
         final String batchId = "testBatch";
+    }
+
+    @Test
+    public void putFilesTest() throws Exception {
+        final String directoryName = getTempBaseBatchDir();
+        final FileSystemDao fileSystemDao = new FileSystemDao(directoryName, 250);
+        final String batchId = UUID.randomUUID().toString();
+
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("uploadData");
+        when(f1.getName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(false);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("uploadData");
+        when(f2.getName()).thenReturn("hello.txt");
+        when(f2.isFormField()).thenReturn(false);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f1, f2);
+
+        final List<String> files = fileSystemDao.saveFiles(batchId, fileItemIterator);
+        assertEquals(2, files.size());
+        assertTrue(files.contains(f1.getName()));
+        assertTrue(files.contains(f2.getName()));
     }
 
     @Test
