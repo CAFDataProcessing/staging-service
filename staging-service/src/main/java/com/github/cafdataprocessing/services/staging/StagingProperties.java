@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.services.staging.exceptions;
+package com.github.cafdataprocessing.services.staging;
 
-public class StagingException extends Exception {
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-    private static final long serialVersionUID = 4824589557352664145L;
+@ConfigurationProperties(prefix = "staging")
+public class StagingProperties {
 
-    public StagingException() {
-        super();
+    private String basePath;
+    private int subbatchSize;
+
+    public String getBasePath() {
+        return basePath;
     }
 
-    public StagingException(final String message) {
-        super(message);
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 
-    public StagingException(final Throwable cause) {
-        super(cause);
+    public int getSubbatchSize() {
+        return subbatchSize;
     }
 
-    public StagingException(final String message, final Throwable cause)
-    {
-        super(message, cause);
+    public void setSubbatchSize(int subbatchSize) {
+        this.subbatchSize = subbatchSize;
     }
 }

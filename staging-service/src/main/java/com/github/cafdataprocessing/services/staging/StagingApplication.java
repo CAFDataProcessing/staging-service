@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -38,22 +39,17 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
-import com.github.cafdataprocessing.services.staging.dao.FileSystemDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
+@EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer {
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingApplication.class);
 
     @Value("${https.port}")
     private int httpsPort;
-
-    @Value("${staging.basePath}")
-    private String basePath;
-
-    @Value("${staging.subbatchSize}")
-    private int subbatchSize;
 
     private final String keyAlias = System.getenv("SSL_CERT_ALIAS");
     private final String keyStore = System.getenv("SSL_KEYSTORE");
@@ -61,6 +57,7 @@ public class StagingApplication implements WebMvcConfigurer {
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
     public static void main(String[] args) {
+        //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
         SpringApplication.run(StagingApplication.class, args);
@@ -101,10 +98,9 @@ public class StagingApplication implements WebMvcConfigurer {
     }
 
     @Bean
-    public BatchDao fileSystemDao()
+    public BatchDao fileSystemDao(final StagingProperties stagingProperties)
     {
-        final BatchDao fileSystemDao = new FileSystemDao(basePath, subbatchSize);
-        return fileSystemDao;
+        return new FileSystemDao(stagingProperties.getBasePath(), stagingProperties.getSubbatchSize());
     }
 
     @Override
@@ -118,15 +114,11 @@ public class StagingApplication implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/swagger").setViewName("forward:/swagger/index.html");
+        registry.addViewController("/swagger/").setViewName("forward:/swagger/index.html");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry
-//                .addResourceHandler("/swagger/")
-//                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui-dist/3.20.6/index.html");
-
         registry
                 .addResourceHandler("/swagger/**")
                 .addResourceLocations(
