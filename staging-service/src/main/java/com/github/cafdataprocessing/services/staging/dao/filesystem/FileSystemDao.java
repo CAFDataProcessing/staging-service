@@ -158,11 +158,12 @@ public class FileSystemDao implements BatchDao {
             }
         }
         catch (IncompleteBatchException | InvalidBatchException | StagingException ex){
-            LOGGER.error("Error saving batch [%s].", ex.getMessage());
+            LOGGER.error(String.format("Error saving batch [%s].", ex.getMessage()));
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
         }
         catch (Throwable t){
+            LOGGER.error(String.format("Error saving batch [%s].", t.getMessage()));
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }

@@ -42,6 +42,7 @@ import com.github.cafdataprocessing.services.staging.client.StagingBatchResponse
 public class StagingServiceIT {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
+//    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT() {
