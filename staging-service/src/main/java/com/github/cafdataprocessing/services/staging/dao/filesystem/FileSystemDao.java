@@ -78,7 +78,7 @@ public class FileSystemDao implements BatchDao {
             }
 
             if(from!=null){
-                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from)>0);
+                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from)>=0);
             }
 
             if(limit!=null){
