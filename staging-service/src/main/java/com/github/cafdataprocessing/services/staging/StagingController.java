@@ -23,9 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
-import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
-import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
-import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.*;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -39,7 +37,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
-import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.BatchResponse;
 import com.github.cafdataprocessing.services.staging.models.Body;
@@ -69,9 +66,6 @@ public class StagingController implements StagingApi {
             @PathVariable("batchId") String batchId,
             @ApiParam(value = "") @RequestParam(value="uploadData", required=false) Body body) {
 
-//Removed due to log injection vulnerability
-//        LOGGER.debug("Staging documents for : {}", batchId);
-
         final ServletFileUpload fileUpload = new ServletFileUpload();
         final FileItemIterator fileItemIterator;
         try{
@@ -79,7 +73,7 @@ public class StagingController implements StagingApi {
         }
         catch(FileUploadException | IOException ex){
             LOGGER.error("Error getting FileItemIterator", ex);
-            return ResponseEntity.badRequest().build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
 
         final BatchResponse batch = new BatchResponse();
@@ -92,10 +86,11 @@ public class StagingController implements StagingApi {
         }
         catch(IncompleteBatchException | InvalidBatchException ex){
             LOGGER.error("Error getting multipart files", ex);
-            return ResponseEntity.badRequest().build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+
         }
         catch(StagingException ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
@@ -106,13 +101,14 @@ public class StagingController implements StagingApi {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
             batchDao.deleteFiles(batchId);
-            return new ResponseEntity<Void>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (final BatchNotFoundException ex) {
             LOGGER.error("Error in deleteBatch ", ex);
-            return ResponseEntity.notFound().build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
+
         }
         catch(final StagingException ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
@@ -133,7 +129,7 @@ public class StagingController implements StagingApi {
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batchList);
         } catch (final StagingException ex) {
             LOGGER.error("Error in getBatches ", ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 

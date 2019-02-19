@@ -66,9 +66,13 @@ public class FileSystemDao implements BatchDao {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
 
+        final Path batchesPath = batchPathProvider.getPathForBatches();
+        if(!batchesPath.toFile().exists()){
+            return new ArrayList<>();
+        }
         //Retrieve the current list of batches in alphabetical order
         try(final Stream<Path> pathStream =
-                    Files.walk(batchPathProvider.getPathForBatches(), FileVisitOption.FOLLOW_LINKS)){
+                    Files.walk(batchesPath, FileVisitOption.FOLLOW_LINKS)){
 
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
                     filter(File::isDirectory).map(File::getName);
