@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.services.staging.exceptions;
+package com.github.cafdataprocessing.services.staging;
 
-public class StagingException extends Exception {
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 
-    private static final long serialVersionUID = 4824589557352664145L;
+public class BatchId {
+    private final String value;
 
-    public StagingException() {
-        super();
+    public BatchId(final String value) throws InvalidBatchIdException{
+        if(!value.matches("^[^\\\\/:*?\"|]+$")){
+            throw new InvalidBatchIdException(value);
+        }
+        this.value = value;
     }
 
-    public StagingException(final String message) {
-        super(message);
-    }
-
-    public StagingException(final Throwable cause) {
-        super(cause);
-    }
-
-    public StagingException(final String message, final Throwable cause)
-    {
-        super(message, cause);
+    public String getValue() {
+        return value;
     }
 }

@@ -99,13 +99,6 @@ paths:
           multipart/mixed:
             schema:
               type: object
-              properties:
-                uploadData:
-                  type: array
-                  description: The documents that need to be uploaded.
-                  items:
-                    type: string
-                    format: binary
       responses:
         "200":
           description: Successfully added the documents to the batch.
@@ -118,10 +111,6 @@ paths:
             invalid.
         "500":
           description: The request failed due to an unexpected server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BatchError"
     delete:
       tags:
         - Staging
@@ -134,11 +123,6 @@ paths:
           description: The batch does not exist.
         "500":
           description: The request failed due to an unexpected server error.
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/BatchError"
-
 components:
   schemas:
     StatusResponse:
@@ -146,7 +130,7 @@ components:
       description: Status of the service
       type: object
       properties:
-        messgae:
+        message:
           type: string
           description: Detailed status message
     BatchResponse:
@@ -160,15 +144,6 @@ components:
           items:
             type: string
             description: Details of documents that were staged
-    BatchError:
-      title: BatchError
-      properties:
-        code:
-          type: string
-          description: An error code
-        messgae:
-          type: string
-          description: Detailed error message
     BatchList:
       title: BatchList
       description: A list of batches identifiers ordered alphabetically

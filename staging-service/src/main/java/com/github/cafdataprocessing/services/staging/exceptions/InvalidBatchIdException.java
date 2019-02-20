@@ -15,24 +15,9 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class StagingException extends Exception {
-
-    private static final long serialVersionUID = 4824589557352664145L;
-
-    public StagingException() {
-        super();
+public class InvalidBatchIdException extends Exception {
+    public InvalidBatchIdException(final String batchId){
+        super(batchId);
     }
 
-    public StagingException(final String message) {
-        super(message);
-    }
-
-    public StagingException(final Throwable cause) {
-        super(cause);
-    }
-
-    public StagingException(final String message, final Throwable cause)
-    {
-        super(message, cause);
-    }
 }

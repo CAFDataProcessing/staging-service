@@ -15,24 +15,23 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class StagingException extends Exception {
+public class BatchNotFoundException extends Exception {
 
-    private static final long serialVersionUID = 4824589557352664145L;
-
-    public StagingException() {
+    public BatchNotFoundException() {
         super();
     }
 
-    public StagingException(final String message) {
+    public BatchNotFoundException(final String message) {
         super(message);
     }
 
-    public StagingException(final Throwable cause) {
+    public BatchNotFoundException(final Throwable cause) {
         super(cause);
     }
 
-    public StagingException(final String message, final Throwable cause)
+    public BatchNotFoundException(final String message, final Throwable cause)
     {
         super(message, cause);
     }
+
 }

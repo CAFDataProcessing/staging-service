@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.services.staging.dao;
+package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,13 +22,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
+import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
 
 /*
@@ -37,61 +40,80 @@ import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
  * It writes the metadata of each document family out into the subbatch file in minified json format.
  * When a configurable subbatch size is reached the subbatch file will be closed and a new one will be opened.
  */
-public class SubBatchWriter {
+public class SubBatchWriter implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubBatchWriter.class);
     private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
     private static final String TIMESTAMP_FORMAT = "yyyyMMdd-HHmmssSSS";
 
-    final File inProgressBatchFolder;
-    final int subbatchSize;
+    private final File inProgressBatchFolder;
+    private final int subbatchSize;
     private OutputStream outStream;
     //Track number of document files processed
-    private int count;
+    private int count = 0;
 
-    public SubBatchWriter(final File inProgressBatchFolder, final int subbatchSize)
-            throws FileNotFoundException {
+    public SubBatchWriter(final File inProgressBatchFolder, final int subbatchSize) {
         this.inProgressBatchFolder = inProgressBatchFolder;
         this.subbatchSize = subbatchSize;
     }
 
-    private void createSubBatchOutStream() throws FileNotFoundException
+    private void createSubBatchOutStream() throws StagingException
     {
         //Make a new subbatch file
         final String subBatchFileName = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT))
                  + SUBBATCH_FILE_SUFFIX;
-        final File subBatch = new File(inProgressBatchFolder.getAbsolutePath().concat("/").concat(subBatchFileName));
+        final File subBatch = Paths.get(inProgressBatchFolder.toString(), subBatchFileName).toFile();
         LOGGER.debug("Created new subbatchFile : {} ", subBatch);
         //Open new stream to start writing to subbatch file
-        outStream = new BufferedOutputStream(new FileOutputStream(subBatch, true));
+
+        try {
+            outStream = new BufferedOutputStream(new FileOutputStream(subBatch, true));
+        } catch (FileNotFoundException e) {
+            throw new StagingException(e);
+        }
     }
 
-    public void writeDocumentFile(
-            final InputStreamSupplier inputStreamSupplier
-            ) throws JsonParseException, IOException {
-        if(count == 0 || count >= subbatchSize)
+    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier) throws StagingException, IncompleteBatchException {
+
+        if(count >= subbatchSize)
         {
             //Close the stream for the current subbatch file
-            closeSubBatchOutputStream();
-            //reset count
-            count = 0;
+            try {
+                close();
+            } catch (Exception e) {
+                throw new StagingException(e);
+            }
+        }
+
+        if(outStream==null){
             createSubBatchOutStream();
         }
-        final InputStream inStream = inputStreamSupplier.get();
-        JsonMinifier.minifyJson(inStream, outStream);
-        inStream.close();
-        count++;
+
+        try(final InputStream inStream = inputStreamSupplier.get()){
+            try {
+                JsonMinifier.minifyJson(inStream, outStream);
+                count++;
+            }
+            catch (IOException ex){
+                throw new StagingException(ex);
+            }
+        }
+        catch (IOException ex){
+            throw new IncompleteBatchException(ex);
+        }
 
         LOGGER.trace("Wrote minified document to  subbatchFile");
     }
 
-    public void closeSubBatchOutputStream() throws IOException
-    {
+    @Override
+    public void close() throws Exception {
         if(outStream != null)
         {
             LOGGER.debug("Closing subbatchFile");
+            count = 0;
             outStream.flush();
             outStream.close();
         }
+        outStream = null;
     }
 
 }

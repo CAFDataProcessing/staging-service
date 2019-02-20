@@ -15,24 +15,27 @@
  */
 package com.github.cafdataprocessing.services.staging.dao;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.github.cafdataprocessing.services.staging.models.StagedFile;
+import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
+import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import org.apache.commons.fileupload.FileItemIterator;
 
 public interface BatchDao {
 
-    List<String> saveFiles(@Size(min = 1) String batchId, Stream<StagedFile> parts) throws JsonParseException, IOException;
+    List<String> saveFiles(@Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
+            throws IncompleteBatchException, InvalidBatchException, StagingException;
 
-    List<String> getFiles(@Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid String from,
-            @Min(1) @Valid Integer limit) throws IOException;
+    List<String> getBatches(@Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,
+            @Min(1) @Valid Integer limit) throws StagingException;
 
-    void deleteFiles(@Size(min = 1) String batchId) throws IOException;
+    void deleteBatch(@Size(min = 1) BatchId BatchId) throws BatchNotFoundException, StagingException;
 
 }
