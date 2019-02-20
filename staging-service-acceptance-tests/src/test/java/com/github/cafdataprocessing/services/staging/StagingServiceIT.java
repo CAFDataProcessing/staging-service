@@ -15,9 +15,6 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,10 +36,12 @@ import com.github.cafdataprocessing.services.staging.client.StagingApi;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchList;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchResponse;
 
+import static org.junit.Assert.*;
+
 public class StagingServiceIT {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
-    //    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+//        private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT() {
@@ -67,6 +66,35 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"batch1.json", "batch2.json", "batch3.json", "batch4.json", "batch5.json", "batch6.json"};
         final StagingBatchResponse response = stageMultiPartStreams(batchId, contentFiles, documentFiles);
         assertTrue("addMultipleDocumentsToBatchTest, 8 files uploaded", response.getEntries().size() == 8);
+    }
+
+    @Test
+    public void addEmptyDocumentToBatchTest() throws Exception {
+        final String[] contentFiles = new String[]{"empty.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{};
+        final StagingBatchResponse response = stageMultiParts(contentFiles, documentFiles);
+        assertEquals(1, response.getEntries().size());
+    }
+
+    @Test
+    public void addEmptyJSONToBatchTest() throws Exception {
+        final String[] contentFiles = new String[]{};
+        final String[] documentFiles = new String[]{"empty.json"};
+        final StagingBatchResponse response = stageMultiParts(contentFiles, documentFiles);
+        assertEquals(1, response.getEntries().size());
+    }
+
+    @Test
+    public void addInvalidJSONToBatchTest() throws Exception {
+        final String[] contentFiles = new String[]{};
+        final String[] documentFiles = new String[]{"not-json.json"};
+        try{
+            final StagingBatchResponse response = stageMultiParts(contentFiles, documentFiles);
+            fail("Expected ApiException");
+        }
+        catch(ApiException ex){
+            assertEquals(400, ex.getCode());
+        }
     }
 
     @Test

@@ -63,7 +63,6 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         final Response response = getApiClient().getHttpClient().newCall(request).execute();
         if (!response.isSuccessful())
         {
-            response.body();
             throw new ApiException("Error adding documents to batch: " + batchId,
                                    response.code(),
                                    null,

@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,8 @@ public class SubBatchWriter implements AutoCloseable {
         }
     }
 
-    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier) throws StagingException, IncompleteBatchException {
+    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier) throws StagingException,
+            InvalidBatchException, IncompleteBatchException {
 
         if(count >= subbatchSize)
         {
@@ -94,7 +96,7 @@ public class SubBatchWriter implements AutoCloseable {
                 count++;
             }
             catch (IOException ex){
-                throw new StagingException(ex);
+                throw new InvalidBatchException(ex);
             }
         }
         catch (IOException ex){
