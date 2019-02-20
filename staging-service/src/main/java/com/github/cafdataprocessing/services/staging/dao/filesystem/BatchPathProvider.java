@@ -15,6 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
+import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.slf4j.Logger;
@@ -41,11 +42,11 @@ public class BatchPathProvider {
         return basePath;
     }
 
-    public Path getPathForBatch(final String batchId){
-        return Paths.get(basePath.toString(), batchId);
+    public Path getPathForBatch(final BatchId batchId){
+        return Paths.get(basePath.toString(), batchId.getValue());
     }
 
-    public Path getInProgressPathForBatch(final String batchId) throws StagingException {
+    public Path getInProgressPathForBatch(final BatchId batchId) throws StagingException {
         /*
         - It will create a temporary folder for the batch to store files while the entire batch is being processed
         - It will open a subbatch file with the following naming pattern "YYYYMMDD-HHMMSS-xxx-json.batch"
@@ -63,7 +64,7 @@ public class BatchPathProvider {
         final String inProgressBatchFolderName = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT))
                 .concat("-").concat("" + Thread.currentThread().getId())
                 .concat("-").concat(ServiceIdentifier.getServiceId())
-                .concat("-").concat(batchId);
+                .concat("-").concat(batchId.getValue());
 
         final Path inProgressPath = Paths.get(basePath.toString(), INPROGRESS_FOLDER, inProgressBatchFolderName);
         final File inProgressFile = inProgressPath.toFile();

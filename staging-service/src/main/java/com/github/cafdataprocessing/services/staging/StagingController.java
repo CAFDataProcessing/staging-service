@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.BatchResponse;
-import com.github.cafdataprocessing.services.staging.models.Body;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
 
@@ -64,14 +63,14 @@ public class StagingController implements StagingApi {
     public ResponseEntity<BatchResponse> addDocumentsToBatch(
             @Size(min=1) @ApiParam(value = "Identifies the batch.",required=true)
             @PathVariable("batchId") String batchId,
-            @ApiParam(value = "") @RequestParam(value="uploadData", required=false) Body body) {
+            Object body) {
 
         final ServletFileUpload fileUpload = new ServletFileUpload();
         final FileItemIterator fileItemIterator;
         try{
             fileItemIterator = fileUpload.getItemIterator(request);
         }
-        catch(FileUploadException | IOException ex){
+        catch(final FileUploadException | IOException ex){
             LOGGER.error("Error getting FileItemIterator", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
@@ -79,17 +78,17 @@ public class StagingController implements StagingApi {
         final BatchResponse batch = new BatchResponse();
         try
         {
-            final List<String> savedFiles = batchDao.saveFiles(batchId, fileItemIterator);
+            final List<String> savedFiles = batchDao.saveFiles(new BatchId(batchId), fileItemIterator);
             batch.entries(savedFiles);
             LOGGER.debug("Staged batch: {}", batch);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batch);
         }
-        catch(IncompleteBatchException | InvalidBatchException ex){
+        catch(final InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
             LOGGER.error("Error getting multipart files", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
 
         }
-        catch(StagingException ex){
+        catch(final StagingException ex){
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
@@ -100,9 +99,14 @@ public class StagingController implements StagingApi {
             @PathVariable("batchId") String batchId) {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
-            batchDao.deleteFiles(batchId);
+            batchDao.deleteBatch(new BatchId(batchId));
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (final BatchNotFoundException ex) {
+        }
+        catch (final InvalidBatchIdException ex){
+            LOGGER.error("Invalid batchId ", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+        catch (final BatchNotFoundException ex) {
             LOGGER.error("Error in deleteBatch ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
 
@@ -124,10 +128,15 @@ public class StagingController implements StagingApi {
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         final BatchList batchList = new BatchList();
         try {
-            final List<String> batchFiles = batchDao.getBatches(startsWith, from, limit);
+            final List<String> batchFiles = batchDao.getBatches(startsWith, new BatchId(from), limit);
             batchList.entries(batchFiles);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batchList);
-        } catch (final StagingException ex) {
+        }
+        catch (final InvalidBatchIdException ex) {
+            LOGGER.error("Invalid batchId ", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+        catch (final StagingException ex) {
             LOGGER.error("Error in getBatches ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }

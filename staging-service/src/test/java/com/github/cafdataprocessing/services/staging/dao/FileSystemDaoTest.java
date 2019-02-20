@@ -27,6 +27,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
+import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
@@ -41,29 +43,22 @@ public class FileSystemDaoTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemDaoTest.class);
 
-    @Ignore
-    public void saveFilesTest() {
-        final String batchId = "testBatch";
-    }
-
     @Test
-    public void putFilesTest() throws Exception {
+    public void saveFilesTest() throws Exception {
         final String directoryName = getTempBaseBatchDir();
         final FileSystemDao fileSystemDao = new FileSystemDao(directoryName, 250);
-        final String batchId = UUID.randomUUID().toString();
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("uploadData");
-        when(f1.getName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(false);
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
         when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
         FileItemStream f2 = mock(FileItemStream.class);
         when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("uploadData");
-        when(f2.getName()).thenReturn("hello.txt");
-        when(f2.isFormField()).thenReturn(false);
+        when(f2.getFieldName()).thenReturn("hello.txt");
+        when(f2.isFormField()).thenReturn(true);
         when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
         FileItemIterator fileItemIterator = mock(FileItemIterator.class);
@@ -72,8 +67,13 @@ public class FileSystemDaoTest {
 
         final List<String> files = fileSystemDao.saveFiles(batchId, fileItemIterator);
         assertEquals(2, files.size());
-        assertTrue(files.contains(f1.getName()));
-        assertTrue(files.contains(f2.getName()));
+        assertTrue(files.contains(f1.getFieldName()));
+        assertTrue(files.contains(f2.getFieldName()));
+    }
+
+    @Test(expected = InvalidBatchIdException.class)
+    public void putFilesInvalidBatchIdTest() throws Exception {
+        final BatchId batchId = new BatchId("../../MyBadBatchId");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class FileSystemDaoTest {
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, from, limit);
+        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
         //Cleanup
         Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
@@ -115,7 +115,7 @@ public class FileSystemDaoTest {
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, from, limit);
+        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
         //Cleanup
         Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
@@ -144,7 +144,7 @@ public class FileSystemDaoTest {
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, from, limit);
+        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
         //Cleanup
         Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
@@ -159,13 +159,27 @@ public class FileSystemDaoTest {
         Files.deleteIfExists(Paths.get(directoryName));
     }
 
-    @Ignore
-    public void deleteFilesTest() {
-        final String batchId = "testBatch";
+    @Test
+    public void deleteFilesTest() throws Exception {
+        final BatchId batchId = new BatchId("testBatch");
+
+        final String directoryName = getTempBaseBatchDir();
+        Files.createDirectories(Paths.get(directoryName , "/testBatch"));
+        final File f1 = new File(directoryName + "/testBatch/test_Christmas_Carol1.txt");
+        FileUtils.writeStringToFile(f1, "abc", "UTF8");
+
+        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
+        final List<String> batches = fsDao.getBatches(null, null, null);
+        assertEquals(1, batches.size());
+        assertTrue(batches.contains(batchId.getValue()));
+
+        fsDao.deleteBatch(batchId);
+
+        final List<String> batchesAfterDelete = fsDao.getBatches(null, null, null);
+        assertEquals(0, batchesAfterDelete.size());
     }
 
     private String getTempBaseBatchDir() throws Exception {
-        //TODO prevent multiple test runs interfering with each other.
         return Files.createTempDirectory("batchBase").toString();
     }
 

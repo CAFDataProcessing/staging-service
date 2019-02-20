@@ -42,7 +42,7 @@ import com.github.cafdataprocessing.services.staging.client.StagingBatchResponse
 public class StagingServiceIT {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
-//    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+    //    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT() {
@@ -58,10 +58,6 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"batch1.json"};
         final StagingBatchResponse response = stageMultiParts(contentFiles, documentFiles);
         assertTrue("addDocumentsToBatchTest, 3 files uploaded", response.getEntries().size() == 3);
-
-        //Cleanup
-        clearFiles(contentFiles);
-        clearFiles(documentFiles);
     }
 
     @Test
@@ -92,65 +88,49 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"batch1.json", "batch2.json", "batch3.json", "batch4.json", "batch5.json", "batch6.json"};
         final StagingBatchResponse response = stageMultiPartStreams(batchId, contentFiles, documentFiles);
         assertTrue("addMultipleDocumentsToBatchTest, 8 files uploaded", response.getEntries().size() == 8);
-        try{
+        try {
             stagingApi.deleteBatch(batchId);
             final StagingBatchList listResponse = stagingApi.getBatches("delTest", "delTest", 10);
             assertTrue("deleteBatchTest, 0 batchs listed", listResponse.getEntries().size() == 0);
-        }
-        catch (ApiException ex){
+        } catch (ApiException ex) {
             fail("deleteBatchTest failed");
         }
     }
 
     private StagingBatchResponse stageMultiParts(final String[] contentFiles, final String[] documentFiles)
-            throws IOException, ApiException
-    {
+            throws IOException, ApiException {
         final List<MultiPart> uploadData = new ArrayList<>();
-        for(final String file : contentFiles)
-        {
-           final File contentFile = new File(file);
-           FileUtils.copyInputStreamToFile(StagingServiceIT.class.getResourceAsStream("/" + file), contentFile);
-           uploadData.add(new MultiPartFile(contentFile));
+        for (final String file : contentFiles) {
+            final File contentFile = Paths.get(Files.createTempDirectory("batchBase").toString(), file).toFile();
+            contentFile.deleteOnExit();
+            FileUtils.copyInputStreamToFile(StagingServiceIT.class.getResourceAsStream("/" + file), contentFile);
+            uploadData.add(new MultiPartFile(contentFile));
         }
-        for(final String file : documentFiles)
-        {
-           final File documentFile = new File(file);
-           FileUtils.copyInputStreamToFile(StagingServiceIT.class.getResourceAsStream("/" + file), documentFile);
-           uploadData.add(new MultiPartDocument(documentFile));
+        for (final String file : documentFiles) {
+            final File documentFile = new File(file);
+            documentFile.deleteOnExit();
+            FileUtils.copyInputStreamToFile(StagingServiceIT.class.getResourceAsStream("/" + file), documentFile);
+            uploadData.add(new MultiPartDocument(documentFile));
         }
         return stagingApi.addDocumentsToBatch("testBatch", uploadData.stream());
     }
 
     private StagingBatchResponse stageMultiPartStreams(final String batchId, final String[] contentFiles, final String[] documentFiles)
-            throws IOException, ApiException
-    {
+            throws IOException, ApiException {
         final List<MultiPart> uploadData = new ArrayList<>();
-        for(final String file : contentFiles)
-        {
-           uploadData.add(new MultiPartContentResource(file, StagingServiceIT.class.getResource("/" + file)));
+        for (final String file : contentFiles) {
+            uploadData.add(new MultiPartContentResource(file, StagingServiceIT.class.getResource("/" + file)));
         }
-        for(final String file : documentFiles)
-        {
-           uploadData.add(new MultiPartDocumentResource(file, StagingServiceIT.class.getResource("/" + file)));
+        for (final String file : documentFiles) {
+            uploadData.add(new MultiPartDocumentResource(file, StagingServiceIT.class.getResource("/" + file)));
         }
-        try
-        {
+        try {
             return stagingApi.addDocumentsToBatch(batchId, uploadData.stream());
-        }
-        catch (final ApiException ex){
+        } catch (final ApiException ex) {
             fail("stageMultiPartStreams failed : " + ex.getMessage()
-               + " response code : " + ex.getCode()
-               + " response body : " + ex.getResponseBody());
+                    + " response code : " + ex.getCode()
+                    + " response body : " + ex.getResponseBody());
             throw ex;
         }
     }
-
-    private void clearFiles(final String[] fileNames) throws IOException
-    {
-        for(final String fileName : fileNames)
-        {
-            Files.deleteIfExists(Paths.get(fileName));
-        }
-    }
-
 }

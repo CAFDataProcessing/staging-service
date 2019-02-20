@@ -37,7 +37,7 @@ spring:
     multipart:
       enabled: true
 staging:
-    basePath: ${CAF_STAGING_SERVICE_BASEPATH:/staging-service}
+    basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
     subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}
 logging:
   level:

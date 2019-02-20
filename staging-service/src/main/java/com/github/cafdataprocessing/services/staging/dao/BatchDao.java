@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
+import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
@@ -29,12 +30,12 @@ import org.apache.commons.fileupload.FileItemIterator;
 
 public interface BatchDao {
 
-    List<String> saveFiles(@Size(min = 1) String batchId, FileItemIterator fileItemIterator)
+    List<String> saveFiles(@Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
             throws IncompleteBatchException, InvalidBatchException, StagingException;
 
-    List<String> getBatches(@Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid String from,
+    List<String> getBatches(@Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,
             @Min(1) @Valid Integer limit) throws StagingException;
 
-    void deleteFiles(@Size(min = 1) String batchId) throws BatchNotFoundException, StagingException;
+    void deleteBatch(@Size(min = 1) BatchId BatchId) throws BatchNotFoundException, StagingException;
 
 }

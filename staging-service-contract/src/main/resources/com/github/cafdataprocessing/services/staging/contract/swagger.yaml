@@ -99,13 +99,6 @@ paths:
           multipart/mixed:
             schema:
               type: object
-              properties:
-                uploadData:
-                  type: array
-                  description: The documents that need to be uploaded.
-                  items:
-                    type: string
-                    format: binary
       responses:
         "200":
           description: Successfully added the documents to the batch.

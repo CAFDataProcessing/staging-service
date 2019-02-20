@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.services.staging.exceptions;
+package com.github.cafdataprocessing.services.staging;
 
-import org.springframework.http.HttpStatus;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 
-public class WebMvcHandledRuntimeException extends RuntimeException {
-    private HttpStatus status;
+public class BatchId {
+    private final String value;
 
-    public WebMvcHandledRuntimeException(HttpStatus status, String message){
-        super(message);
-        this.status = status;
+    public BatchId(final String value) throws InvalidBatchIdException{
+        if(!value.matches("^[^\\\\/:*?\"|]+$")){
+            throw new InvalidBatchIdException(value);
+        }
+        this.value = value;
     }
 
-    public HttpStatus getStatus() {
-        return status;
+    public String getValue() {
+        return value;
     }
 }

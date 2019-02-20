@@ -27,10 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
+import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
@@ -60,9 +57,9 @@ public class FileSystemDao implements BatchDao {
 
     @Override
     public List<String> getBatches(
-            @Size(min = 1, max = 256) @Valid final String startsWith,
-            @Size(min = 1, max = 256) @Valid final String from,
-            @Min(1) @Valid final Integer limit) throws StagingException {
+            final String startsWith,
+            final BatchId from,
+            final Integer limit) throws StagingException {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
 
@@ -72,7 +69,7 @@ public class FileSystemDao implements BatchDao {
         }
         //Retrieve the current list of batches in alphabetical order
         try(final Stream<Path> pathStream =
-                    Files.walk(batchesPath, FileVisitOption.FOLLOW_LINKS)){
+                    Files.walk(batchesPath, FileVisitOption.FOLLOW_LINKS).skip(1)){
 
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
                     filter(File::isDirectory).map(File::getName);
@@ -82,7 +79,7 @@ public class FileSystemDao implements BatchDao {
             }
 
             if(from!=null){
-                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from)>=0);
+                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from.getValue())>=0);
             }
 
             if(limit!=null){
@@ -97,10 +94,10 @@ public class FileSystemDao implements BatchDao {
     }
 
     @Override
-    public void deleteFiles(@Size(min = 1) final String batchId) throws BatchNotFoundException, StagingException {
+    public void deleteBatch(final BatchId batchId) throws BatchNotFoundException, StagingException {
         final Path batchPath = batchPathProvider.getPathForBatch(batchId);
         if(!batchPath.toFile().exists()){
-            throw new BatchNotFoundException(batchId);
+            throw new BatchNotFoundException(batchId.getValue());
         }
 
         try {
@@ -111,7 +108,7 @@ public class FileSystemDao implements BatchDao {
     }
 
     @Override
-    public List<String> saveFiles(@Size(min = 1) String batchId, FileItemIterator fileItemIterator)
+    public List<String> saveFiles(BatchId batchId, FileItemIterator fileItemIterator)
             throws StagingException, InvalidBatchException, IncompleteBatchException {
 
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(batchId);
@@ -130,18 +127,18 @@ public class FileSystemDao implements BatchDao {
                     throw new IncompleteBatchException(ex);
                 }
 
-                if(fileItemStream.isFormField()){
-                    LOGGER.error("{} is not a file", fileItemStream.getName());
-                    throw new InvalidBatchException(String.format("FileItemStream [%s] is not a form field.", fileItemStream.getName()));
-                }
-                if(!fileItemStream.getFieldName().equals("uploadData")){
-                    LOGGER.error("{} is not in 'uploadData'. Invalid field name : {}", fileItemStream.getName(),
-                            fileItemStream.getFieldName());
-                    throw new InvalidBatchException(String.format("Unexpected form field [%s].", fileItemStream.getFieldName()));
+                if(!fileItemStream.isFormField()){
+                    LOGGER.error("A form field is required.");
+                    throw new InvalidBatchException("A form field is required.");
                 }
 
+                final String filename = fileItemStream.getFieldName();
+                if(filename==null || filename.trim().length()==0){
+                    LOGGER.error("The form field name must be present and contain the filename.");
+                    throw new InvalidBatchException("The form field name must be present and contain the filename.");
+                }
                 final String contentType = fileItemStream.getContentType();
-                final String normalizedFilename = Paths.get(fileItemStream.getName()).toFile().getName();
+                final String normalizedFilename = Paths.get(filename).toFile().getName();
 
                 if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
@@ -187,7 +184,7 @@ public class FileSystemDao implements BatchDao {
         }
     }
 
-    private void completeInProgressBatch(final Path inProgressBatchFolderPath, final String batchId)
+    private void completeInProgressBatch(final Path inProgressBatchFolderPath, final BatchId batchId)
             throws StagingException {
 
         final Path batchFolder = batchPathProvider.getPathForBatch(batchId);

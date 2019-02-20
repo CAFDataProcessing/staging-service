@@ -48,8 +48,8 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         while(uploadDataIterator.hasNext())
         {
             final MultiPart fileToStage = uploadDataIterator.next();
-            mpBuilder.addFormDataPart("uploadData",
-                                       fileToStage.getName(),
+            mpBuilder.addFormDataPart(fileToStage.getName(),
+                                       null,
                                        new StreamingBody(MediaType.parse(fileToStage.getContentType()),
                                                fileToStage.openInputStream())
                                      );
