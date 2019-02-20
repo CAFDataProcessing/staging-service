@@ -125,6 +125,17 @@ public class StagingServiceIT {
         }
     }
 
+    @Test
+    public void deleteNonExistingBatchTest() throws Exception {
+        final String batchId = "delNonExistingTestBatch";
+        try {
+            stagingApi.deleteBatch(batchId);
+            fail("Expected ApiException");
+        } catch (ApiException ex) {
+            assertEquals(404, ex.getCode());
+        }
+    }
+
     private StagingBatchResponse stageMultiParts(final String[] contentFiles, final String[] documentFiles)
             throws IOException, ApiException {
         final List<MultiPart> uploadData = new ArrayList<>();
