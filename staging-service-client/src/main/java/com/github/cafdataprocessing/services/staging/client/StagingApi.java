@@ -17,7 +17,6 @@ package com.github.cafdataprocessing.services.staging.client;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.stream.Stream;
@@ -51,7 +50,7 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
             mpBuilder.addFormDataPart(fileToStage.getName(),
                                        null,
                                        new StreamingBody(MediaType.parse(fileToStage.getContentType()),
-                                               fileToStage.openInputStream())
+                                               fileToStage::openInputStream)
                                      );
         }
         final RequestBody requestBody = mpBuilder.build();
@@ -76,11 +75,12 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
     }
 
     class StreamingBody extends RequestBody {
-        private final InputStream inputStream;
+        private final InputStreamSupplier inputStreamSupplier;
         private final MediaType contentType;
 
-        StreamingBody(final MediaType contentType, final InputStream inputStream) {
-          this.inputStream = inputStream;
+        //Try to maker this a supplier
+        StreamingBody(final MediaType contentType, final InputStreamSupplier inputStreamSupplier) {
+          this.inputStreamSupplier = inputStreamSupplier;
           this.contentType = contentType;
         }
 
@@ -93,7 +93,7 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         public void writeTo(final BufferedSink sink) throws IOException {
             Source source = null;
             try {
-                source = Okio.source(inputStream);
+                source = Okio.source(inputStreamSupplier.get());
                 sink.writeAll(source);
             } finally {
                 Util.closeQuietly(source);
