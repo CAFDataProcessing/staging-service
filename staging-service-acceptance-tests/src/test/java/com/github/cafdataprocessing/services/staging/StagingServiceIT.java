@@ -73,7 +73,7 @@ public class StagingServiceIT {
         final String[] contentFiles = new String[]{"empty.txt", "A_Christmas_Carol2.txt"};
         final String[] documentFiles = new String[]{};
         final StagingBatchResponse response = stageMultiParts(contentFiles, documentFiles);
-        assertEquals(1, response.getEntries().size());
+        assertEquals(2, response.getEntries().size());
     }
 
     @Test
