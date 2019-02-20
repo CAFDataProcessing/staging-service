@@ -48,7 +48,7 @@
         <springBootVersion>2.0.4.RELEASE</springBootVersion>
         <okhttp-version>2.7.5</okhttp-version>
         <enforceCorrectDependencies>true</enforceCorrectDependencies>
-        <fasterxmlVersion>2.9.6</fasterxmlVersion>
+        <fasterxmlVersion>2.9.8</fasterxmlVersion>
         <springDataVersion>2.0.9.RELEASE</springDataVersion>
     </properties>
 
@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.5.32</version>
+                <version>8.5.34</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
