@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2015-2018 Micro Focus or one of its affiliates.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>staging-service-aggregator</artifactId>
+        <groupId>com.github.cafdataprocessing</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>staging-service-acceptance-tests</artifactId>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.failsafe.version>2.19</maven.failsafe.version>
+        <fabric8.docker.maven.version>0.25.2</fabric8.docker.maven.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>staging-service-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>use-default-fixed-ports</id>
+            <properties>
+                <staging.ports.api.http>25082</staging.ports.api.http>
+                <staging.ports.api.admin>25085</staging.ports.api.admin>
+            </properties>
+        </profile>
+    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-test-properties</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/test/resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--Run integration tests.-->
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsafe.version}</version>
+
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>staging-service</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <systemPropertyVariables>
+                                <test.mode>staging-service</test.mode>
+                            </systemPropertyVariables>
+                            <environmentVariables>
+                                <staging-service>http://${docker.host.address}:${staging.ports.api.http}</staging-service>
+                                <HTTP_PROXY>${env.HTTP_PROXY}</HTTP_PROXY>
+                                <HTTPS_PROXY>${env.HTTP_PROXY}</HTTPS_PROXY>
+                                <NO_PROXY>${env.HTTP_PROXY}</NO_PROXY>
+                            </environmentVariables>
+                            <summaryFile>target/failsafe-reports/failsafe-summary-staging-service.xml</summaryFile>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <summaryFiles>
+                                <summaryFile>target/failsafe-reports/failsafe-summary-staging-service.xml</summaryFile>
+                            </summaryFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${fabric8.docker.maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-docker-container</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <watchInterval>500</watchInterval>
+                    <logDate>default</logDate>
+                    <autoPull>on</autoPull>
+                    <skipPush>true</skipPush>
+                    <images>
+                        <image>
+                            <alias>staging-service-tests</alias>
+                            <name>${dockerSettingsServiceOrg}staging-service${dockerProjectVersion}</name>
+                            <run>
+                                <ports>
+                                    <port>${staging.ports.api.http}:8080</port>
+                                    <port>${staging.ports.api.https}:8443</port>
+                                    <port>${staging.ports.api.admin}:8081</port>
+                                    <!--<port>6005:6005</port>-->
+                                </ports>
+                                <env>
+                                    <SSL_CERT_ALIAS>staging</SSL_CERT_ALIAS>
+                                    <SSL_KEYSTORE>staging.keystore</SSL_KEYSTORE>
+                                    <SSL_KEYSTORE_PASSWORD>changeit</SSL_KEYSTORE_PASSWORD>
+                                    <SSL_KEYSTORE_PATH>/test-keystore</SSL_KEYSTORE_PATH>
+                                    <CAF_STAGING_SERVICE_LOG_LEVEL>TRACE</CAF_STAGING_SERVICE_LOG_LEVEL>
+                                    <CAF_STAGING_SERVICE_SUBBATCH_SIZE>4</CAF_STAGING_SERVICE_SUBBATCH_SIZE>
+                                    <!--<CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=6005</CAF_SERVICE_JAVA_OPTS>-->
+                                </env>
+                                <volumes>
+                                    <from>
+                                        <image>keystore</image>
+                                    </from>
+                                </volumes>
+                                <log>
+                                    <enabled>true</enabled>
+                                </log>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${staging.ports.api.admin}/healthcheck</url>
+                                    </http>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                            </run>
+                        </image>
+                        <image>
+                            <alias>keystore</alias>
+                            <name>${project.artifactId}-keystore:${project.version}</name>
+                            <build>
+                                <from>java:8</from>
+                                <runCmds>
+                                    <runCmd>mkdir /test-keystore</runCmd>
+                                    <runCmd>$JAVA_HOME/bin/keytool -genkey -noprompt -alias staging -dname "CN=myname, OU=myorganisational.unit, O=myorganisation, L=mycity, S=myprovince, C=GB" -keystore /test-keystore/staging.keystore -storepass changeit -keypass changeit -keyalg RSA</runCmd>
+                                </runCmds>
+                                <volumes>
+                                    <volume>/test-keystore</volume>
+                                </volumes>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

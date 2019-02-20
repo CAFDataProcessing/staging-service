@@ -1,0 +1,12 @@
+#HomeController renamed to SwaggerController Check this can't be configured
+**/HomeController.java
+
+#SettingsApiController copied and modified with implementation
+**/SettingsApiController.java
+
+
+#Annotations from Swagger2SpringBoot added to StagingService
+**/Swagger2SpringBoot.java
+
+#Swagger Documentation Configuration added to StagingService
+**/SwaggerDocumentationConfig.java

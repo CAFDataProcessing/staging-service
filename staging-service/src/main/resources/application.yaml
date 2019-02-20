@@ -1,0 +1,46 @@
+#
+# Copyright 2015-2018 Micro Focus or one of its affiliates.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+debug: false
+server:
+  port: 8080
+https:
+  port: 8443
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: healthcheck
+  endpoint:
+    health:
+      show-details: ALWAYS
+    info:
+      enabled: false
+spring:
+  servlet:
+    multipart:
+      enabled: true
+staging:
+    basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
+    subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}
+logging:
+  level:
+    ROOT: ${CAF_LOG_LEVEL:WARN}
+    org.springframework: ${CAF_STAGING_SERVICE_SPRING_LOG_LEVEL:${CAF_LOG_LEVEL:WARN}}
+    com.github.cafdataprocessing.services.staging: ${CAF_STAGING_SERVICE_LOG_LEVEL:${CAF_LOG_LEVEL:INFO}}

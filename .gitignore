@@ -21,3 +21,73 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+*~
+\#*
+*.swp
+**/target/*
+
+# Eclipse
+.settings/
+.settings
+.project
+.classpath
+
+# IntelliJ
+**/.idea/*
+*.iml
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/dictionaries/
+**/.idea/libraries/*.xml
+**/.idea/artifacts/*.xml
+**/.idea/copyright
+**/.idea/uiDesigner.xml
+**/.idea/dataSources.*
+**/.idea/sqldialects.xml
+**/.idea/inspectionProfiles/
+**/.idea/codeStyleSettings.xml
+**/.idea/jsLinters/
+*.iws
+*.orig
+atlassian-ide-plugin.xml
+
+# Chef-ish
+infrastructure/instances/
+infrastructure/archived-instances/
+infrastructure/chef/chef-client-running.pid
+infrastructure/chef/chef-stacktrace.out
+infrastructure/chef/remote_file/
+.vagrant/
+
+# Front-end
+node_modules
+dist
+.tmp
+.sass-cache
+bower_components
+test-results.xml
+#docs/
+fileRev.json
+appWidgets/
+
+# Ingest service
+ingest/*.log*
+
+# Test
+test/**/drivers/*
+test/**/reports/*
+
+ingest/config/credentials.json
+infrastructure/chef/site-cookbooks/idol/files/default/data_bags/variables/twitter.json
+
+# Eclipse
+bin
+
+# Docs stuff
+docs/node_modules
+docs/_site
+docs/.sass-cache
+docs/.jekyll-metadata
+docs/Gemfile.lock
+docs/caf-templates

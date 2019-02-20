@@ -1,0 +1,156 @@
+#
+# Copyright 2015-2018 Micro Focus or one of its affiliates.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: CAF Staging Service APIs
+  description: Highly resilient filesystem service to stage files.
+tags:
+  - name: Staging
+    description: Staging Files Operations
+paths:
+  /status:
+    get:
+      tags:
+        - Staging
+      operationId: getStatus
+      summary: Returns status information about the staging service. A client should use this to check that the service is functional before uploading a large batch.
+      responses:
+        "200":
+          description: Service is functional and can accept batches for staging.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+        "500":
+          description: The request failed due to an unexpected server error.
+  /batches:
+    parameters:
+      - in: query
+        name: startsWith
+        description: Specifies the prefix for batch identifier to fetch batches whose
+          identifiers start with the specified value.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - in: query
+        name: from
+        description: Specifies the identifier to fetch batches that follow it
+          alphabetically.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - in: query
+        name: limit
+        description: Specifies the number of results to return (defaults to 25 if not
+          specified).
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 25
+    get:
+      tags:
+        - Staging
+      operationId: getBatches
+      summary: Retrieve the current list of batches in alphabetical order.
+      responses:
+        "200":
+          description: Successfully retrieved batches.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchList"
+        "500":
+          description: The request failed due to an unexpected server error.
+  "/batches/{batchId}":
+    parameters:
+      - in: path
+        name: batchId
+        description: Identifies the batch.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    put:
+      tags:
+        - Staging
+      operationId: addDocumentsToBatch
+      summary: Add documents to a batch. The batch will be automatically created if it
+        doesn't already exist.
+      requestBody:
+        content:
+          multipart/mixed:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successfully added the documents to the batch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResponse"
+        "400":
+          description: The request could not be processed because one or more arguments are
+            invalid.
+        "500":
+          description: The request failed due to an unexpected server error.
+    delete:
+      tags:
+        - Staging
+      operationId: deleteBatch
+      summary: Delete specified batch.
+      responses:
+        "204":
+          description: Successfully deleted the batch.
+        "404":
+          description: The batch does not exist.
+        "500":
+          description: The request failed due to an unexpected server error.
+components:
+  schemas:
+    StatusResponse:
+      title: StatusResponse
+      description: Status of the service
+      type: object
+      properties:
+        message:
+          type: string
+          description: Detailed status message
+    BatchResponse:
+      title: BatchResponse
+      description: A list of documents that were staged
+      type: object
+      properties:
+        entries:
+          type: array
+          description: List of documents that were staged
+          items:
+            type: string
+            description: Details of documents that were staged
+    BatchList:
+      title: BatchList
+      description: A list of batches identifiers ordered alphabetically
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            type: string
+            description: The batch identifier
