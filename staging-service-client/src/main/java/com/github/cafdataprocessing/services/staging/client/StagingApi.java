@@ -40,7 +40,7 @@ import okio.Source;
 public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
     private final String PUT_API_PATH = "/batches/";
 
-    public StagingBatchResponse addDocumentsToBatch(final String batchId, final Stream<MultiPart> uploadData)
+    public StagingBatchResponse createOrUpdateBatch(final String batchId, final Stream<MultiPart> uploadData)
             throws ApiException, FileNotFoundException, IOException {
         final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();

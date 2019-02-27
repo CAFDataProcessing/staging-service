@@ -91,7 +91,7 @@ paths:
     put:
       tags:
         - Staging
-      operationId: addDocumentsToBatch
+      operationId: createOrUpdateBatch
       summary: Add documents to a batch. The batch will be automatically created if it
         doesn't already exist.
       requestBody:

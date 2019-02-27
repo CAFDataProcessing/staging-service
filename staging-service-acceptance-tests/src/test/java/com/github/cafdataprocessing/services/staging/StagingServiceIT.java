@@ -103,7 +103,7 @@ public class StagingServiceIT {
         final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
         final String[] documentFiles = new String[]{"batch1.json",};
         final StagingBatchResponse response = stageMultiPartStreams(batchId, contentFiles, documentFiles);
-        assertTrue("addDocumentsToBatchTest, 3 files uploaded", response.getEntries().size() == 3);
+        assertTrue("getBatchesTest, 3 files uploaded", response.getEntries().size() == 3);
 
         final StagingBatchList listResponse = stagingApi.getBatches("test", "test", 10);
         assertTrue("getBatchesTest, 1 batch listed", listResponse.getEntries().size() == 1);
@@ -115,7 +115,7 @@ public class StagingServiceIT {
         final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
         final String[] documentFiles = new String[]{"batch1.json", "batch2.json", "batch3.json", "batch4.json", "batch5.json", "batch6.json"};
         final StagingBatchResponse response = stageMultiPartStreams(batchId, contentFiles, documentFiles);
-        assertTrue("addMultipleDocumentsToBatchTest, 8 files uploaded", response.getEntries().size() == 8);
+        assertTrue("deleteBatchTest, 8 files uploaded", response.getEntries().size() == 8);
         try {
             stagingApi.deleteBatch(batchId);
             final StagingBatchList listResponse = stagingApi.getBatches("delTest", "delTest", 10);
@@ -151,7 +151,7 @@ public class StagingServiceIT {
             FileUtils.copyInputStreamToFile(StagingServiceIT.class.getResourceAsStream("/" + file), documentFile);
             uploadData.add(new MultiPartDocument(documentFile));
         }
-        return stagingApi.addDocumentsToBatch("testBatch", uploadData.stream());
+        return stagingApi.createOrUpdateBatch("testBatch", uploadData.stream());
     }
 
     private StagingBatchResponse stageMultiPartStreams(final String batchId, final String[] contentFiles, final String[] documentFiles)
@@ -164,7 +164,7 @@ public class StagingServiceIT {
             uploadData.add(new MultiPartDocumentResource(file, StagingServiceIT.class.getResource("/" + file)));
         }
         try {
-            return stagingApi.addDocumentsToBatch(batchId, uploadData.stream());
+            return stagingApi.createOrUpdateBatch(batchId, uploadData.stream());
         } catch (final ApiException ex) {
             fail("stageMultiPartStreams failed : " + ex.getMessage()
                     + " response code : " + ex.getCode()
