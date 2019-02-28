@@ -91,8 +91,8 @@ paths:
     put:
       tags:
         - Staging
-      operationId: addDocumentsToBatch
-      summary: Add documents to a batch. The batch will be automatically created if it
+      operationId: createOrReplaceBatch
+      summary: Upload documents. The batch will be automatically created if it
         doesn't already exist.
       requestBody:
         content:
@@ -101,7 +101,7 @@ paths:
               type: object
       responses:
         "200":
-          description: Successfully added the documents to the batch.
+          description: Successfully uploaded batch of documents.
           content:
             application/json:
               schema:

@@ -60,7 +60,7 @@ public class StagingController implements StagingApi {
         this.request = request;
     }
 
-    public ResponseEntity<BatchResponse> addDocumentsToBatch(
+    public ResponseEntity<BatchResponse> createOrReplaceBatch(
             @Size(min=1) @ApiParam(value = "Identifies the batch.",required=true)
             @PathVariable("batchId") String batchId,
             Object body) {
