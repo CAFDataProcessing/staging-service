@@ -34,6 +34,7 @@ public final class JsonMinifier {
         while (parser.nextToken() != null) {
             gen.copyCurrentEvent(parser);
         }
+        gen.flush();
         outstream.write(System.lineSeparator().getBytes());
     }
 
