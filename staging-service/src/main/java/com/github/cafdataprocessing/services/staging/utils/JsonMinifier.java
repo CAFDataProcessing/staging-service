@@ -21,6 +21,7 @@ import java.io.OutputStream;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 
 public final class JsonMinifier {
@@ -29,13 +30,16 @@ public final class JsonMinifier {
     public static final void minifyJson(final InputStream inputStream, final OutputStream outstream) throws IOException
     {
         final JsonFactory factory = new JsonFactory();
+        factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
+        factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = factory.createParser(inputStream);
-        final JsonGenerator gen = factory.createGenerator(outstream);
-        while (parser.nextToken() != null) {
-            gen.copyCurrentEvent(parser);
+        try(final JsonGenerator gen = factory.createGenerator(outstream))
+        {
+            while (parser.nextToken() != null) {
+                gen.copyCurrentEvent(parser);
+            }
         }
-        gen.writeRaw(System.lineSeparator());
-        gen.flush();
+        outstream.write("\n".getBytes());
     }
 
 }
