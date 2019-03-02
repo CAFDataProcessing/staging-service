@@ -31,6 +31,10 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.squareup.okhttp</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
@@ -89,7 +93,7 @@
                             <apiPackage>com.github.cafdataprocessing.services.staging.client.internal</apiPackage>
                             <invokerPackage>com.github.cafdataprocessing.services.staging.client</invokerPackage>
                             <modelNamePrefix>Staging</modelNamePrefix>
-                            <!--<ignoreFileOverride>${project.basedir}/src/main/swagger-config/.swagger-codegen-ignore</ignoreFileOverride>-->
+                            <httpUserAgent>caf-staging-service-java-client/${project.version}</httpUserAgent><!-- does not work-->
                             <configOptions>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>${project.artifactId}</artifactId>

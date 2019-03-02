@@ -15,13 +15,10 @@
  */
 package com.github.cafdataprocessing.services.staging.client;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.Request;
@@ -38,10 +35,34 @@ import okio.Source;
  *
  */
 public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
+    private final String USER_AGENT_HEADER_NAME = "User-Agent";
+    private final String USER_AGENT_HEADER_VALUE = "caf-staging-service-java-client/1.0.0-SNAPSHOT";
     private final String PUT_API_PATH = "/batches/";
 
-    public StagingBatchResponse createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
-            throws ApiException, FileNotFoundException, IOException {
+    public StagingApi(final String basePath)
+    {
+        final ApiClient apiClient = getApiClient();
+        apiClient.setBasePath(basePath);
+        apiClient.setUserAgent(USER_AGENT_HEADER_VALUE);
+        /*apiClient.getHttpClient()
+                 .interceptors()
+                 .add(
+                     new Interceptor() {
+                        @Override
+                        public Response intercept(final Chain chain) throws IOException {
+                            final Request request = chain.request();
+                            final Request newRequest = request.newBuilder()
+                                    .header(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE)
+                                    .build();
+                            return chain.proceed(newRequest);
+                        }
+                    }
+                );*/
+        setApiClient(apiClient);
+    }
+
+    public void createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
+            throws ApiException {
         final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();
         while(uploadDataIterator.hasNext())
@@ -57,20 +78,20 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         final String apiPath = getApiClient().getBasePath() + PUT_API_PATH + batchId;
         final Request request = new Request.Builder()
                 .url(apiPath)
+                .header(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE)
                 .put(requestBody)
                 .build();
-        final Response response = getApiClient().getHttpClient().newCall(request).execute();
-        if (!response.isSuccessful())
-        {
-            throw new ApiException("Error uploading documents to batch: " + batchId,
-                                   response.code(),
-                                   null,
-                                   response.body().string());
-        }
-        else
-        {
-            final Type returnType = new TypeToken<StagingBatchResponse>(){}.getType();
-            return (StagingBatchResponse)getApiClient().handleResponse(response, returnType);
+        try {
+            final Response response = getApiClient().getHttpClient().newCall(request).execute();
+            if (!response.isSuccessful())
+            {
+                throw new ApiException("Error uploading documents to batch: " + batchId,
+                                           response.code(),
+                                           null,
+                                           response.body().string());
+            }
+        } catch (IOException e) {
+            throw new ApiException(e);
         }
     }
 

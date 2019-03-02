@@ -138,24 +138,24 @@ public class FileSystemDao implements BatchDao {
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
                 final String contentType = fileItemStream.getContentType();
-                final String normalizedFilename = Paths.get(filename).toFile().getName();
-
                 if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
                     subBatchWriter.writeDocumentFile(fileItemStream::openStream);
+                    fileNames.add(filename);
                 }
                 else
                 {
+                    final String normalizedFilename = Paths.get(filename).toFile().getName();
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
                     try(final InputStream inStream = fileItemStream.openStream()){
                         FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
                         LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
+                        fileNames.add(normalizedFilename);
                     }
                     catch(IOException ex){
                         throw new StagingException(ex);
                     }
                 }
-                fileNames.add(normalizedFilename);
             }
         }
         catch (IncompleteBatchException | InvalidBatchException | StagingException ex){

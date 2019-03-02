@@ -31,6 +31,7 @@ public class BatchPathProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchPathProvider.class);
     private static final String TIMESTAMP_FORMAT = "yyyyMMdd-HHmmssSSS";
     private static final String INPROGRESS_FOLDER = "in_progress";
+    public static final String COMPLETED_FOLDER = "completed";
 
     private Path basePath;
 
@@ -39,11 +40,11 @@ public class BatchPathProvider {
     }
 
     public Path getPathForBatches(){
-        return basePath;
+        return Paths.get(basePath.toString(), COMPLETED_FOLDER);
     }
 
     public Path getPathForBatch(final BatchId batchId){
-        return Paths.get(basePath.toString(), batchId.getValue());
+        return Paths.get(basePath.toString(), COMPLETED_FOLDER, batchId.getValue());
     }
 
     public Path getInProgressPathForBatch(final BatchId batchId) throws StagingException {

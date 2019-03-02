@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 
 public class FileSystemDaoTest {
@@ -69,6 +70,9 @@ public class FileSystemDaoTest {
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         assertTrue(files.contains(f2.getFieldName()));
+
+        //Cleanup
+        FileUtils.deleteDirectory(new File(directoryName));
     }
 
     @Test(expected = InvalidBatchIdException.class)
@@ -83,21 +87,23 @@ public class FileSystemDaoTest {
         final Integer limit = 10;
 
         final String directoryName = getTempBaseBatchDir();
+        final String completedDirectoryName = getCompletedBatchDir(directoryName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(directoryName + "/testBatch"));
-        Files.createDirectories(Paths.get(directoryName + "/abcBatch"));
-        final File f1 = new File(directoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(directoryName + "/testBatch/A_Christmas_Carol2.txt");
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
+        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
         final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
         //Cleanup
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(directoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName));
         Files.deleteIfExists(Paths.get(directoryName));
     }
 
@@ -107,21 +113,23 @@ public class FileSystemDaoTest {
         final String from = "best";
         final Integer limit = 10;
         final String directoryName = getTempBaseBatchDir();
+        final String completedDirectoryName = getCompletedBatchDir(directoryName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(directoryName + "/testBatch"));
-        Files.createDirectories(Paths.get(directoryName + "/abcBatch"));
-        final File f1 = new File(directoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(directoryName + "/testBatch/A_Christmas_Carol2.txt");
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
+        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
         final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
         //Cleanup
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(directoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName));
         Files.deleteIfExists(Paths.get(directoryName));
     }
 
@@ -131,31 +139,33 @@ public class FileSystemDaoTest {
         final String from = "testBatch8";
         final Integer limit = 10;
         final String directoryName = getTempBaseBatchDir();
+        final String completedDirectoryName = getCompletedBatchDir(directoryName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(directoryName + "/testBatch"));
-        Files.createDirectories(Paths.get(directoryName + "/testBatch6"));
-        Files.createDirectories(Paths.get(directoryName + "/testBatch7"));
-        Files.createDirectories(Paths.get(directoryName + "/testBatch8"));
-        Files.createDirectories(Paths.get(directoryName + "/testBatch9"));
-        Files.createDirectories(Paths.get(directoryName + "/testBatch10"));
-        Files.createDirectories(Paths.get(directoryName + "/abcBatch"));
-        final File f1 = new File(directoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(directoryName + "/testBatch/A_Christmas_Carol2.txt");
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch7"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch8"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch9"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
+        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
         final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
         //Cleanup
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch6"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch7"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch8"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch9"));
-        Files.deleteIfExists(Paths.get(directoryName + "/testBatch10"));
-        Files.deleteIfExists(Paths.get(directoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch7"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch8"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch9"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName));
         Files.deleteIfExists(Paths.get(directoryName));
     }
 
@@ -164,8 +174,9 @@ public class FileSystemDaoTest {
         final BatchId batchId = new BatchId("testBatch");
 
         final String directoryName = getTempBaseBatchDir();
-        Files.createDirectories(Paths.get(directoryName , "/testBatch"));
-        final File f1 = new File(directoryName + "/testBatch/test_Christmas_Carol1.txt");
+        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        Files.createDirectories(Paths.get(completedDirectoryName , "/testBatch"));
+        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
         FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
@@ -177,10 +188,17 @@ public class FileSystemDaoTest {
 
         final List<String> batchesAfterDelete = fsDao.getBatches(null, null, null);
         assertEquals(0, batchesAfterDelete.size());
+        //Cleanup
+        Files.deleteIfExists(Paths.get(completedDirectoryName));
+        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     private String getTempBaseBatchDir() throws Exception {
         return Files.createTempDirectory("batchBase").toString();
+    }
+
+    private String getCompletedBatchDir(final String baseDir) throws Exception {
+        return Files.createDirectories(Paths.get(baseDir , BatchPathProvider.COMPLETED_FOLDER)).toString();
     }
 
 }
