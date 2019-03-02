@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import com.github.cafdataprocessing.services.staging.client.ApiClient;
 import com.github.cafdataprocessing.services.staging.client.ApiException;
 import com.github.cafdataprocessing.services.staging.client.MultiPart;
 import com.github.cafdataprocessing.services.staging.client.MultiPartContent;
@@ -41,7 +42,10 @@ public class StagingServiceIT {
     private final StagingApi stagingApi;
 
     public StagingServiceIT() {
-        stagingApi = new StagingApi(STAGING_SERVICE_URI);
+        final ApiClient apiClient = new ApiClient();
+        apiClient.setBasePath(STAGING_SERVICE_URI);
+        stagingApi = new StagingApi();
+        stagingApi.setApiClient(apiClient);
     }
 
     @Test

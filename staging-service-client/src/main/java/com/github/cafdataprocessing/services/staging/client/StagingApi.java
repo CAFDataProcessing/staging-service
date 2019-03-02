@@ -16,7 +16,9 @@
 package com.github.cafdataprocessing.services.staging.client;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import com.squareup.okhttp.MediaType;
@@ -35,31 +37,7 @@ import okio.Source;
  *
  */
 public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
-    private final String USER_AGENT_HEADER_NAME = "User-Agent";
-    private final String USER_AGENT_HEADER_VALUE = "caf-staging-service-java-client/1.0.0-SNAPSHOT";
     private final String PUT_API_PATH = "/batches/";
-
-    public StagingApi(final String basePath)
-    {
-        final ApiClient apiClient = getApiClient();
-        apiClient.setBasePath(basePath);
-        apiClient.setUserAgent(USER_AGENT_HEADER_VALUE);
-        /*apiClient.getHttpClient()
-                 .interceptors()
-                 .add(
-                     new Interceptor() {
-                        @Override
-                        public Response intercept(final Chain chain) throws IOException {
-                            final Request request = chain.request();
-                            final Request newRequest = request.newBuilder()
-                                    .header(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE)
-                                    .build();
-                            return chain.proceed(newRequest);
-                        }
-                    }
-                );*/
-        setApiClient(apiClient);
-    }
 
     public void createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
             throws ApiException {
@@ -76,9 +54,11 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         }
         final RequestBody requestBody = mpBuilder.build();
         final String apiPath = getApiClient().getBasePath() + PUT_API_PATH + batchId;
-        final Request request = new Request.Builder()
+        final Map<String, String> emptyHeaders = new HashMap<>();
+        final Request.Builder reqBuilder = new Request.Builder();
+        getApiClient().processHeaderParams(emptyHeaders, reqBuilder);
+        final Request request = reqBuilder
                 .url(apiPath)
-                .header(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE)
                 .put(requestBody)
                 .build();
         try {
