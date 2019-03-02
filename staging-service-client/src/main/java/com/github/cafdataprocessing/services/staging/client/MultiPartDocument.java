@@ -17,21 +17,37 @@ package com.github.cafdataprocessing.services.staging.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 public class MultiPartDocument implements MultiPart{
+    private final String name;
+    private final InputStreamSupplier streamSupplier;
 
-    private final File inputFile;
+    public MultiPartDocument(final URL resourceURL)
+    {
+        this.name = generateName();
+        this.streamSupplier = resourceURL::openStream;
+    }
 
     public MultiPartDocument(final File inputFile)
     {
-        this.inputFile = inputFile;
+        this.name = generateName();
+        this.streamSupplier = () -> new FileInputStream(inputFile);
+    }
+
+    public MultiPartDocument(final InputStreamSupplier streamSupplier)
+    {
+        this.name = generateName();
+        this.streamSupplier = streamSupplier;
     }
 
     @Override
     public String getName() {
-        return inputFile.getName();
+        return name;
     }
 
     @Override
@@ -40,8 +56,12 @@ public class MultiPartDocument implements MultiPart{
     }
 
     @Override
-    public InputStream openInputStream() throws FileNotFoundException {
-        return new FileInputStream(inputFile);
+    public InputStream openInputStream() throws IOException {
+        return streamSupplier.get();
+    }
+
+    private String generateName() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 
 }

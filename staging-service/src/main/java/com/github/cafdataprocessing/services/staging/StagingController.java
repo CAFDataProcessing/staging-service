@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
-import com.github.cafdataprocessing.services.staging.models.BatchResponse;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
 
@@ -60,7 +59,7 @@ public class StagingController implements StagingApi {
         this.request = request;
     }
 
-    public ResponseEntity<BatchResponse> createOrReplaceBatch(
+    public ResponseEntity<Void> createOrReplaceBatch(
             @Size(min=1) @ApiParam(value = "Identifies the batch.",required=true)
             @PathVariable("batchId") String batchId,
             Object body) {
@@ -74,14 +73,11 @@ public class StagingController implements StagingApi {
             LOGGER.error("Error getting FileItemIterator", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-
-        final BatchResponse batch = new BatchResponse();
         try
         {
             final List<String> savedFiles = batchDao.saveFiles(new BatchId(batchId), fileItemIterator);
-            batch.entries(savedFiles);
-            LOGGER.debug("Staged batch: {}", batch);
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batch);
+            LOGGER.debug("Staged batch: {}, entries: {}", batchId, savedFiles);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         catch(final InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
             LOGGER.error("Error getting multipart files", ex);

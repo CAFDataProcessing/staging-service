@@ -102,10 +102,6 @@ paths:
       responses:
         "200":
           description: Successfully uploaded batch of documents.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BatchResponse"
         "400":
           description: The request could not be processed because one or more arguments are
             invalid.
@@ -133,17 +129,6 @@ components:
         message:
           type: string
           description: Detailed status message
-    BatchResponse:
-      title: BatchResponse
-      description: A list of documents that were staged
-      type: object
-      properties:
-        entries:
-          type: array
-          description: List of documents that were staged
-          items:
-            type: string
-            description: Details of documents that were staged
     BatchList:
       title: BatchList
       description: A list of batches identifiers ordered alphabetically

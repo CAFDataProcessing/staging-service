@@ -15,13 +15,12 @@
  */
 package com.github.cafdataprocessing.services.staging.client;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 public interface MultiPart {
     String getName();
     String getContentType();
-    InputStream openInputStream() throws FileNotFoundException, IOException;
+    InputStream openInputStream() throws IOException;
 
 }

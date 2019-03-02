@@ -15,13 +15,12 @@
  */
 package com.github.cafdataprocessing.services.staging.client;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.Request;
@@ -40,8 +39,8 @@ import okio.Source;
 public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
     private final String PUT_API_PATH = "/batches/";
 
-    public StagingBatchResponse createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
-            throws ApiException, FileNotFoundException, IOException {
+    public void createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
+            throws ApiException {
         final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();
         while(uploadDataIterator.hasNext())
@@ -55,22 +54,24 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         }
         final RequestBody requestBody = mpBuilder.build();
         final String apiPath = getApiClient().getBasePath() + PUT_API_PATH + batchId;
-        final Request request = new Request.Builder()
+        final Map<String, String> emptyHeaders = new HashMap<>();
+        final Request.Builder reqBuilder = new Request.Builder();
+        getApiClient().processHeaderParams(emptyHeaders, reqBuilder);
+        final Request request = reqBuilder
                 .url(apiPath)
                 .put(requestBody)
                 .build();
-        final Response response = getApiClient().getHttpClient().newCall(request).execute();
-        if (!response.isSuccessful())
-        {
-            throw new ApiException("Error uploading documents to batch: " + batchId,
-                                   response.code(),
-                                   null,
-                                   response.body().string());
-        }
-        else
-        {
-            final Type returnType = new TypeToken<StagingBatchResponse>(){}.getType();
-            return (StagingBatchResponse)getApiClient().handleResponse(response, returnType);
+        try {
+            final Response response = getApiClient().getHttpClient().newCall(request).execute();
+            if (!response.isSuccessful())
+            {
+                throw new ApiException("Error uploading documents to batch: " + batchId,
+                                           response.code(),
+                                           null,
+                                           response.body().string());
+            }
+        } catch (IOException e) {
+            throw new ApiException(e);
         }
     }
 

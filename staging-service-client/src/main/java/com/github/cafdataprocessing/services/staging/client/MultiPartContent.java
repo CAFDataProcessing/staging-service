@@ -15,19 +15,33 @@
  */
 package com.github.cafdataprocessing.services.staging.client;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class MultiPartContentResource implements MultiPart{
+public class MultiPartContent implements MultiPart{
 
     private final String name;
-    private final URL resourceURL;
+    private final InputStreamSupplier streamSupplier;
 
-    public MultiPartContentResource(final String name, final URL resourceURL)
+    public MultiPartContent(final String name, final URL resourceURL)
     {
         this.name = name;
-        this.resourceURL = resourceURL;
+        this.streamSupplier = resourceURL::openStream;
+    }
+
+    public MultiPartContent(final File inputFile)
+    {
+        this.name = inputFile.getName();
+        this.streamSupplier = () -> new FileInputStream(inputFile);
+    }
+
+    public MultiPartContent(final String name, final InputStreamSupplier streamSupplier)
+    {
+        this.name = name;
+        this.streamSupplier = streamSupplier;
     }
 
     @Override
@@ -42,7 +56,7 @@ public class MultiPartContentResource implements MultiPart{
 
     @Override
     public InputStream openInputStream() throws IOException {
-        return resourceURL.openStream();
+        return streamSupplier.get();
     }
 
 }
