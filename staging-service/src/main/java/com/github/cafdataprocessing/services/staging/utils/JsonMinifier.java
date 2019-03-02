@@ -39,7 +39,7 @@ public final class JsonMinifier {
                 gen.copyCurrentEvent(parser);
             }
         }
-        outstream.write("\n".getBytes());
+        outstream.write('\n');
     }
 
 }
