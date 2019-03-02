@@ -1,0 +1,221 @@
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="A_Christmas_Carol1.txt"
+Content-Type: application/octet-stream
+
+Marley was dead: to begin with. There is no doubt whatever about that. The register of his burial was signed by the clergyman, the clerk, the undertaker, and the chief mourner. Scrooge signed it: and Scrooge s name was good upon  Change, for anything he chose to put his hand to. Old Marley was as dead as a door-nail.
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="A_Christmas_Carol2.txt"
+Content-Type: application/octet-stream
+
+About Christmas
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch1.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "fav-book.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": {
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          },
+        "TITLE": "A Christmas Carol",
+        "AUTHOR": "Charles Dickens",
+        "PUB_DATE": "December 19, 1843",
+        "CONTENT": {
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          },
+        "SUMMARY": {
+            "data": "A_Christmas_Carol2.txt",
+            "encoding": "local_ref"
+          },
+        "PUBLISHER": [
+          "Chapman and Hall",
+          "Elliot Stock"
+        ]
+      }
+    }]
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch2.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "batch2.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    }
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch3.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "batch3.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": {
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          },
+        "TITLE": "A Christmas Carol",
+        "AUTHOR": "Charles Dickens",
+        "PUB_DATE": "December 19, 1843",
+        "CONTENT": {
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          },
+        "SUMMARY": {
+            "data": "A_Christmas_Carol2.txt",
+            "encoding": "local_ref"
+          },
+        "PUBLISHER": [
+          "Chapman and Hall",
+          "Elliot Stock"
+        ]
+      }
+    }]
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch4.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "batch4.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": {
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          },
+        "TITLE": "A Christmas Carol",
+        "AUTHOR": "Charles Dickens",
+        "PUB_DATE": "December 19, 1843",
+        "CONTENT": {
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          },
+        "SUMMARY": {
+            "data": "A_Christmas_Carol2.txt",
+            "encoding": "local_ref"
+          },
+        "PUBLISHER": [
+          "Chapman and Hall",
+          "Elliot Stock"
+        ]
+      }
+    }]
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch5.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "batch5.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": {
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          },
+        "TITLE": "A Christmas Carol",
+        "AUTHOR": "Charles Dickens",
+        "PUB_DATE": "December 19, 1843",
+        "CONTENT": {
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          },
+        "SUMMARY": {
+            "data": "A_Christmas_Carol2.txt",
+            "encoding": "local_ref"
+          },
+        "PUBLISHER": [
+          "Chapman and Hall",
+          "Elliot Stock"
+        ]
+      }
+    }]
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e
+Content-Disposition: form-data; name="batch6.json"
+Content-Type: application/document+json
+
+{
+  "document": {
+    "reference": "batch6.msg",
+    "fields": {
+      "FROM": "Mark Roberts",
+      "TO": "Gene Simmons",
+      "SUBJECT": "Favourite book",
+      "CONTENT": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": {
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          },
+        "TITLE": "A Christmas Carol",
+        "AUTHOR": "Charles Dickens",
+        "PUB_DATE": "December 19, 1843",
+        "CONTENT": {
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          },
+        "SUMMARY": {
+            "data": "A_Christmas_Carol2.txt",
+            "encoding": "local_ref"
+          },
+        "PUBLISHER": [
+          "Chapman and Hall",
+          "Elliot Stock"
+        ]
+      }
+    }]
+  }
+}
+--efb8369b-607b-4dcf-9f92-e6cd8244db1e--
