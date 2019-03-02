@@ -43,11 +43,11 @@ Delete specified batch.
         stagingApi = new StagingApi();
         stagingApi.setApiClient(apiClient);
         
-        //To get the status of the staging service
+        // To get the status of the staging service
         final StagingStatusResponse status = stagingApi.getStatus();
         System.out.println("Staging service status : " + status.getMessage());
         
-        //To upload a batch
+        // To upload a batch
         final String batchId = "testBatch";
         final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
         final String[] documentFiles = new String[]{"batch1.json", "batch2.json", "batch3.json", 
@@ -66,11 +66,11 @@ Delete specified batch.
                     + " response code : " + ex.getCode()
                     + " response body : " + ex.getResponseBody());
         }
-        //To list batches
+        // To list batches
         final StagingBatchList batches = stagingApi.getBatches("test", testBat, 10);
         System.out.println("Batch list : " + batches.getEntries());
         
-        //To delete a batch
+        // To delete a batch
         stagingApi.deleteBatch(batchId);
         
 ```
