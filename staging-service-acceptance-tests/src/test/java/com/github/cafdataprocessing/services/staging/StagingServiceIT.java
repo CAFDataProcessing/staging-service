@@ -91,7 +91,7 @@ public class StagingServiceIT {
     @Test
     public void uploadInvalidJSONToBatchTest() throws Exception {
         final String[] contentFiles = new String[]{};
-        final String[] documentFiles = new String[]{"not-json.json"};
+        final String[] documentFiles = new String[]{"not-json.notjson"};
         try{
             stageMultiParts("testBatchInvalidJSON", contentFiles, documentFiles);
             fail("Expected ApiException");
