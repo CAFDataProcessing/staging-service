@@ -17,6 +17,7 @@ package com.github.cafdataprocessing.services.staging.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -71,6 +73,36 @@ public class FileSystemDaoTest {
         assertTrue(files.contains(f1.getFieldName()));
         assertTrue(files.contains(f2.getFieldName()));
 
+        //Cleanup
+        FileUtils.deleteDirectory(new File(directoryName));
+    }
+
+    @Test
+    public void saveInvalidJsonTest() throws Exception {
+        final String directoryName = getTempBaseBatchDir();
+        final FileSystemDao fileSystemDao = new FileSystemDao(directoryName, 250);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        // Invalid json
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{\"abc\": \"lll\",}".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, false);
+        when(fileItemIterator.next()).thenReturn(f1);
+
+        try
+        {
+            fileSystemDao.saveFiles(batchId, fileItemIterator);
+            fail("Incorrectly uploaded invalid batch");
+        }
+        catch(final InvalidBatchException e)
+        {
+            assertTrue("Expected InvalidBatchException thrown", true);
+        }
         //Cleanup
         FileUtils.deleteDirectory(new File(directoryName));
     }
