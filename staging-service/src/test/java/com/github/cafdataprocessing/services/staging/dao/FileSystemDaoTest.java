@@ -170,6 +170,42 @@ public class FileSystemDaoTest {
     }
 
     @Test
+    public void getFilesPaginate() throws Exception {
+        final String directoryName = getTempBaseBatchDir();
+        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch/files"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6/files"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch7"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch8"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch9"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
+        final File f1 = new File(completedDirectoryName + "/testBatch/files/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt");
+        FileUtils.writeStringToFile(f1, "abc", "UTF8");
+        FileUtils.writeStringToFile(f2, "def", "UTF8");
+        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
+        final List<String> fileNames = fsDao.getBatches(null, null, 25);
+        assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
+        //Cleanup
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files/test_Christmas_Carol1.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6/files"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch7"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch8"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch9"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
+        Files.deleteIfExists(Paths.get(completedDirectoryName));
+        Files.deleteIfExists(Paths.get(directoryName));
+    }
+
+    @Test
     public void deleteFilesTest() throws Exception {
         final BatchId batchId = new BatchId("testBatch");
 

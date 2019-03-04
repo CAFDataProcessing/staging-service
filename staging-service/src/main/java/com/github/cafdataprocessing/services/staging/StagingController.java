@@ -124,7 +124,16 @@ public class StagingController implements StagingApi {
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         final BatchList batchList = new BatchList();
         try {
-            final List<String> batchFiles = batchDao.getBatches(startsWith, new BatchId(from), limit);
+            final BatchId fromBatchId;
+            if(from == null)
+            {
+                fromBatchId = null;
+            }
+            else
+            {
+                fromBatchId = new BatchId(from);
+            }
+            final List<String> batchFiles = batchDao.getBatches(startsWith, fromBatchId, limit);
             batchList.entries(batchFiles);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batchList);
         }

@@ -69,7 +69,7 @@ public class FileSystemDao implements BatchDao {
         }
         //Retrieve the current list of batches in alphabetical order
         try(final Stream<Path> pathStream =
-                    Files.walk(batchesPath, FileVisitOption.FOLLOW_LINKS).skip(1)){
+                    Files.walk(batchesPath, 1, FileVisitOption.FOLLOW_LINKS).skip(1)){
 
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
                     filter(File::isDirectory).map(File::getName);
