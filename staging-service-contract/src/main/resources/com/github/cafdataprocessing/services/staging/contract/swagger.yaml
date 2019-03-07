@@ -24,6 +24,15 @@ tags:
     description: Staging Files Operations
 paths:
   /status:
+    parameters:
+      - in: header
+        name: X-TENANT-ID
+        description: Identifies the tenant making the request.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+        required: true
     get:
       tags:
         - Staging
@@ -40,6 +49,14 @@ paths:
           description: The request failed due to an unexpected server error.
   /batches:
     parameters:
+      - in: header
+        name: X-TENANT-ID
+        description: Identifies the tenant making the request.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+        required: true
       - in: query
         name: startsWith
         description: Specifies the prefix for batch identifier to fetch batches whose
@@ -81,6 +98,14 @@ paths:
           description: The request failed due to an unexpected server error.
   "/batches/{batchId}":
     parameters:
+      - in: header
+        name: X-TENANT-ID
+        description: Identifies the tenant making the request.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+        required: true
       - in: path
         name: batchId
         description: Identifies the batch.

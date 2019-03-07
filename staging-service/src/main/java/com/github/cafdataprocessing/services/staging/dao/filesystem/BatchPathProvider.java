@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.slf4j.Logger;
@@ -39,15 +40,19 @@ public class BatchPathProvider {
         this.basePath = Paths.get(basePath);
     }
 
-    public Path getPathForBatches(){
-        return Paths.get(basePath.toString(), COMPLETED_FOLDER);
+    public Path getPathForTenant(final TenantId tenantId){
+        return Paths.get(basePath.toString(), tenantId.getValue());
     }
 
-    public Path getPathForBatch(final BatchId batchId){
-        return Paths.get(basePath.toString(), COMPLETED_FOLDER, batchId.getValue());
+    public Path getPathForBatches(final TenantId tenantId){
+        return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER);
     }
 
-    public Path getInProgressPathForBatch(final BatchId batchId) throws StagingException {
+    public Path getPathForBatch(final TenantId tenantId, final BatchId batchId){
+        return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue());
+    }
+
+    public Path getInProgressPathForBatch(final TenantId tenantId, final BatchId batchId) throws StagingException {
         /*
         - It will create a temporary folder for the batch to store files while the entire batch is being processed
         - It will open a subbatch file with the following naming pattern "YYYYMMDD-HHMMSS-xxx-json.batch"
@@ -67,7 +72,7 @@ public class BatchPathProvider {
                 .concat("-").concat(ServiceIdentifier.getServiceId())
                 .concat("-").concat(batchId.getValue());
 
-        final Path inProgressPath = Paths.get(basePath.toString(), INPROGRESS_FOLDER, inProgressBatchFolderName);
+        final Path inProgressPath = Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER, inProgressBatchFolderName);
         final File inProgressFile = inProgressPath.toFile();
 
         if (!inProgressFile.exists()) {

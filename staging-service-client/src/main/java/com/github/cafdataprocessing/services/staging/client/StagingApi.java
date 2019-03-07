@@ -37,9 +37,10 @@ import okio.Source;
  *
  */
 public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
+    private final String TENANT_HEADER_NAME = "X-TENANT-ID";
     private final String PUT_API_PATH = "/batches/";
 
-    public void createOrReplaceBatch(final String batchId, final Stream<MultiPart> uploadData)
+    public void createOrReplaceBatch(final String tenantId, final String batchId, final Stream<MultiPart> uploadData)
             throws ApiException {
         final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();
@@ -54,9 +55,10 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         }
         final RequestBody requestBody = mpBuilder.build();
         final String apiPath = getApiClient().getBasePath() + PUT_API_PATH + batchId;
-        final Map<String, String> emptyHeaders = new HashMap<>();
+        final Map<String, String> stagingHeaders = new HashMap<>();
+        stagingHeaders.put(TENANT_HEADER_NAME, tenantId);
         final Request.Builder reqBuilder = new Request.Builder();
-        getApiClient().processHeaderParams(emptyHeaders, reqBuilder);
+        getApiClient().processHeaderParams(stagingHeaders, reqBuilder);
         final Request request = reqBuilder
                 .url(apiPath)
                 .put(requestBody)
@@ -65,10 +67,10 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
             final Response response = getApiClient().getHttpClient().newCall(request).execute();
             if (!response.isSuccessful())
             {
-                throw new ApiException("Error uploading documents to batch: " + batchId,
+                throw new ApiException("Error uploading documents for tenant " + tenantId + " batch: " + batchId,
                                            response.code(),
                                            null,
-                                           response.body().string());
+                                           response.message());
             }
         } catch (IOException e) {
             throw new ApiException(e);

@@ -14,25 +14,29 @@ This project builds a Java library that can be used to make calls to the Staging
 
 The [integration tests](../staging-service-acceptance-tests) show how the staging-service-client can be used.
 
-#### getStatus() returns StagingStatusResponse
+#### getStatus(String tenantId) returns StagingStatusResponse
 Returns status information about the staging service. A client should use this to check that the service is functional before uploading a large batch.
+- **tenantId**: Tenant identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 
-#### createOrReplaceBatch(String batchId, Stream<MultiPart> uploadData)
+#### createOrReplaceBatch(String tenantId, String batchId, Stream<MultiPart> uploadData)
 Upload documents to a batch. The batch will be automatically created if it doesn't already exist.
 
+- **tenantId**: Tenant identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 - **batchId**: Batch identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 - **uploadData**: Stream of multiple document families and associated files
 
-#### getBatches(String startsWith, String from, Integer limit) returns StagingBatchList
+#### getBatches(String tenantId, String startsWith, String from, Integer limit) returns StagingBatchList
 Retrieve the current list of batches in alphabetical order.
 
+- **tenantId**: Tenant identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 - **startsWith**: Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.
 - **from**: Specifies the identifier to fetch batches that follow it alphabetically.
 - **limit**: Specifies the number of results to return (defaults to 25).
 
-#### deleteBatch(String batchId)
+#### deleteBatch(String tenantId, String batchId)
 Delete specified batch.
 
+- **tenantId**: Tenant identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 - **batchId**: Batch identifier (should match the following regex : "^[^\\\\/:*?\"|]+$")
 
 #### Sample code snippet
@@ -43,8 +47,10 @@ apiClient.setBasePath(stagingServiceURI);
 stagingApi = new StagingApi();
 stagingApi.setApiClient(apiClient);
 
+final String tenantId = "acme-com";
+
 // To get the status of the staging service
-final StagingStatusResponse status = stagingApi.getStatus();
+final StagingStatusResponse status = stagingApi.getStatus(tenantId);
 System.out.println("Staging service status : " + status.getMessage());
 
 // To upload a batch
@@ -60,17 +66,17 @@ for (final String file : documentFiles) {
     uploadData.add(new MultiPartDocument(getClass().getResource("/" + file)));
 }
 try {
-    stagingApi.createOrReplaceBatch(batchId, uploadData.stream());
+    stagingApi.createOrReplaceBatch(tenantId, batchId, uploadData.stream());
 } catch (final ApiException ex) {
     System.out.println("Upload batch failed : " + ex.getMessage()
             + " response code : " + ex.getCode()
             + " response body : " + ex.getResponseBody());
 }
 // To list batches
-final StagingBatchList batches = stagingApi.getBatches("test", testBat, 10);
+final StagingBatchList batches = stagingApi.getBatches(tenantId, "test", testBat, 10);
 System.out.println("Batch list : " + batches.getEntries());
 
 // To delete a batch
-stagingApi.deleteBatch(batchId);
+stagingApi.deleteBatch(tenantId, batchId);
         
 ```

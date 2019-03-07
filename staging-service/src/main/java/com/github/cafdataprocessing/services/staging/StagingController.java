@@ -34,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
@@ -60,6 +61,8 @@ public class StagingController implements StagingApi {
     }
 
     public ResponseEntity<Void> createOrReplaceBatch(
+            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
+            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
             @Size(min=1) @ApiParam(value = "Identifies the batch.",required=true)
             @PathVariable("batchId") String batchId,
             Object body) {
@@ -75,11 +78,11 @@ public class StagingController implements StagingApi {
         }
         try
         {
-            final List<String> savedFiles = batchDao.saveFiles(new BatchId(batchId), fileItemIterator);
+            final List<String> savedFiles = batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
             LOGGER.debug("Staged batch: {}, entries: {}", batchId, savedFiles);
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        catch(final InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
+        catch(final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
             LOGGER.error("Error getting multipart files", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
 
@@ -90,13 +93,19 @@ public class StagingController implements StagingApi {
     }
 
     public ResponseEntity<Void> deleteBatch(
+            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
+            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
             @Size(min=1)
             @ApiParam(value = "Identifies the batch.",required=true)
             @PathVariable("batchId") String batchId) {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
-            batchDao.deleteBatch(new BatchId(batchId));
+            batchDao.deleteBatch(new TenantId(X_TENANT_ID), new BatchId(batchId));
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (final InvalidTenantIdException ex) {
+            LOGGER.error("Invalid X-TENANT-ID ", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
         catch (final InvalidBatchIdException ex){
             LOGGER.error("Invalid batchId ", ex);
@@ -113,6 +122,8 @@ public class StagingController implements StagingApi {
     }
 
     public ResponseEntity<BatchList> getBatches(
+            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
+            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
             @Size(min=1,max=256)
             @ApiParam(value = "Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.")
             @Valid @RequestParam(value = "startsWith", required = false) String startsWith,
@@ -133,9 +144,13 @@ public class StagingController implements StagingApi {
             {
                 fromBatchId = new BatchId(from);
             }
-            final List<String> batchFiles = batchDao.getBatches(startsWith, fromBatchId, limit);
+            final List<String> batchFiles = batchDao.getBatches(new TenantId(X_TENANT_ID), startsWith, fromBatchId, limit);
             batchList.entries(batchFiles);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batchList);
+        }
+        catch (final InvalidTenantIdException ex) {
+            LOGGER.error("Invalid X-TENANT-ID ", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
         catch (final InvalidBatchIdException ex) {
             LOGGER.error("Invalid batchId ", ex);
@@ -148,7 +163,10 @@ public class StagingController implements StagingApi {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> getStatus() {
+    public ResponseEntity<StatusResponse> getStatus(
+            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
+            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID
+            ) {
         StatusResponse status = new StatusResponse();
         status.setMessage("Service available");
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);

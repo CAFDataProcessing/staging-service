@@ -23,18 +23,21 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +48,30 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDa
 public class FileSystemDaoTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemDaoTest.class);
+    private static final String BATCH_BASE_FOLDER = "batchBase";
+    private static String TEST_TENANT_ID = "12345";
+    private TenantId tenantId;
+    private String baseDirName;
+
+    @Before
+    public void setUp() throws Exception {
+        tenantId = new TenantId(TEST_TENANT_ID);
+        baseDirName = getTempBaseBatchDir();
+    }
+
+    @After
+    public void tearDown() throws IOException
+    {
+        final File baseDir = new File(baseDirName);
+        if(baseDir.exists()){
+            FileUtils.deleteDirectory(baseDir);
+        }
+    }
 
     @Test
     public void saveFilesTest() throws Exception {
-        final String directoryName = getTempBaseBatchDir();
-        final FileSystemDao fileSystemDao = new FileSystemDao(directoryName, 250);
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
@@ -68,19 +88,15 @@ public class FileSystemDaoTest {
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f1, f2);
 
-        final List<String> files = fileSystemDao.saveFiles(batchId, fileItemIterator);
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         assertTrue(files.contains(f2.getFieldName()));
-
-        //Cleanup
-        FileUtils.deleteDirectory(new File(directoryName));
     }
 
     @Test
     public void saveInvalidJsonTest() throws Exception {
-        final String directoryName = getTempBaseBatchDir();
-        final FileSystemDao fileSystemDao = new FileSystemDao(directoryName, 250);
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
         FileItemStream f1 = mock(FileItemStream.class);
@@ -96,20 +112,18 @@ public class FileSystemDaoTest {
 
         try
         {
-            fileSystemDao.saveFiles(batchId, fileItemIterator);
+            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("Incorrectly uploaded invalid batch");
         }
         catch(final InvalidBatchException e)
         {
             assertTrue("Expected InvalidBatchException thrown", true);
         }
-        //Cleanup
-        FileUtils.deleteDirectory(new File(directoryName));
     }
 
     @Test(expected = InvalidBatchIdException.class)
     public void putFilesInvalidBatchIdTest() throws Exception {
-        final BatchId batchId = new BatchId("../../MyBadBatchId");
+        new BatchId("../../MyBadBatchId");
     }
 
     @Test
@@ -118,8 +132,7 @@ public class FileSystemDaoTest {
         final String from = "test";
         final Integer limit = 10;
 
-        final String directoryName = getTempBaseBatchDir();
-        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId,baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
@@ -127,16 +140,10 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+
+        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
-        //Cleanup
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName));
-        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     @Test
@@ -144,8 +151,7 @@ public class FileSystemDaoTest {
         final String startsWith = "test"; 
         final String from = "best";
         final Integer limit = 10;
-        final String directoryName = getTempBaseBatchDir();
-        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
@@ -153,16 +159,9 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
-        //Cleanup
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName));
-        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     @Test
@@ -170,8 +169,7 @@ public class FileSystemDaoTest {
         final String startsWith = "test"; 
         final String from = "testBatch8";
         final Integer limit = 10;
-        final String directoryName = getTempBaseBatchDir();
-        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
@@ -184,27 +182,14 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(startsWith, new BatchId(from), limit);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
-        //Cleanup
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch7"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch8"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch9"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch10"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName));
-        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     @Test
     public void getFilesPaginate() throws Exception {
-        final String directoryName = getTempBaseBatchDir();
-        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch/files"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
@@ -218,55 +203,37 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> fileNames = fsDao.getBatches(null, null, 25);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        final List<String> fileNames = fsDao.getBatches(tenantId, null, null, 25);
         assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
-        //Cleanup
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files/test_Christmas_Carol1.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch/files"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6/files"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch6"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch7"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch8"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch9"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/testBatch10"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName + "/abcBatch"));
-        Files.deleteIfExists(Paths.get(completedDirectoryName));
-        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     @Test
     public void deleteFilesTest() throws Exception {
         final BatchId batchId = new BatchId("testBatch");
 
-        final String directoryName = getTempBaseBatchDir();
-        final String completedDirectoryName = getCompletedBatchDir(directoryName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(completedDirectoryName , "/testBatch"));
         final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
-        FileSystemDao fsDao = new FileSystemDao(directoryName, 250);
-        final List<String> batches = fsDao.getBatches(null, null, null);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        final List<String> batches = fsDao.getBatches(tenantId, null, null, null);
         assertEquals(1, batches.size());
         assertTrue(batches.contains(batchId.getValue()));
 
-        fsDao.deleteBatch(batchId);
+        fsDao.deleteBatch(tenantId, batchId);
 
-        final List<String> batchesAfterDelete = fsDao.getBatches(null, null, null);
+        final List<String> batchesAfterDelete = fsDao.getBatches(tenantId, null, null, null);
         assertEquals(0, batchesAfterDelete.size());
-        //Cleanup
-        Files.deleteIfExists(Paths.get(completedDirectoryName));
-        Files.deleteIfExists(Paths.get(directoryName));
     }
 
     private String getTempBaseBatchDir() throws Exception {
-        return Files.createTempDirectory("batchBase").toString();
+        return Files.createTempDirectory(BATCH_BASE_FOLDER).toString();
     }
 
-    private String getCompletedBatchDir(final String baseDir) throws Exception {
-        return Files.createDirectories(Paths.get(baseDir , BatchPathProvider.COMPLETED_FOLDER)).toString();
+    private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception {
+        return Files.createDirectories(Paths.get(baseDir , tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
     }
 
 }
