@@ -119,6 +119,41 @@ public class StagingServiceIT {
     }
 
     @Test
+    public void uploadDocumentsToMultipleTenantsTest() throws Exception {
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{"batch1.json"};
+
+        final String tenantId1 = "tenant1";
+        final String batchId1 = "t1-testBatch1";
+        // Upload 1 batch to tenant1
+        stageMultiParts(tenantId1, batchId1, contentFiles, documentFiles);
+
+        final String tenantId2 = "tenant2";
+        // Upload 3 batches to tenant2
+        final String batchId21 = "t2-testBatch21";
+        stageMultiParts(tenantId2, batchId21, contentFiles, documentFiles);
+        final String batchId22 = "t2-testBatch22";
+        stageMultiParts(tenantId2, batchId22, contentFiles, documentFiles);
+        final String batchId23 = "t2-testBatch23";
+        stageMultiParts(tenantId2, batchId23, contentFiles, documentFiles);
+
+        StagingBatchList response = stagingApi.getBatches(tenantId1, null, null, 10);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, 1 batch in tenant1", response.getEntries().size() == 1);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, found t1-testBatch1 in tenant1", response.getEntries().contains(batchId1));
+
+        response = stagingApi.getBatches(tenantId1, "t2", null, 10);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, no such batches in tenant1", response.getEntries().size() == 0);
+
+        response = stagingApi.getBatches(tenantId2, null, null, 10);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, 3 batches in tenant2", response.getEntries().size() == 3);
+
+        response = stagingApi.getBatches(tenantId2, "t2", "t2-testBatch22", 10);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, returning 2 batches in tenant2", response.getEntries().size() == 2);
+        assertTrue("uploadDocumentsToMultipleTenantsTest, found t2-testBatch22 in tenant2", response.getEntries().contains(batchId22));
+        assertTrue("uploadDocumentsToMultipleTenantsTest, found t2-testBatch23 in tenant2", response.getEntries().contains(batchId23));
+    }
+
+    @Test
     public void getBatchesTest() throws Exception {
         final String tenantId = "tenant-abcTestBatch";
         final String batchId = "abcTestBatch";
