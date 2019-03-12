@@ -1,4 +1,33 @@
-# Staging Service Operations
+# Staging Service
+
+## Configuration
+
+Configuration is achieved via environment variables.
+
+### General Service Configuration
+
+#### CAF_STAGING_SERVICE_BASEPATH
+The base folder where the batches will be staged. Defaults to /batches/.
+
+#### CAF_STAGING_SERVICE_SUBBATCH_SIZE
+The number of family documents to store in a single sub-batch file. Defaults to 250.
+
+#### CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD
+The minimum usable disk space in bytes that should be available to the service. Defaults to 536870912 (which is 512MB)
+
+### Logging Configuration
+
+#### CAF_LOG_LEVEL
+Default WARN. Controls the overall log level unless the package log level environment variable is set. 
+
+These environment variables can be set to control the logging from certain packages:
+#### CAF_STAGING_SERVICE_SPRING_LOG_LEVEL
+Default WARN. Controls log level for the org.springframework package.
+
+#### CAF_STAGING_SERVICE_LOG_LEVEL
+Default INFO. Controls log level for the com.github.cafdataprocessing.services.staging package.
+
+# Operations
 
 All the operations in this service require the tenant identifier to be set in the **X-TENANT-ID** header.
 

@@ -22,7 +22,6 @@ public class StagingProperties {
 
     private String basePath;
     private int subbatchSize;
-    private long diskSizeThresholdMb;
 
     public String getBasePath() {
         return basePath;
@@ -40,11 +39,4 @@ public class StagingProperties {
         this.subbatchSize = subbatchSize;
     }
 
-    public long getDiskSizeThresholdMb() {
-        return diskSizeThresholdMb;
-    }
-
-    public void setDiskSizeThresholdMb(int diskSizeThresholdMb) {
-        this.diskSizeThresholdMb = diskSizeThresholdMb;
-    }
 }
