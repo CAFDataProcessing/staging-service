@@ -38,5 +38,4 @@ public class StagingProperties {
     public void setSubbatchSize(int subbatchSize) {
         this.subbatchSize = subbatchSize;
     }
-
 }
