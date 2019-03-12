@@ -39,6 +39,7 @@ spring:
 staging:
     basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
     subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}
+    diskSizeThresholdMb: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD_MB:512}
 logging:
   level:
     ROOT: ${CAF_LOG_LEVEL:WARN}
