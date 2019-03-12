@@ -38,7 +38,7 @@ public class StagingHealth extends AbstractHealthIndicator {
                          @Value("${staging.diskSizeThresholdMb}") final Long threshold) {
         super("Staging disk space health check failed");
         this.path = path;
-        this.threshold = threshold;
+        this.threshold = threshold * 1024 * 1024;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class StagingHealth extends AbstractHealthIndicator {
         {
             final DiskInfo diskInfo = DiskSpaceChecker.getDiskInformation(this.path);
             final long diskFreeInBytes = diskInfo.getUsableSpace();
-            final long thresholdInBytes = this.threshold * 1024 * 1024;
+            final long thresholdInBytes = this.threshold;
             if (diskFreeInBytes >= thresholdInBytes) {
                 builder.up();
             }
@@ -67,9 +67,9 @@ public class StagingHealth extends AbstractHealthIndicator {
             LOGGER.warn(String.format("Staging path not found: %s", this.path));
             //TODO: Should the staging base folder be created when the service starts up?
             builder.up();
-            builder.withDetail(path + ": total space", "unknown")
-               .withDetail(path + ": free space", "unknown")
-               .withDetail("threshold (Mb):", this.threshold);
+            builder.withDetail(path + " total space", "unknown")
+               .withDetail(path + " free space", "unknown")
+               .withDetail("threshold", this.threshold);
         }
     }
   }
