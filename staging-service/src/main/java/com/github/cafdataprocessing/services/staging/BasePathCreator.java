@@ -21,27 +21,20 @@ import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationPreparedEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StartupListener implements ApplicationListener<ApplicationPreparedEvent> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StartupListener.class);
-    final String basePath;
+public class BasePathCreator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePathCreator.class);
 
-    public StartupListener(final StagingProperties stagingProperties)
-    {
-        basePath = stagingProperties.getBasePath();
+    @Autowired
+    public BasePathCreator(final StagingProperties stagingProperties){
+        createFolder(stagingProperties.getBasePath());
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationPreparedEvent event) {
-        createFolder();
-    }
-
-    private void createFolder() {
-        final Path baseStagingPath = Paths.get(basePath.toString());
+    private void createFolder(final String path) {
+        final Path baseStagingPath = Paths.get(path);
         final File batchesFile = baseStagingPath.toFile();
         if (!batchesFile.exists()) {
             LOGGER.debug("Creating base staging folder: {}...", baseStagingPath);
