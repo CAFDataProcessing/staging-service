@@ -28,15 +28,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartupListener implements ApplicationListener<ApplicationPreparedEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartupListener.class);
+    final String basePath;
+
+    public StartupListener(final StagingProperties stagingProperties)
+    {
+        basePath = stagingProperties.getBasePath();
+    }
 
     @Override
     public void onApplicationEvent(ApplicationPreparedEvent event) {
-        final String basePath = event.getApplicationContext().getEnvironment().getProperty("staging.basePath");
-        createFolder(basePath);
+        createFolder();
     }
 
-    private void createFolder(final String path) {
-        final Path baseStagingPath = Paths.get(path.toString());
+    private void createFolder() {
+        final Path baseStagingPath = Paths.get(basePath.toString());
         final File batchesFile = baseStagingPath.toFile();
         if (!batchesFile.exists()) {
             LOGGER.debug("Creating base staging folder: {}...", baseStagingPath);
