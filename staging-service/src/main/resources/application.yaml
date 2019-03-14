@@ -32,6 +32,10 @@ management:
       show-details: ALWAYS
     info:
       enabled: false
+  health:
+    diskspace:
+      path: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
+      threshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:536870912}
 spring:
   servlet:
     multipart:

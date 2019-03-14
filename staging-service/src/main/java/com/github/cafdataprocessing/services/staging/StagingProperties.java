@@ -15,7 +15,6 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "staging")
