@@ -15,6 +15,9 @@ The number of family documents to store in a single sub-batch file. Defaults to 
 #### CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD
 The minimum usable disk space in bytes that should be available to the service. Defaults to 536870912 (which is 512MB)
 
+#### CAF_STAGING_SERVICE_STORAGEPATH
+The base storage folder where the content files will be staged. Defaults to /etc/store/batches/.
+
 ### Logging Configuration
 
 #### CAF_LOG_LEVEL

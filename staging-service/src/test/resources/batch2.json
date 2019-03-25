@@ -1,0 +1,29 @@
+{
+    "document": {
+        "reference": "300",
+        "fields": {
+            "TENANT": [{
+                    "data": "acmeEntity-com"
+                }],
+            "reference": [{
+                    "data": "300"
+                }],
+            "ID": [{
+                    "data": "300"
+                }],
+            "ROOT_ID": [{
+                    "data": "300"
+                }],
+            "REPOSITORY_TYPE": [{
+                    "data": "FILESYSTEM"
+                }],
+            "LANGUAGE_CODES": [{
+                    "data": "{\"CODE\":\"en\",\"CONFIDENCE\":97}",
+                    "encoding": "utf-8"
+                }, {
+                    "data": "{\"CODE\":\"fr\",\"CONFIDENCE\":3}"
+                }]
+        }
+    },
+    "changeLog": []
+}

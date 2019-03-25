@@ -43,6 +43,7 @@ spring:
 staging:
     basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
     subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}
+    storagePath: ${CAF_STAGING_SERVICE_STORAGEPATH:/etc/store/batches/}
 logging:
   level:
     ROOT: ${CAF_LOG_LEVEL:WARN}

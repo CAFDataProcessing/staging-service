@@ -51,10 +51,12 @@ public class FileSystemDao implements BatchDao {
 
     private final BatchPathProvider batchPathProvider;
     private final int subbatchSize;
+    private final String storagePath;
 
-    public FileSystemDao(final String basePath, final int subbatchSize) {
+    public FileSystemDao(final String basePath, final int subbatchSize, final String storagePath) {
         batchPathProvider = new BatchPathProvider(basePath);
         this.subbatchSize = subbatchSize;
+        this.storagePath = storagePath;
     }
 
     @Override
@@ -116,6 +118,7 @@ public class FileSystemDao implements BatchDao {
             throws StagingException, InvalidBatchException, IncompleteBatchException {
 
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
+        final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
@@ -144,7 +147,7 @@ public class FileSystemDao implements BatchDao {
                 final String contentType = fileItemStream.getContentType();
                 if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
-                    subBatchWriter.writeDocumentFile(fileItemStream::openStream);
+                    subBatchWriter.writeDocumentFile(fileItemStream::openStream, storageRefFolderPath.toString());
                     fileNames.add(filename);
                 }
                 else

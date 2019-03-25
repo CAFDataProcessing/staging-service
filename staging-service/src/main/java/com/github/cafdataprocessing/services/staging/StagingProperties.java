@@ -22,6 +22,7 @@ public class StagingProperties {
 
     private String basePath;
     private int subbatchSize;
+    private String storagePath;
 
     public String getBasePath() {
         return basePath;
@@ -37,5 +38,13 @@ public class StagingProperties {
 
     public void setSubbatchSize(int subbatchSize) {
         this.subbatchSize = subbatchSize;
+    }
+
+    public String getStoragePath() {
+        return storagePath;
+    }
+
+    public void setStoragePath(String storagePath) {
+        this.storagePath = storagePath;
     }
 }
