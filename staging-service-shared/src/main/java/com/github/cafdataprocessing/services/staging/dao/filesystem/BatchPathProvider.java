@@ -89,4 +89,10 @@ public class BatchPathProvider {
         }
         return inProgressPath;
     }
+
+    public Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
+            final String contentFolder)
+    {
+        return Paths.get(storePath, tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue(), contentFolder);
+    }
 }

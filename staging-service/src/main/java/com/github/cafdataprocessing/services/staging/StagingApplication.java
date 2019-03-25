@@ -100,7 +100,7 @@ public class StagingApplication implements WebMvcConfigurer {
     @Bean
     public BatchDao fileSystemDao(final StagingProperties stagingProperties)
     {
-        return new FileSystemDao(stagingProperties.getBasePath(), stagingProperties.getSubbatchSize());
+        return new FileSystemDao(stagingProperties.getBasePath(), stagingProperties.getSubbatchSize(), stagingProperties.getStoragePath());
     }
 
     @Override

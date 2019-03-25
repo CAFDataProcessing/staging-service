@@ -52,6 +52,7 @@ public class FileSystemDaoTest {
     private static String TEST_TENANT_ID = "12345";
     private TenantId tenantId;
     private String baseDirName;
+    private String storageDirName;
 
     @Before
     public void setUp() throws Exception {
@@ -70,7 +71,7 @@ public class FileSystemDaoTest {
 
     @Test
     public void saveFilesTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250);
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -96,7 +97,7 @@ public class FileSystemDaoTest {
 
     @Test
     public void saveInvalidJsonTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250);
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
         FileItemStream f1 = mock(FileItemStream.class);
@@ -140,7 +141,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName);
 
         final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
@@ -159,7 +160,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
     }
@@ -182,7 +183,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
     }
@@ -203,7 +204,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final List<String> fileNames = fsDao.getBatches(tenantId, null, null, 25);
         assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
     }
@@ -217,7 +218,7 @@ public class FileSystemDaoTest {
         final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250);
+        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName);
         final List<String> batches = fsDao.getBatches(tenantId, null, null, null);
         assertEquals(1, batches.size());
         assertTrue(batches.contains(batchId.getValue()));
