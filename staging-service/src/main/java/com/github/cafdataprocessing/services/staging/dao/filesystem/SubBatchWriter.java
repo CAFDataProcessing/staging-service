@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
+import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 
 /*
  * This class handles the sub-batching and storing of documents.
@@ -92,10 +93,11 @@ public class SubBatchWriter implements AutoCloseable {
 
         try(final InputStream inStream = inputStreamSupplier.get()){
             try {
-                JsonMinifier.minifyJson(inStream, outStream, storageRefFolderPath);
+                JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath);
                 count++;
             }
-            catch (IOException ex){
+            catch (IOException | InvalidDocumentException ex){
+                LOGGER.error("Error staging document", ex);
                 throw new InvalidBatchException(ex);
             }
         }

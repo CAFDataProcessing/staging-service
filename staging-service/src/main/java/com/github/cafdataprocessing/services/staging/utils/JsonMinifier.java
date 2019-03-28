@@ -19,17 +19,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
+import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
+import com.worldturner.medeia.api.ValidationFailedException;
 
 public final class JsonMinifier {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonMinifier.class);
 
     private static final String DATA_FIELD = "data";
     private static final String ENCODING_FIELD = "encoding";
@@ -38,97 +37,118 @@ public final class JsonMinifier {
 
     private JsonMinifier(){}
 
+    public static final void validateAndMinifyJson(final InputStream inputStream, final OutputStream outstream, final String storageRefPath)
+            throws IOException, InvalidDocumentException
+    {
+        final JsonFactory factory = new JsonFactory();
+        factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
+        factory.configure(Feature.AUTO_CLOSE_TARGET, false);
+        final JsonParser parser = DocumentValidator.getValidatingParser(inputStream);
+        try(final JsonGenerator gen = factory.createGenerator(outstream))
+        {
+            try
+            {
+                processJsonTokens(parser, gen, storageRefPath);
+            }
+            catch(final ValidationFailedException e)
+            {
+                throw new InvalidDocumentException(e);
+            }
+        }
+        outstream.write('\n');
+    }
+
     public static final void minifyJson(final InputStream inputStream, final OutputStream outstream, final String storageRefPath) throws IOException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = factory.createParser(inputStream);
-        String dataBuffer = null;
-        String encodingBuffer = null;
-        JsonToken token;
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
-            boolean pauseWriting = false;
-            boolean bufferData = false;
-            boolean bufferEncoding = false;
-            boolean updateReference = false;
-
-            while ((token = parser.nextToken()) != null) {
-                switch (token) {
-                    case FIELD_NAME:
-                        LOGGER.trace("Read FIELD_NAME...");
-                        // Pause writing and start buffering if the 'data' or 'encoding' fields are encountered
-                        if (parser.getText().equalsIgnoreCase(DATA_FIELD)) {
-                            pauseWriting = true;
-                            bufferData = true;
-                            bufferEncoding = false;
-                        } else if (parser.getText().equalsIgnoreCase(ENCODING_FIELD)) {
-                            pauseWriting = true;
-                            bufferEncoding = true;
-                            bufferData = false;
-                        } else {
-                            bufferData = false;
-                            bufferEncoding = false;
-                            pauseWriting = false;
-                        }
-                        break;
-                    case VALUE_FALSE:
-                    case VALUE_NULL:
-                    case VALUE_NUMBER_FLOAT:
-                    case VALUE_NUMBER_INT:
-                    case VALUE_STRING:
-                    case VALUE_TRUE:
-                        LOGGER.trace("Read VALUE...");
-                        // Buffer data or encoding field values
-                        if (bufferData) {
-                            dataBuffer = parser.getText();
-                        }
-                        if (bufferEncoding) {
-                            encodingBuffer = parser.getText();
-                            if (encodingBuffer.equalsIgnoreCase(LOCAL_REF)) {
-                                encodingBuffer = STORAGE_REF;
-                                updateReference = true;
-                            } else {
-                                updateReference = false;
-                            }
-                        }
-                        break;
-                    case END_OBJECT:
-                        LOGGER.trace("Read END_OBJECT...");
-                        // If writing was paused, update buffered data/encoding
-                        // values and write them out
-                        if (pauseWriting) {
-                            if (updateReference) {
-                                dataBuffer = storageRefPath + "/" + dataBuffer;
-                            }
-                            gen.writeFieldName(DATA_FIELD);
-                            gen.writeString(dataBuffer);
-                            if (encodingBuffer != null) {
-                                gen.writeFieldName(ENCODING_FIELD);
-                                gen.writeString(encodingBuffer);
-                            }
-                            // clear the buffers
-                            dataBuffer = null;
-                            encodingBuffer = null;
-                        }
-                        pauseWriting = false;
-                        break;
-                    case START_OBJECT:
-                    case START_ARRAY:
-                    case END_ARRAY:
-                    case NOT_AVAILABLE:
-                    case VALUE_EMBEDDED_OBJECT:
-                    default:
-                        break;
-                }
-                LOGGER.trace(parser.getText());
-                if (!pauseWriting) {
-                    gen.copyCurrentEvent(parser);
-                }
-            }
+            processJsonTokens(parser, gen, storageRefPath);
         }
         outstream.write('\n');
     }
 
+    private static void processJsonTokens(final JsonParser parser, final JsonGenerator gen, final String storageRefPath) throws IOException {
+        String dataBuffer = null;
+        String encodingBuffer = null;
+        JsonToken token;
+        boolean pauseWriting = false;
+        boolean bufferData = false;
+        boolean bufferEncoding = false;
+        boolean updateReference = false;
+        while ((token = parser.nextToken()) != null) {
+            switch (token) {
+                case FIELD_NAME:
+                    // Pause writing and start buffering if the 'data' or 'encoding' fields are encountered
+                    if (parser.getText().equalsIgnoreCase(DATA_FIELD)) {
+                        pauseWriting = true;
+                        bufferData = true;
+                        bufferEncoding = false;
+                    } else if (parser.getText().equalsIgnoreCase(ENCODING_FIELD)) {
+                        pauseWriting = true;
+                        bufferEncoding = true;
+                        bufferData = false;
+                    } else {
+                        bufferData = false;
+                        bufferEncoding = false;
+                        pauseWriting = false;
+                    }
+                    break;
+                case VALUE_FALSE:
+                case VALUE_NULL:
+                case VALUE_NUMBER_FLOAT:
+                case VALUE_NUMBER_INT:
+                case VALUE_STRING:
+                case VALUE_TRUE:
+                    // Buffer data or encoding field values
+                    if (bufferData) {
+                        dataBuffer = parser.getText();
+                    }
+                    if (bufferEncoding) {
+                        encodingBuffer = parser.getText();
+                        if (encodingBuffer.equalsIgnoreCase(LOCAL_REF)) {
+                            encodingBuffer = STORAGE_REF;
+                            updateReference = true;
+                        } else {
+                            updateReference = false;
+                        }
+                    }
+                    break;
+                case END_OBJECT:
+                    // If writing was paused, update buffered data/encoding
+                    // values and write them out
+                    if (pauseWriting) {
+                        if (updateReference) {
+                            dataBuffer = storageRefPath + "/" + dataBuffer;
+                        }
+                        gen.writeFieldName(DATA_FIELD);
+                        gen.writeString(dataBuffer);
+                        if (encodingBuffer != null) {
+                            gen.writeFieldName(ENCODING_FIELD);
+                            gen.writeString(encodingBuffer);
+                        }
+                        // clear the buffers
+                        dataBuffer = null;
+                        encodingBuffer = null;
+                    }
+                    // reset checks
+                    updateReference = false;
+                    pauseWriting = false;
+                    break;
+                case START_OBJECT:
+                case START_ARRAY:
+                case END_ARRAY:
+                case NOT_AVAILABLE:
+                case VALUE_EMBEDDED_OBJECT:
+                default:
+                    break;
+            }
+            if (!pauseWriting) {
+                gen.copyCurrentEvent(parser);
+            }
+        }
+    }
 }
