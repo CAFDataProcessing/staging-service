@@ -134,6 +134,8 @@ public final class JsonMinifier {
                         dataBuffer = null;
                         encodingBuffer = null;
                     }
+                    // reset checks
+                    updateReference = false;
                     pauseWriting = false;
                     break;
                 case START_OBJECT:

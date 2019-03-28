@@ -444,4 +444,55 @@ public final class JsonMinifierTest {
         System.out.println("validateAndMinifyNestedDocJsonTest : Minified Json : " + minifiedJson);
         assertTrue("validateAndMinifyNestedDocJsonTest", minifiedJson.contains("subdocuments"));
     }
+
+    @Test
+    public void validateAndMinifyNoRefMultiValueJsonTest() throws Exception {
+        System.out.println("validateAndMinifyNoRefMultiValueJsonTest...");
+        String testJson =
+            "{"
+        + "    'document': {"
+        + "      'reference': 'batch2.msg',"
+        + "      'fields': {"
+        + "        'FROM': [{'data': 'Mark Roberts'}],"
+        + "        'TO': [{'data': 'Gene Simmons'}],"
+        + "        'SUBJECT': [{'data': 'Favourite book'}],"
+        + "        'CONTENT': [{'data': 'This is the book that popularised the use of the phrase Merry Christmas.'}],"
+        + "        'PUBLISHER': [{'data': 'Chapman and Hall'}, {'data': 'Elliot Stock'}]"
+        + "      }"
+        + "    }"
+        + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files");
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("validateAndMinifyNoRefMultiValueJsonTest : Minified Json : " + minifiedJson);
+        assertTrue("validateAndMinifyNoRefMultiValueJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+    }
+
+    @Test
+    public void validateAndMinifyLocalRefMultiValueJsonTest() throws Exception {
+        System.out.println("validateAndMinifyLocalRefMultiValueJsonTest...");
+        String testJson =
+            "{"
+        + "    'document': {"
+        + "      'reference': 'batch2.msg',"
+        + "      'fields': {"
+        + "        'FROM': [{'data': 'Mark Roberts'}],"
+        + "        'TO': [{'data': 'Gene Simmons'}],"
+        + "        'SUBJECT': [{'data': 'Favourite book'}],"
+        + "        'CONTENT': [{'data': 'This is the book that popularised the use of the phrase Merry Christmas.'}],"
+        + "        'SUMMARY': [{'data': 'A_Christmas_Carol2.txt', 'encoding': 'local_ref'}],"
+        + "        'PUBLISHER': [{'data': 'Chapman and Hall'}, {'data': 'Elliot Stock'}]"
+        + "      }"
+        + "    }"
+        + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files");
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("validateAndMinifyLocalRefMultiValueJsonTest : Minified Json : " + minifiedJson);
+        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+    }
 }
