@@ -493,6 +493,7 @@ public final class JsonMinifierTest {
         JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files");
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyLocalRefMultiValueJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", minifiedJson.contains("\"PUBLISHER\":[{\"data\":\"Chapman and Hall\"}"));
     }
 }
