@@ -133,6 +133,14 @@
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.cafdataprocessing</groupId>
+            <artifactId>worker-document-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.worldturner.medeia</groupId>
+            <artifactId>medeia-validator-core</artifactId>
+        </dependency>
         <!--Test dependencies-->
         <dependency>
             <groupId>junit</groupId>
