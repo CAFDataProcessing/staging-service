@@ -367,7 +367,7 @@
                         <!-- Assemble the config files from the test-configs folder to an image in /config on the host. -->
                         <image>
                             <alias>config</alias>
-                            <name>${dockerImagePrefix}${project.artifactId}-test-config:${project.version}</name>
+                            <name>${project.artifactId}-test-config:${project.version}</name>
                             <build>
                                 <assembly>
                                     <basedir>/config</basedir>
@@ -384,9 +384,6 @@
                                     </inline>
                                 </assembly>
                             </build>
-                            <run>
-                                <containerNamePattern>%a</containerNamePattern>
-                            </run>
                         </image>
                         <!-- Job Service and DB -->
                         <image>
