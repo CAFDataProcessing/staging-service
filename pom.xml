@@ -256,18 +256,6 @@
                 <artifactId>swagger-ui-dist</artifactId>
                 <version>3.20.6</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.jobservice</groupId>
-                <artifactId>worker-batch-framework</artifactId>
-                <version>${caf.worker-batch-framework.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-document-shared</artifactId>
-                <version>4.1.0-292</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
