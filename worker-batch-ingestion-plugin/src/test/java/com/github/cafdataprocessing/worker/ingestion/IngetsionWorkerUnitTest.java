@@ -16,7 +16,7 @@
 package com.github.cafdataprocessing.worker.ingestion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hpe.caf.messagebuilder.TaskMessage;
+import com.hpe.aspen.batch.messagebuilder.TaskMessage;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
