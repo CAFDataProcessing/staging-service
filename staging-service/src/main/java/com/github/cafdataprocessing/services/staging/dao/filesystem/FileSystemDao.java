@@ -52,11 +52,14 @@ public class FileSystemDao implements BatchDao {
     private final BatchPathProvider batchPathProvider;
     private final int subbatchSize;
     private final String storagePath;
+    private final int fieldValueSizeThreshold;
 
-    public FileSystemDao(final String basePath, final int subbatchSize, final String storagePath) {
+    public FileSystemDao(final String basePath, final int subbatchSize,
+                         final String storagePath, final int fieldValueSizeThreshold) {
         batchPathProvider = new BatchPathProvider(basePath);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
+        this.fieldValueSizeThreshold = fieldValueSizeThreshold;
     }
 
     @Override
@@ -147,7 +150,10 @@ public class FileSystemDao implements BatchDao {
                 final String contentType = fileItemStream.getContentType();
                 if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
-                    subBatchWriter.writeDocumentFile(fileItemStream::openStream, storageRefFolderPath.toString());
+                    subBatchWriter.writeDocumentFile(fileItemStream::openStream,
+                                                     storageRefFolderPath.toString(),
+                                                     Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                                     fieldValueSizeThreshold);
                     fileNames.add(filename);
                 }
                 else

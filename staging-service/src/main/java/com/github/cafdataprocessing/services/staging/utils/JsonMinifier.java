@@ -18,6 +18,13 @@ package com.github.cafdataprocessing.services.staging.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -34,10 +41,18 @@ public final class JsonMinifier {
     private static final String ENCODING_FIELD = "encoding";
     private static final String LOCAL_REF = "local_ref";
     private static final String STORAGE_REF = "storage_ref";
+    private static final String UTF8_ENCODING = "utf8";
+    private static final String BASE64_ENCODING = "base64";
+    private static final String TXT_ENTENSION = ".txt";
+    private static final String BINARY_ENTENSION = ".bin";
 
     private JsonMinifier(){}
 
-    public static final void validateAndMinifyJson(final InputStream inputStream, final OutputStream outstream, final String storageRefPath)
+    public static final void validateAndMinifyJson(final InputStream inputStream,
+                                                   final OutputStream outstream,
+                                                   final String storageRefPath,
+                                                   final String inprogressContentFolderPath,
+                                                   final int fieldValueSizeThreshold)
             throws IOException, InvalidDocumentException
     {
         final JsonFactory factory = new JsonFactory();
@@ -48,7 +63,7 @@ public final class JsonMinifier {
         {
             try
             {
-                processJsonTokens(parser, gen, storageRefPath);
+                processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
             }
             catch(final ValidationFailedException e)
             {
@@ -58,7 +73,11 @@ public final class JsonMinifier {
         outstream.write('\n');
     }
 
-    public static final void minifyJson(final InputStream inputStream, final OutputStream outstream, final String storageRefPath) throws IOException
+    public static final void minifyJson(final InputStream inputStream,
+                                        final OutputStream outstream,
+                                        final String storageRefPath,
+                                        final String inprogressContentFolderPath,
+                                        final int fieldValueSizeThreshold) throws IOException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
@@ -66,12 +85,16 @@ public final class JsonMinifier {
         final JsonParser parser = factory.createParser(inputStream);
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
-            processJsonTokens(parser, gen, storageRefPath);
+            processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
         }
         outstream.write('\n');
     }
 
-    private static void processJsonTokens(final JsonParser parser, final JsonGenerator gen, final String storageRefPath) throws IOException {
+    private static void processJsonTokens(final JsonParser parser,
+                                          final JsonGenerator gen,
+                                          final String storageRefPath,
+                                          final String inprogressContentFolderPath,
+                                          final int fieldValueSizeThreshold) throws IOException {
         String dataBuffer = null;
         String encodingBuffer = null;
         JsonToken token;
@@ -121,6 +144,16 @@ public final class JsonMinifier {
                     // If writing was paused, update buffered data/encoding
                     // values and write them out
                     if (pauseWriting) {
+                        // check size of data field value
+                        if(dataBuffer.getBytes().length > fieldValueSizeThreshold)
+                        {
+                            // write it out to a loose file
+                            final String fileName = RandomStringUtils.randomAlphanumeric(10);
+                            final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);
+                            dataBuffer = contentFileName;
+                            encodingBuffer = STORAGE_REF;
+                            updateReference = true;
+                        }
                         if (updateReference) {
                             dataBuffer = storageRefPath + "/" + dataBuffer;
                         }
@@ -150,5 +183,24 @@ public final class JsonMinifier {
                 gen.copyCurrentEvent(parser);
             }
         }
+    }
+
+    private static String writeDataToFile(final String data, final String fileName,
+                                        final String inprogressContentFolderPath, final String encoding) throws IOException {
+        String contentFileName = fileName;
+        if (encoding == null || encoding.equalsIgnoreCase(UTF8_ENCODING)) {
+            contentFileName = fileName + TXT_ENTENSION;
+            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            FileUtils.writeStringToFile(targetFile.toFile(), data, StandardCharsets.UTF_8);
+        }
+        else if (encoding.equalsIgnoreCase(BASE64_ENCODING))
+        {
+            contentFileName = fileName + BINARY_ENTENSION;
+            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            // If encoding is base64, write file after base64 decoding the data
+            final byte[] decodedData = Base64.decodeBase64(data);
+            FileUtils.writeByteArrayToFile(targetFile.toFile(), decodedData);
+        }
+        return contentFileName;
     }
 }

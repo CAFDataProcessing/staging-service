@@ -23,6 +23,7 @@ public class StagingProperties {
     private String basePath;
     private int subbatchSize;
     private String storagePath;
+    private int fieldValueSizeThreshold;
 
     public String getBasePath() {
         return basePath;
@@ -46,5 +47,13 @@ public class StagingProperties {
 
     public void setStoragePath(String storagePath) {
         this.storagePath = storagePath;
+    }
+
+    public int getFieldValueSizeThreshold() {
+        return fieldValueSizeThreshold;
+    }
+
+    public void setFieldValueSizeThreshold(int fieldValueSizeThreshold) {
+        this.fieldValueSizeThreshold = fieldValueSizeThreshold;
     }
 }
