@@ -19,7 +19,9 @@ import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
+import lombok.Getter;
 
+@Getter
 public class Subbatch extends BatchId
 {
     private String fileName;
@@ -41,16 +43,6 @@ public class Subbatch extends BatchId
     public String toString()
     {
         return "subbatch:" + tenantId.getValue() + "/" + super.getValue() + "/" + fileName;
-    }
-    
-    public String getFileName()
-    {
-        return fileName;
-    }
-    
-    public TenantId getTenantId()
-    {
-        return tenantId;
     }
     
     public BatchId getBatchId() throws InvalidBatchIdException

@@ -105,7 +105,9 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     {
         final String tenantId = extractTenantId(batchIds);
         final String[] batchesSplit = extractBatchIds(batchIds);
-        Arrays.stream(batchesSplit).parallel().forEach(batch -> batchWorkerServices.registerBatchSubtask(tenantId + "/" + batch));
+        for (final String batch : batchesSplit) {
+            batchWorkerServices.registerBatchSubtask(tenantId + "/" + batch);
+        }
     }
 
     private void handleSingleBatchId(final String batchId, final BatchWorkerServices batchWorkerServices)
@@ -116,12 +118,12 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
             final String[] extensions = {"batch"};
             final Collection<File> subbatchesFiles = FileUtils.listFiles(pathOfSubBatches.toFile(), extensions, false);
-            subbatchesFiles.parallelStream().forEach(f -> log.debug("Batch file found: " + FilenameUtils.getName(f.getAbsolutePath())));
-            subbatchesFiles
-                .parallelStream()
-                .forEach(subbatch
-                    -> batchWorkerServices.registerBatchSubtask("subbatch:" + tenantId.getValue() + "/" + batchIdExtracted.getValue()
-                    + "/" + FilenameUtils.getName(subbatch.getAbsolutePath())));
+            
+            for (final File subbatch : subbatchesFiles) {
+                log.debug("Batch file found: " + FilenameUtils.getName(subbatch.getAbsolutePath()));
+                batchWorkerServices.registerBatchSubtask("subbatch:" + tenantId.getValue() + "/" + batchIdExtracted.getValue()
+                    + "/" + FilenameUtils.getName(subbatch.getAbsolutePath()));
+            }
         } catch (InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new RuntimeException("Exception while handling a single batch id: " + ex.getMessage());
