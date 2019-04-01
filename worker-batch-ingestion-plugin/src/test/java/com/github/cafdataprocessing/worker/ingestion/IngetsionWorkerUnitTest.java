@@ -393,7 +393,7 @@ public class IngetsionWorkerUnitTest
             public void registerBatchSubtask(String batchDefinition)
             {
                 try {
-                    log.debug("Here: " + batchDefinition);
+                    log.info("I am registering this subtask: " + batchDefinition);
                     plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
                 } catch (BatchDefinitionException e) {
                     throw new RuntimeException(e.getMessage(), e.getCause());
