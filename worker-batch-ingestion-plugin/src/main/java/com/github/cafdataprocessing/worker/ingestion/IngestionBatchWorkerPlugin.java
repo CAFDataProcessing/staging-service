@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -118,7 +119,7 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
             final String[] extensions = {"batch"};
             final Collection<File> subbatchesFiles = FileUtils.listFiles(pathOfSubBatches.toFile(), extensions, false);
-            
+
             for (final File subbatch : subbatchesFiles) {
                 log.debug("Batch file found: " + FilenameUtils.getName(subbatch.getAbsolutePath()));
                 batchWorkerServices.registerBatchSubtask("subbatch:" + tenantId.getValue() + "/" + batchIdExtracted.getValue()
@@ -235,7 +236,9 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 }
             }
         }
-        map.entrySet().parallelStream().forEach(e -> log.debug("Custom Data found: " + e.getKey() + ", value: " + e.getValue()));
+        for (final Entry<String, String> entry : map.entrySet()) {
+            log.debug("Custom Data found: " + entry.getKey() + ", value: " + entry.getValue());
+        }
         return map;
     }
 
@@ -262,7 +265,9 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 }
             }
         }
-        list.parallelStream().forEach(d -> log.debug("Script found: " + d.name));
+        for (final DocumentWorkerScript script : list) {
+            log.debug("Script found: " + script.name);
+        }
         return list;
     }
 
