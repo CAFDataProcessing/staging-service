@@ -538,7 +538,7 @@ public final class JsonMinifierTest {
         System.out.println("minifyLargeBase64DataJsonTest...");
         final InputStream inputStream = JsonMinifierTest.class.getResource("/largeBase64DataBatch.json").openStream();
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+        JsonMinifier.validateAndMinifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
                 inprogressContentFolderPath, fieldValueSizeThreshold);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyLargeBase64DataJsonTest : Minified Json : " + minifiedJson);
