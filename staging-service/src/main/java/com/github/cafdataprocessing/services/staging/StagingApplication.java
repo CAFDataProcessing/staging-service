@@ -117,10 +117,11 @@ public class StagingApplication implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/swagger/").setViewName("forward:/swagger/index.html");
+        registry.addViewController("/swagger").setViewName("redirect:./swagger/");
+        registry.addViewController("/").setViewName("redirect:./swagger/");
         registry.addViewController("/swagger-ui").setViewName("redirect:./swagger/");
         registry.addViewController("/swagger-ui/").setViewName("redirect:/swagger-ui");
-        registry.addViewController("/swagger").setViewName("redirect:./swagger/");
-        registry.addViewController("/swagger/").setViewName("forward:index.html");
     }
 
     @Override
