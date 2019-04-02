@@ -48,12 +48,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Plugin that expects a batch definition as a String of IDs and will create tasks from these IDs.
  *
- * The format could be,
- *
- * tenantId/batch1|batch2|batch3|... 
- * tenantId/batch1 
- * subbatch:tenantId/batchId/file-json.batch
- *
+ * The format could be:
+ * <ul>
+ * <li>tenantId/batch1|batch2|batch3|...</li>
+ * <li>tenantId/batch1</li>
+ * <li>subbatch:tenantId/batchId/file-json.batch</li>
+ * </ul>
  */
 @Slf4j
 public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
