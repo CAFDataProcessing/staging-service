@@ -173,13 +173,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.2.0</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <systemPropertyVariables>
                         <docker.host.address>${docker.host.address}</docker.host.address>

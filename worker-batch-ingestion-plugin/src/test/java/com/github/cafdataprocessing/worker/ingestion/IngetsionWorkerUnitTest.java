@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hpe.caf.messagebuilder.TaskMessage;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
+import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import java.util.AbstractMap;
@@ -46,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("Unit tests for the IngestionBatchWorkerPlugin")
-public class IngetsionWorkerUnitTest
+public final class IngetsionWorkerUnitTest
 {
     private BatchWorkerServices testWorkerServices;
     private String taskMessageType;
@@ -63,7 +64,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test multiple batch ids successfully proccessed with custom data")
-    void testMultiBatchIdsWithCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testMultiBatchIdsWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -93,7 +94,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test multiple batch ids successfully processed without custom data")
-    void testMultiBatchIdsWithoutCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testMultiBatchIdsWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -121,7 +122,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test single batch id successfully processed with custom data")
-    void testSingleBatchIdWithCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testSingleBatchIdWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -151,7 +152,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test single batch id successfully processed without custom data")
-    void testSingleBatchIdWithoutCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testSingleBatchIdWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -179,7 +180,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test subbatch successfully processed with custom data")
-    void testSubbatchWithCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testSubbatchWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -209,7 +210,7 @@ public class IngetsionWorkerUnitTest
     @Test
     @RepeatedTest(19)
     @DisplayName("Test subbatch successfully processed without custom data")
-    void testSubbatchWithoutCustomData() throws JsonProcessingException, BatchDefinitionException
+    void testSubbatchWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -237,7 +238,8 @@ public class IngetsionWorkerUnitTest
     @ParameterizedTest
     @DisplayName("Test multiple batches with scripts")
     @MethodSource("scriptProvider")
-    void testMultipleBatchesWithScripts(final Map<String, String> testTaskMessageParams) throws BatchDefinitionException
+    void testMultipleBatchesWithScripts(final Map<String, String> testTaskMessageParams) throws BatchDefinitionException,
+                                                                                                BatchWorkerTransientException
     {
         final List<TaskMessage> constructedMessages = new ArrayList<>();
 
@@ -272,7 +274,7 @@ public class IngetsionWorkerUnitTest
     void testBatchDefinitionsNull()
     {
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
-        final Exception ex = assertThrows(RuntimeException.class,
+        final Exception ex = assertThrows(BatchDefinitionException.class,
                                           () -> plugin.processBatch(testWorkerServices, null, taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), is(equalTo("IngestionBatchWorkerPlugin has not received a valid batch definition string")));
     }
@@ -290,16 +292,16 @@ public class IngetsionWorkerUnitTest
         final String batchDefinitionInvalidBatch = "tenant2/bat:ch1";
         taskMessageType = "DocumentMessage";
 
-        Exception ex = assertThrows(RuntimeException.class,
+        Exception ex = assertThrows(BatchDefinitionException.class,
                                     () -> plugin.processBatch(testWorkerServices, batchDefinitionInvalidBatch,
                                                               taskMessageType, testTaskMessageParams));
-        assertThat(ex.getMessage(), containsString("Exception while handling a single batch id: bat:ch1"));
+        assertThat(ex.getMessage(), containsString("Invalid format of the batch definition: tenant2/bat:ch1"));
 
         final String batchDefinitionInvalidTenant = "tenant:2/batch1";
-        ex = assertThrows(RuntimeException.class,
+        ex = assertThrows(BatchDefinitionException.class,
                           () -> plugin.processBatch(testWorkerServices, batchDefinitionInvalidTenant,
                                                     taskMessageType, testTaskMessageParams));
-        assertThat(ex.getMessage(), containsString("Exception while handling a single batch id: tenant:2"));
+        assertThat(ex.getMessage(), containsString("Invalid format of the batch definition: tenant:2/batch1"));
     }
 
     @Test
@@ -335,11 +337,30 @@ public class IngetsionWorkerUnitTest
         final String batchDefinitionNonExistingFile = "subbatch:tenant4/batch8/20190314-100001-ttt-json.batch";
         taskMessageType = "DocumentMessage";
 
-        final Exception ex = assertThrows(RuntimeException.class,
+        final Exception ex = assertThrows(BatchDefinitionException.class,
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingFile,
                                                                     taskMessageType, testTaskMessageParams));
-        assertThat(ex.getMessage(), containsString("Exception while trying to read lines from"));
-        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch"));
+        assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
+        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, the file does not exist"));
+    }
+    
+    @Test
+    @DisplayName("Test transient exception")
+    void testTransientException(){
+         final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = null;
+        final String batchDefinitionNonExistingFile = "subbatch:tenant5/batch9/20190328-100001-t04-json.batch";
+        taskMessageType = "DocumentMessage";
+
+        final Exception ex = assertThrows(BatchWorkerTransientException.class,
+                                          () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingFile,
+                                                                    taskMessageType, testTaskMessageParams));
+        assertThat(ex.getMessage(), containsString("Transient exception while reading subbatch: "));
+        assertThat(ex.getMessage(), containsString("20190328-100001-t04-json.batch, message: Input length = 2"));
     }
 
     @Test
@@ -355,19 +376,19 @@ public class IngetsionWorkerUnitTest
         final String batchDefinitionNoTenantId = "batch8|batch5";
         taskMessageType = "DocumentMessage";
 
-        Exception ex = assertThrows(RuntimeException.class,
+        Exception ex = assertThrows(BatchDefinitionException.class,
                                     () -> plugin.processBatch(testWorkerServices, batchDefinitionNoTenantId,
                                                               taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("The tenant id is not present in the string passed"));
 
         final String batchDefinitionNoTenantIdTwo = "/batch8|batch6";
-        ex = assertThrows(RuntimeException.class,
+        ex = assertThrows(BatchDefinitionException.class,
                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNoTenantIdTwo,
                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("The tenant id is not present in the string passed"));
 
         final String batchDefinitionNoBatchId = "tenant/";
-        ex = assertThrows(RuntimeException.class,
+        ex = assertThrows(BatchDefinitionException.class,
                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNoBatchId,
                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while handling a single batch id: "));
@@ -395,7 +416,7 @@ public class IngetsionWorkerUnitTest
                 try {
                     log.info("I am registering this subtask: " + batchDefinition);
                     plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
-                } catch (BatchDefinitionException e) {
+                } catch (BatchDefinitionException | BatchWorkerTransientException e) {
                     throw new RuntimeException(e.getMessage(), e.getCause());
                 }
             }

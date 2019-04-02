@@ -25,21 +25,25 @@ import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
+import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
+import java.io.CharConversionException;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import java.io.IOException;
+import java.io.UTFDataFormatException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.CharacterCodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -53,7 +57,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 @Slf4j
-public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
+public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 {
     private final ObjectMapper mapper;
     private final BatchPathProvider fileSystemProvider;
@@ -71,7 +75,7 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     @Override
     public void processBatch(final BatchWorkerServices batchWorkerServices, final String batchDefinition,
                              final String taskMessageType, final Map<String, String> taskMessageParams)
-        throws BatchDefinitionException
+        throws BatchDefinitionException, BatchWorkerTransientException
     {
         log.debug("Definitions received: " + batchDefinition);
         if (taskMessageParams != null) {
@@ -80,137 +84,166 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 
         if (batchDefinition == null || batchDefinition.trim().length() == 0) {
             log.error("IngestionBatchWorkerPlugin has not received a valid batch definition string");
-            throw new RuntimeException("IngestionBatchWorkerPlugin has not received a valid batch definition string");
+            throw new BatchDefinitionException("IngestionBatchWorkerPlugin has not received a valid batch definition string");
         }
-        if (batchDefinition.startsWith("subbatch:")) {
-            try {
-                // this is already a subbatch
-                // read the file from the staging and send it through
-                log.debug("Subbatch received: " + batchDefinition);
-                handleSubbatch(batchDefinition, batchWorkerServices, taskMessageParams);
-            } catch (InvalidBatchIdException ex) {
-                log.error("Invalid Batch Id Exception! " + ex.getMessage());
-                throw new RuntimeException("Invalid Batch Id Exception! " + ex.getMessage());
+        if (batchDefinition.contains(":")) {
+            if (batchDefinition.startsWith("subbatch:")) {
+                try {
+                    // this is already a subbatch
+                    // read the file from the staging and send it through
+                    log.debug("Subbatch received: " + batchDefinition);
+                    handleSubbatch(batchDefinition, batchWorkerServices, taskMessageParams);
+                } catch (final InvalidBatchIdException ex) {
+                    log.error("Invalid Batch Id Exception! " + ex.getMessage());
+                    throw new BatchDefinitionException("Invalid Batch Id Exception! " + ex.getMessage());
+                }
+            } else {
+                log.error("Invalid format of the batch definition: " + batchDefinition);
+                throw new BatchDefinitionException("Invalid format of the batch definition: " + batchDefinition);
             }
         } else if (batchDefinition.contains("|")) {
             log.debug("Multiple Batches received: " + batchDefinition);
-            handleMultipleBatchIds(batchDefinition, batchWorkerServices);
+            try {
+                handleMultipleBatchIds(batchDefinition, batchWorkerServices);
+            } catch (final InvalidTenantIdException | InvalidBatchIdException ex) {
+                log.error("Invalid Batch or Tenant Id Exception! " + ex.getMessage());
+                throw new BatchDefinitionException("Invalid Tenant or Batch Id Exception! " + ex.getMessage());
+            }
         } else {
             log.debug("Single Batch received: " + batchDefinition);
             handleSingleBatchId(batchDefinition, batchWorkerServices);
         }
-
     }
 
     private void handleMultipleBatchIds(final String batchIds, final BatchWorkerServices batchWorkerServices)
+        throws BatchDefinitionException, InvalidTenantIdException, InvalidBatchIdException
     {
-        final String tenantId = extractTenantId(batchIds);
-        final String[] batchesSplit = extractBatchIds(batchIds);
-        for (final String batch : batchesSplit) {
-            batchWorkerServices.registerBatchSubtask(tenantId + "/" + batch);
+        final TenantId tenantId = new TenantId(extractTenantId(batchIds));
+        final List<BatchId> batchesSplit = extractBatchIds(batchIds);
+        for (final BatchId batch : batchesSplit) {
+            batchWorkerServices.registerBatchSubtask(tenantId.getValue() + "/" + batch.getValue());
         }
     }
 
-    private void handleSingleBatchId(final String batchId, final BatchWorkerServices batchWorkerServices)
+    private void handleSingleBatchId(final String batchId, final BatchWorkerServices batchWorkerServices) throws BatchDefinitionException
     {
         try {
             final TenantId tenantId = new TenantId(extractTenantId(batchId));
-            final BatchId batchIdExtracted = new BatchId(extractBatchIds(batchId)[0]);
+            final BatchId batchIdExtracted = extractBatchIds(batchId).get(0);
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
             final String[] extensions = {"batch"};
             final Collection<File> subbatchesFiles = FileUtils.listFiles(pathOfSubBatches.toFile(), extensions, false);
 
             for (final File subbatch : subbatchesFiles) {
-                log.debug("Batch file found: " + FilenameUtils.getName(subbatch.getAbsolutePath()));
+                log.debug("Batch file found: " + subbatch.getName());
                 batchWorkerServices.registerBatchSubtask("subbatch:" + tenantId.getValue() + "/" + batchIdExtracted.getValue()
-                    + "/" + FilenameUtils.getName(subbatch.getAbsolutePath()));
+                    + "/" + subbatch.getName());
             }
-        } catch (InvalidBatchIdException | InvalidTenantIdException ex) {
+        } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
-            throw new RuntimeException("Exception while handling a single batch id: " + ex.getMessage());
+            throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
         }
 
     }
 
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
-                                final Map<String, String> taskMessageParams) throws InvalidBatchIdException
+                                final Map<String, String> taskMessageParams)
+        throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
     {
         final Subbatch subbatchObj = extractSubbatch(subbatch);
         final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(subbatchObj.getTenantId(), subbatchObj.getBatchId());
-        final Path batchFileName = Paths.get(pathOfSubBatches.toString(), subbatchObj.getFileName());
-        log.debug("I am going to read each line of: " + batchFileName);
-        try (Stream<String> lines = Files.lines(batchFileName)) {
-            lines.forEach(line -> {
-                try {
-                    final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
-                    final Map<String, String> customData = populateCustomData(taskMessageParams);
-                    if (!customData.isEmpty()) {
-                        document.customData = customData;
-                    }
-                    final List<DocumentWorkerScript> scripts = populateScripts(taskMessageParams);
-                    if (!scripts.isEmpty()) {
-                        document.scripts = scripts;
-                    }
-                    log.debug("I am going to registers an Item Subtask for: " + document.document.reference);
-                    batchWorkerServices.registerItemSubtask(DocumentWorkerConstants.DOCUMENT_TASK_NAME,
-                                                            DocumentWorkerConstants.WORKER_API_VER, document);
-                } catch (IOException ex) {
-                    log.error("Exception while deserializing the json of " + line + "\nFile: " + batchFileName + "\n"
-                        + ex.getMessage());
-                    throw new RuntimeException("Exception while deserializing the json of " + line + "\nFile: " + batchFileName + "\n"
-                        + ex.getMessage());
-                } catch (BatchDefinitionException ex) {
-                    log.error("BatchDefinitionException " + ex.getMessage());
-                    throw new RuntimeException("BatchDefinitionException " + ex.getMessage());
-                }
-            });
-        } catch (IOException ex) {
-            log.error("Exception while trying to read lines from: " + batchFileName + "\n" + ex.getMessage());
-            throw new RuntimeException("Exception while trying to read lines from: " + batchFileName + "\n" + ex.getMessage());
+        final Path subbatchFileName = Paths.get(pathOfSubBatches.toString(), subbatchObj.getFileName());
+        log.debug("I am going to read each line of: " + subbatchFileName);
+        final List<String> lines = new ArrayList<>();
+        try {
+            if (!Files.exists(subbatchFileName)) {
+                log.error("Exception while reading subbatch: " + subbatchFileName + ", the file does not exist");
+                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatchFileName + ", the file does not exist");
+            }
+            lines.addAll(Files.readAllLines(subbatchFileName));
+        } catch (final IOException ex) {
+            log.error("Transient exception while reading subbatch: " + subbatchFileName + ", message: " + ex.getMessage());
+            throw new BatchWorkerTransientException("Transient exception while reading subbatch: " + subbatchFileName + ", message: "
+                + ex.getMessage());
+        }
+        final List<DocumentWorkerDocumentTask> documents = new ArrayList<>();
+        for (final String line : lines) {
+            try {
+                documents.add(createDocument(line, taskMessageParams));
+            } catch (final IOException ex) {
+                // exception from jackson readValue()
+                log.error("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n" + ex.getMessage());
+                throw new RuntimeException("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n"
+                    + ex.getMessage());
+            }
+        }
+        for (final DocumentWorkerDocumentTask document : documents) {
+            log.debug("I am going to registers an Item Subtask for: " + document.document.reference);
+            batchWorkerServices.registerItemSubtask(DocumentWorkerConstants.DOCUMENT_TASK_NAME, 1, document);
         }
     }
 
-    private String extractTenantId(final String batchIds)
+    private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
+        throws IOException, BatchDefinitionException
+    {
+        final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
+        final Map<String, String> customData = populateCustomData(taskMessageParams);
+        if (!customData.isEmpty()) {
+            document.customData = customData;
+        }
+        final List<DocumentWorkerScript> scripts = populateScripts(taskMessageParams);
+        if (!scripts.isEmpty()) {
+            document.scripts = scripts;
+        }
+        return document;
+    }
+
+    private String extractTenantId(final String batchIds) throws BatchDefinitionException
     {
         final int tenantDelimiter = batchIds.indexOf("/");
         if (tenantDelimiter == -1) {
             log.error("The tenant id is not present in the string passed");
-            throw new RuntimeException("The tenant id is not present in the string passed");
+            throw new BatchDefinitionException("The tenant id is not present in the string passed");
         }
         final String tenantId = batchIds.substring(0, tenantDelimiter);
-        if (StringUtils.isEmpty(tenantId)) {
+        if (tenantId.isEmpty()) {
             log.error("The tenant id is not present in the string passed");
-            throw new RuntimeException("The tenant id is not present in the string passed");
+            throw new BatchDefinitionException("The tenant id is not present in the string passed");
         }
         return tenantId;
     }
 
-    private String[] extractBatchIds(final String batchIds)
+    private List<BatchId> extractBatchIds(final String batchIds) throws BatchDefinitionException, InvalidBatchIdException
     {
+        final List<BatchId> batchList = new ArrayList<>();
         final int tenantDelimiter = batchIds.indexOf("/");
         final String[] batchesSplit = batchIds.substring(tenantDelimiter + 1, batchIds.length()).split("\\|");
         if (batchesSplit.length == 0) {
             log.error("No batch ids were found");
-            throw new RuntimeException("No batch ids were found");
+            throw new BatchDefinitionException("No batch ids were found");
         }
         log.debug("Batch Id(s) found: " + Arrays.toString(batchesSplit));
-        return batchesSplit;
+        for (final String batch : batchesSplit) {
+            batchList.add(new BatchId(batch));
+        }
+        return batchList;
     }
 
-    private Subbatch extractSubbatch(final String subbatch)
+    private Subbatch extractSubbatch(final String subbatch) throws BatchDefinitionException, InvalidBatchIdException
     {
         final String subbatchOnlyPart = subbatch.substring(subbatch.lastIndexOf("/") + 1, subbatch.length());
         if (StringUtils.isEmpty(subbatchOnlyPart)) {
             log.error("No subbatch was found");
-            throw new RuntimeException("No subbatch was found");
+            throw new BatchDefinitionException("No subbatch was found");
         }
         final String tenantId = extractTenantId(subbatch.substring(subbatch.indexOf(":") + 1, subbatch.length()));
-        final String batchId = extractBatchIds(subbatch.substring(subbatch.indexOf(":") + 1, subbatch.lastIndexOf("/")))[0];
+        final String batchId = extractBatchIds(subbatch.substring(subbatch.indexOf(":") + 1, subbatch.lastIndexOf("/")))
+            .get(0).getValue();
         try {
             return new Subbatch(subbatchOnlyPart, tenantId, batchId);
-        } catch (InvalidBatchIdException | InvalidTenantIdException ex) {
+        } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception: " + ex.getMessage());
-            throw new RuntimeException("Exception: " + ex.getMessage());
+            throw new BatchDefinitionException("Exception: " + ex.getMessage());
         }
     }
 
@@ -271,9 +304,18 @@ public class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         return list;
     }
 
-    private String createKey(final String customDataMapKey)
+    /**
+     * This an utility method that helps to extract the key value of a custom map or the name of the script of the task message
+     * parameters.
+     *
+     * They arrive in a format similar to, customData:key or scripts:name, and it returns only the "key" or "name" part.
+     *
+     * @param key the string to parse
+     * @return only the valid key for custom data or the name of the script
+     */
+    private String createKey(final String key)
     {
-        return customDataMapKey.substring(customDataMapKey.indexOf(":") + 1, customDataMapKey.length());
+        return key.substring(key.indexOf(":") + 1, key.length());
     }
 
 }

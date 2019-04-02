@@ -475,7 +475,7 @@ public class BatchWorkerAcceptanceIT
             final byte[] taskData = returnedTaskData.getTaskData();
             final String exception = new String(taskData);
 
-            assertThat(exception, containsString("Exception while handling a single batch id: tenant:1"));
+            assertThat(exception, containsString("BatchDefinitionException Invalid format of the batch definition: tenant:1/batch1"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -521,7 +521,7 @@ public class BatchWorkerAcceptanceIT
             final byte[] taskData = returnedTaskData.getTaskData();
             final String exception = new String(taskData);
 
-            assertThat(exception, containsString("Exception while handling a single batch id: bat:ch1"));
+            assertThat(exception, containsString("BatchDefinitionException Invalid format of the batch definition: tenant1/bat:ch1"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -615,8 +615,8 @@ public class BatchWorkerAcceptanceIT
             final byte[] taskData = returnedTaskData.getTaskData();
             final String exception = new String(taskData);
 
-            assertThat(exception, containsString("Exception while trying to read lines from: "
-                       + "/srv/common/webdav/tenant4/completed/batch8/20190314-100001-ttt-json.batch"));
+            assertThat(exception, containsString("BatchDefinitionException Exception while reading subbatch: "
+                       + "/srv/common/webdav/tenant4/completed/batch8/20190314-100001-ttt-json.batch, the file does not exist"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);

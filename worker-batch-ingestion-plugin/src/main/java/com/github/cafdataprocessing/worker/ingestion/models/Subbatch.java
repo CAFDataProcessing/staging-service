@@ -22,32 +22,23 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdE
 import lombok.Getter;
 
 @Getter
-public class Subbatch extends BatchId
+public class Subbatch
 {
-    private String fileName;
+    private final String fileName;
     private final TenantId tenantId;
-    
-    public Subbatch(final String batchId, final String tenantId) throws InvalidBatchIdException, InvalidTenantIdException
+    private final BatchId batchId;
+
+    public Subbatch(final String fileName, final String tenantId, final String batchId)
+        throws InvalidBatchIdException, InvalidTenantIdException
     {
-        super(batchId);
         this.tenantId = new TenantId(tenantId);
-    }
-    
-    public Subbatch(final String fileName, final String tenantId, final String batchId) throws InvalidBatchIdException, InvalidTenantIdException
-    {
-        this(batchId, tenantId);
+        this.batchId = new BatchId(batchId);
         this.fileName = fileName;
     }
-    
+
     @Override
     public String toString()
     {
-        return "subbatch:" + tenantId.getValue() + "/" + super.getValue() + "/" + fileName;
+        return "subbatch:" + tenantId.getValue() + "/" + batchId.getValue() + "/" + fileName;
     }
-    
-    public BatchId getBatchId() throws InvalidBatchIdException
-    {
-        return new BatchId(this.getValue());
-    }
-    
 }
