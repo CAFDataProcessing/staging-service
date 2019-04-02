@@ -114,7 +114,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         }
     }
 
-    private void handleMultipleBatchIds(final String batchIds, final BatchWorkerServices batchWorkerServices)
+    private static void handleMultipleBatchIds(final String batchIds, final BatchWorkerServices batchWorkerServices)
         throws BatchDefinitionException, InvalidTenantIdException, InvalidBatchIdException
     {
         final TenantId tenantId = new TenantId(extractTenantId(batchIds));
@@ -197,7 +197,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         return document;
     }
 
-    private String extractTenantId(final String batchIds) throws BatchDefinitionException
+    private static String extractTenantId(final String batchIds) throws BatchDefinitionException
     {
         final int tenantDelimiter = batchIds.indexOf("/");
         if (tenantDelimiter == -1) {
@@ -212,7 +212,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         return tenantId;
     }
 
-    private List<BatchId> extractBatchIds(final String batchIds) throws BatchDefinitionException, InvalidBatchIdException
+    private static List<BatchId> extractBatchIds(final String batchIds) throws BatchDefinitionException, InvalidBatchIdException
     {
         final List<BatchId> batchList = new ArrayList<>();
         final int tenantDelimiter = batchIds.indexOf("/");
@@ -228,7 +228,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         return batchList;
     }
 
-    private Subbatch extractSubbatch(final String subbatch) throws BatchDefinitionException, InvalidBatchIdException
+    private static Subbatch extractSubbatch(final String subbatch) throws BatchDefinitionException, InvalidBatchIdException
     {
         final String subbatchOnlyPart = subbatch.substring(subbatch.lastIndexOf("/") + 1, subbatch.length());
         if (StringUtils.isEmpty(subbatchOnlyPart)) {
@@ -246,7 +246,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         }
     }
 
-    private Map<String, String> populateCustomData(final Map<String, String> taskMessageParams) throws BatchDefinitionException
+    private static Map<String, String> populateCustomData(final Map<String, String> taskMessageParams) throws BatchDefinitionException
     {
         final Map<String, String> map = new HashMap<>();
         if (taskMessageParams != null && !taskMessageParams.isEmpty()) {
@@ -274,7 +274,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         return map;
     }
 
-    private List<DocumentWorkerScript> populateScripts(final Map<String, String> taskMessageParams) throws BatchDefinitionException
+    private static List<DocumentWorkerScript> populateScripts(final Map<String, String> taskMessageParams) throws BatchDefinitionException
     {
         final List<DocumentWorkerScript> list = new ArrayList<>();
         if (taskMessageParams != null && !taskMessageParams.isEmpty()) {
@@ -312,7 +312,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
      * @param key the string to parse
      * @return only the valid key for custom data or the name of the script
      */
-    private String createKey(final String key)
+    private static String createKey(final String key)
     {
         return key.substring(key.indexOf(":") + 1, key.length());
     }
