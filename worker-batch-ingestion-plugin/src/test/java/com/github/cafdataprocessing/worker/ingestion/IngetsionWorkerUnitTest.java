@@ -343,11 +343,12 @@ public final class IngetsionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
         assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, the file does not exist"));
     }
-    
+
     @Test
     @DisplayName("Test transient exception")
-    void testTransientException(){
-         final List<TaskMessage> constructedMessages = new ArrayList<>();
+    void testTransientException()
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
