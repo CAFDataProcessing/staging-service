@@ -18,6 +18,9 @@ The minimum usable disk space in bytes that should be available to the service. 
 #### CAF_STAGING_SERVICE_STORAGEPATH
 The base storage folder where the content files will be staged. Defaults to /etc/store/batches/.
 
+#### CAF_STAGING_SERVICE_FIELDVALUE_SIZE_THRESHOLD
+The maximum data value size in bytes allowed for a field in a document before it is extracted into a separate file. Defaults to 8192 (which is 8KB)
+
 ### Logging Configuration
 
 #### CAF_LOG_LEVEL

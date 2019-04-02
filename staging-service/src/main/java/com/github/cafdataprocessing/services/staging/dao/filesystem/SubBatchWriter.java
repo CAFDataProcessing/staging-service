@@ -74,7 +74,10 @@ public class SubBatchWriter implements AutoCloseable {
         }
     }
 
-    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier, final String storageRefFolderPath)
+    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier,
+                                  final String storageRefFolderPath,
+                                  final String inprogressContentFolderPath,
+                                  final int fieldValueSizeThreshold)
             throws StagingException, InvalidBatchException, IncompleteBatchException {
 
         if(count >= subbatchSize)
@@ -93,7 +96,8 @@ public class SubBatchWriter implements AutoCloseable {
 
         try(final InputStream inStream = inputStreamSupplier.get()){
             try {
-                JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath);
+                JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
+                                                   inprogressContentFolderPath, fieldValueSizeThreshold);
                 count++;
             }
             catch (IOException | InvalidDocumentException ex){
