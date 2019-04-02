@@ -29,14 +29,8 @@ import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
-import java.io.CharConversionException;
 import java.io.File;
-import java.io.FileNotFoundException;
-
 import java.io.IOException;
-import java.io.UTFDataFormatException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.CharacterCodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
