@@ -1,7 +1,0 @@
-{
-        "prefetchBuffer": 0,
-        "inputQueue": "ingestion-batch-in",
-        "retryQueue": "ingestion-batch-in",
-        "rejectedQueue": "ingestion-batch-err",
-        "retryLimit": 2
-}

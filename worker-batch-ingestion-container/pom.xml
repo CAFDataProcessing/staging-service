@@ -357,27 +357,6 @@
                                 </log>
                             </run>
                         </image>
-                        <!-- Assemble the config files from the test-configs folder to an image in /config on the host. -->
-                        <image>
-                            <alias>config</alias>
-                            <name>${project.artifactId}-test-config:${project.version}</name>
-                            <build>
-                                <assembly>
-                                    <basedir>/config</basedir>
-                                    <inline>
-                                        <fileSets>
-                                            <fileSet>
-                                                <directory>test-configs</directory>
-                                                <outputDirectory>/</outputDirectory>
-                                                <includes>
-                                                    <include>*</include>
-                                                </includes>
-                                            </fileSet>
-                                        </fileSets>
-                                    </inline>
-                                </assembly>
-                            </build>
-                        </image>
                         <!-- Job Service and DB -->
                         <image>
                             <alias>postgres</alias>
@@ -480,14 +459,20 @@
                                     <port>${worker.adminport}:8081</port>
                                 </ports>
                                 <env>
-                                    <CAF_APPNAME>test/worker-ingestion</CAF_APPNAME>
-                                    <CAF_CONFIG_PATH>/config</CAF_CONFIG_PATH>
                                     <CAF_STAGING_SERVICE_BASEPATH>/srv/common/webdav</CAF_STAGING_SERVICE_BASEPATH>
+                                    <CAF_BATCH_WORKER_ERROR_QUEUE>test-output</CAF_BATCH_WORKER_ERROR_QUEUE>
+                                    <CAF_RABBITMQ_MAX_ATTEMPTS>3</CAF_RABBITMQ_MAX_ATTEMPTS>
+                                    <CAF_RABBITMQ_BACKOFF_INTERVAL>5</CAF_RABBITMQ_BACKOFF_INTERVAL>
+                                    <CAF_RABBITMQ_MAX_BACKOFF_INTERVAL>15</CAF_RABBITMQ_MAX_BACKOFF_INTERVAL>
+                                    <CAF_RABBITMQ_HOST>rabbitmq</CAF_RABBITMQ_HOST>
+                                    <CAF_RABBITMQ_PORT>5672</CAF_RABBITMQ_PORT>
+                                    <CAF_RABBITMQ_USERNAME>guest</CAF_RABBITMQ_USERNAME>
+                                    <CAF_RABBITMQ_PASSWORD>guest</CAF_RABBITMQ_PASSWORD>
+                                    <CAF_WORKER_INPUT_QUEUE>ingestion-batch-in</CAF_WORKER_INPUT_QUEUE>
                                 </env>
                                 <volumes>
                                     <from>
                                         <image>webdav</image>
-                                        <image>config</image>
                                     </from>
                                 </volumes>
                                 <links>
