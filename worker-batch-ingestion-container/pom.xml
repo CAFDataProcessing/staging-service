@@ -40,7 +40,6 @@
         <fabric8.docker.maven.version>0.28.0</fabric8.docker.maven.version>
         <maven.failsafe.version>2.22.1</maven.failsafe.version>
         <test.data>${project.basedir}/test-data/input</test.data>
-        <test.configs>${project.basedir}/test-configs</test.configs>
 
         <jobServiceDatabaseName>jobservice</jobServiceDatabaseName>
         <postgresPassword>mysecretpassword</postgresPassword>
@@ -184,8 +183,6 @@
                         <datastore.enabled>false</datastore.enabled>
                     </systemPropertyVariables>
                     <environmentVariables>
-                        <CAF_APPNAME>test/worker-ingestion</CAF_APPNAME>
-                        <CAF_CONFIG_PATH>${project.build.directory}/config-files</CAF_CONFIG_PATH>
                         <CAF_CONFIG_DECODER>JavascriptDecoder</CAF_CONFIG_DECODER>
                         <CAF_CONFIG_ENABLE_SUBSTITUTOR>false</CAF_CONFIG_ENABLE_SUBSTITUTOR>
                         <CAF_WORKER_DATASTORE_PATH>datastore</CAF_WORKER_DATASTORE_PATH>
@@ -196,6 +193,7 @@
                         <JOB_SERVICE_ADDRESS>http://${docker.host.address}:${job-service.adminport}/job-service/v1</JOB_SERVICE_ADDRESS>
                         <RABBITMQ_TEST_HOST>${docker.host.address}</RABBITMQ_TEST_HOST>
                         <RABBITMQ_TEST_PORT>${rabbitmq.node.port}</RABBITMQ_TEST_PORT>
+                        <CAF_BATCH_WORKER_ERROR_QUEUE>test-output</CAF_BATCH_WORKER_ERROR_QUEUE>
                     </environmentVariables>
                 </configuration>
             </plugin>

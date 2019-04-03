@@ -83,7 +83,8 @@ public class BatchWorkerAcceptanceIT
     public BatchWorkerAcceptanceIT() throws IOException, TimeoutException
     {
         workflow_queue = "worker-workflow";
-        output_queue = "test-output";
+        output_queue = System.getenv("CAF_BATCH_WORKER_ERROR_QUEUE");
+        log.debug("Output queue: " + output_queue);
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(System.getenv("RABBITMQ_TEST_HOST"));
         factory.setPort(Integer.parseInt(System.getenv("RABBITMQ_TEST_PORT")));
@@ -104,6 +105,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(System.getenv("RABBITMQ_TEST_HOST"), is(notNullValue()));
         log.debug("RabbitMQ port: " + System.getenv("RABBITMQ_TEST_PORT"));
         assertThat(System.getenv("RABBITMQ_TEST_PORT"), is(notNullValue()));
+        assertThat(System.getenv("CAF_BATCH_WORKER_ERROR_QUEUE"), is(notNullValue()));
     }
 
     @Test
@@ -703,10 +705,6 @@ public class BatchWorkerAcceptanceIT
 
     private void closeQueue(final String consumerTag, final String queue) throws IOException
     {
-        if (queue.equals(workflow_queue)) {
-            channel.queuePurge(output_queue);
-            channel.queueDelete(output_queue);
-        }
         channel.queuePurge(queue);
         channel.basicCancel(consumerTag);
         channel.queueDelete(queue);
