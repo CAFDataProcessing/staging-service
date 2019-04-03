@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("Unit tests for the IngestionBatchWorkerPlugin")
-public final class IngetsionWorkerUnitTest
+public final class IngestionWorkerUnitTest
 {
     private BatchWorkerServices testWorkerServices;
     private String taskMessageType;
