@@ -721,6 +721,7 @@ public class BatchWorkerAcceptanceIT
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         }
         closeQueue(consumerTag, output_queue);
+        closeQueue(null, workflow_queue);
         assertThat(messageCount, is(equalTo(1)));
     }
 
@@ -852,7 +853,9 @@ public class BatchWorkerAcceptanceIT
     private void closeQueue(final String consumerTag, final String queue) throws IOException
     {
         channel.queuePurge(queue);
-        channel.basicCancel(consumerTag);
+        if (consumerTag != null) {
+            channel.basicCancel(consumerTag);
+        }
         channel.queueDelete(queue);
     }
 
