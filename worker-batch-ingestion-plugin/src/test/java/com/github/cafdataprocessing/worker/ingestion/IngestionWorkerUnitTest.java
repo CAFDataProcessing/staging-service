@@ -341,7 +341,67 @@ public final class IngestionWorkerUnitTest
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingFile,
                                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
-        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, the file does not exist"));
+        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, the file (or its folder) does not exist"));
+    }
+    
+    @Test
+    @DisplayName("Test non existing directory (batch)")
+    void testNonExistingDirectory()
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = null;
+        final String batchDefinitionNonExistingDirectory = "tenant4/batch10";
+        taskMessageType = "DocumentMessage";
+
+        final Exception ex = assertThrows(BatchDefinitionException.class,
+                                          () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
+                                                                    taskMessageType, testTaskMessageParams));
+        assertThat(ex.getMessage(), containsString("Exception while reading the batch folder: "));
+        assertThat(ex.getMessage(), containsString("batch10, the directory does not exist"));
+    }
+    
+    @Test
+    @DisplayName("Test non existing directory (batch) in the a multiple batch")
+    void testNonExistingDirectoryInMultiBatch()
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = null;
+        final String batchDefinitionNonExistingDirectory = "tenant1/batch1|batch10|batch2";
+        taskMessageType = "DocumentMessage";
+
+        final Exception ex = assertThrows(Exception.class,
+                                          () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
+                                                                    taskMessageType, testTaskMessageParams));
+        assertThat(ex.getMessage(), containsString("Exception while reading the batch folder: "));
+        assertThat(ex.getMessage(), containsString("batch10, the directory does not exist"));
+    }
+    
+    @Test
+    @DisplayName("Test non existing directory (batch) in a subbatch")
+    void testNonExistingDirectoryInSubbatch()
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = null;
+        final String batchDefinitionNonExistingDirectory = "subbatch:tenant4/batch10/20190314-100001-t04-json.batch";
+        taskMessageType = "DocumentMessage";
+
+        final Exception ex = assertThrows(BatchDefinitionException.class,
+                                          () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
+                                                                    taskMessageType, testTaskMessageParams));
+        assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
+        assertThat(ex.getMessage(), containsString("the file (or its folder) does not exist"));
     }
 
     @Test
