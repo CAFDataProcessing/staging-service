@@ -618,8 +618,7 @@ public class BatchWorkerAcceptanceIT
             final String exception = new String(taskData);
 
             assertThat(exception, containsString("BatchDefinitionException Exception while reading subbatch: "
-                       + "/srv/common/webdav/tenant4/completed/batch8/20190314-100001-ttt-json.batch, the file (or its folder) "
-                       + "does not exist"));
+                       + "/srv/common/webdav/tenant4/completed/batch8/20190314-100001-ttt-json.batch, it does not exist"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -666,8 +665,8 @@ public class BatchWorkerAcceptanceIT
             final byte[] taskData = returnedTaskData.getTaskData();
             final String exception = new String(taskData);
 
-            assertThat(exception, containsString("BatchDefinitionException Exception while reading the batch folder: "
-                       + "/srv/common/webdav/tenant4/completed/batch10, the directory does not exist"));
+            assertThat(exception, containsString("BatchDefinitionException Exception while reading the batch: "
+                       + "/srv/common/webdav/tenant4/completed/batch10, it was not found"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -714,8 +713,8 @@ public class BatchWorkerAcceptanceIT
             final byte[] taskData = returnedTaskData.getTaskData();
             final String exception = new String(taskData);
 
-            assertThat(exception, containsString("Exception while reading the batch folder: "
-                       + "/srv/common/webdav/tenant1/completed/batch10, the directory does not exist"));
+            assertThat(exception, containsString("Exception while reading the batch: "
+                       + "/srv/common/webdav/tenant1/completed/batch10, it was not found"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -764,8 +763,7 @@ public class BatchWorkerAcceptanceIT
             final String exception = new String(taskData);
 
             assertThat(exception, containsString("Exception while reading subbatch: "
-                       + "/srv/common/webdav/tenant4/completed/batch10/20190314-100001-t04-json.batch, the file (or its folder) "
-                       + "does not exist"));
+                       + "/srv/common/webdav/tenant4/completed/batch10/20190314-100001-t04-json.batch, it does not exist"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);

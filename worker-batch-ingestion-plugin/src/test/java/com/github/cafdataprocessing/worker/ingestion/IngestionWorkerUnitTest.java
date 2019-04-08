@@ -341,7 +341,7 @@ public final class IngestionWorkerUnitTest
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingFile,
                                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
-        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, the file (or its folder) does not exist"));
+        assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, it does not exist"));
     }
     
     @Test
@@ -360,8 +360,8 @@ public final class IngestionWorkerUnitTest
         final Exception ex = assertThrows(BatchDefinitionException.class,
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
                                                                     taskMessageType, testTaskMessageParams));
-        assertThat(ex.getMessage(), containsString("Exception while reading the batch folder: "));
-        assertThat(ex.getMessage(), containsString("batch10, the directory does not exist"));
+        assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
+        assertThat(ex.getMessage(), containsString("batch10, it was not found"));
     }
     
     @Test
@@ -380,8 +380,8 @@ public final class IngestionWorkerUnitTest
         final Exception ex = assertThrows(Exception.class,
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
                                                                     taskMessageType, testTaskMessageParams));
-        assertThat(ex.getMessage(), containsString("Exception while reading the batch folder: "));
-        assertThat(ex.getMessage(), containsString("batch10, the directory does not exist"));
+        assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
+        assertThat(ex.getMessage(), containsString("batch10, it was not found"));
     }
     
     @Test
@@ -401,7 +401,7 @@ public final class IngestionWorkerUnitTest
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
                                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
-        assertThat(ex.getMessage(), containsString("the file (or its folder) does not exist"));
+        assertThat(ex.getMessage(), containsString(", it does not exist"));
     }
 
     @Test

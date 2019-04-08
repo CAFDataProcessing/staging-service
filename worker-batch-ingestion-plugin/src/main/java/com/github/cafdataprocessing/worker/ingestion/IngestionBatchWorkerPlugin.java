@@ -132,9 +132,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
 
             if (!Files.exists(pathOfSubBatches)) {
-                log.error("Exception while reading the batch folder: " + pathOfSubBatches + ", the directory does not exist");
-                throw new BatchDefinitionException("Exception while reading the batch folder: " + pathOfSubBatches
-                    + ", the directory does not exist");
+                log.error("Exception while reading the batch: " + pathOfSubBatches + ", it was not found");
+                throw new BatchDefinitionException("Exception while reading the batch: " + pathOfSubBatches
+                    + ", it was not found");
             }
 
             final String[] extensions = {"batch"};
@@ -162,9 +162,8 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         final List<String> lines = new ArrayList<>();
         try {
             if (!Files.exists(subbatchFileName)) {
-                log.error("Exception while reading subbatch: " + subbatchFileName + ", the file (or its folder) does not exist");
-                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatchFileName + ", the file (or its folder)"
-                    + " does not exist");
+                log.error("Exception while reading subbatch: " + subbatchFileName + ", it does not exist");
+                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatchFileName + ", it does not exist");
             }
             lines.addAll(Files.readAllLines(subbatchFileName));
         } catch (final IOException ex) {
