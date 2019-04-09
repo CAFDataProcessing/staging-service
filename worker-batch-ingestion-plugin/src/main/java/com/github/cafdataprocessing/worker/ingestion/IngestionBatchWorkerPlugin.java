@@ -145,6 +145,11 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 batchWorkerServices.registerBatchSubtask("subbatch:" + tenantId.getValue() + "/" + batchIdExtracted.getValue()
                     + "/" + subbatch.getName());
             }
+        } catch (final IllegalArgumentException ex) {
+            log.error("Exception while reading the batch: " + batchId
+                + ", it was not found");
+            throw new BatchDefinitionException("Exception while reading the batch: " + batchId
+                + ", it was not found");
         } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
