@@ -130,6 +130,13 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final TenantId tenantId = new TenantId(extractTenantId(batchId));
             final BatchId batchIdExtracted = extractBatchIds(batchId).get(0);
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
+
+            if (!Files.exists(pathOfSubBatches)) {
+                log.error("Exception while reading the batch: " + batchId + ", it was not found");
+                throw new BatchDefinitionException("Exception while reading the batch: " + batchId
+                    + ", it was not found");
+            }
+
             final String[] extensions = {"batch"};
             final Collection<File> subbatchesFiles = FileUtils.listFiles(pathOfSubBatches.toFile(), extensions, false);
 
@@ -142,7 +149,6 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
         }
-
     }
 
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
@@ -156,8 +162,8 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         final List<String> lines = new ArrayList<>();
         try {
             if (!Files.exists(subbatchFileName)) {
-                log.error("Exception while reading subbatch: " + subbatchFileName + ", the file does not exist");
-                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatchFileName + ", the file does not exist");
+                log.error("Exception while reading subbatch: " + subbatch + ", it does not exist");
+                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatch + ", it does not exist");
             }
             lines.addAll(Files.readAllLines(subbatchFileName));
         } catch (final IOException ex) {

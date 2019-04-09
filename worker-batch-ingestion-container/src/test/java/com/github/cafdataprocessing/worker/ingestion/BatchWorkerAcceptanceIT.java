@@ -618,7 +618,152 @@ public class BatchWorkerAcceptanceIT
             final String exception = new String(taskData);
 
             assertThat(exception, containsString("BatchDefinitionException Exception while reading subbatch: "
-                       + "/srv/common/webdav/tenant4/completed/batch8/20190314-100001-ttt-json.batch, the file does not exist"));
+                       + "subbatch:tenant4/batch8/20190314-100001-ttt-json.batch, it does not exist"));
+
+            count++;
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+        closeQueue(consumerTag, output_queue);
+        assertThat(messageCount, is(equalTo(1)));
+    }
+
+    @Test
+    @DisplayName("Test non existing batch directory")
+    void nonExistingDirectoryTest() throws ApiException, InterruptedException, IOException
+    {
+        final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
+        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant4/batch10",
+                                         taskParams);
+        jobsApi.createOrUpdateJob(jobId, job, "");
+        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
+
+        Thread.sleep(30000L);
+
+        final int messageCount = setupQueue(output_queue);
+        final boolean autoAck = false;
+        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
+
+        int count = 0;
+        while (count < 1) {
+            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+
+            final String message = new String(delivery.getBody());
+            final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
+
+            assertThat(returnedTaskData, is(notNullValue()));
+            assertThat(returnedTaskData.getVersion(), is(equalTo(3)));
+            assertThat(returnedTaskData.getTaskClassifier(), is(equalTo("BatchWorker")));
+            assertThat(returnedTaskData.getTaskApiVersion(), is(equalTo(1)));
+            assertThat(returnedTaskData.getTaskStatus(), is(equalTo(TaskStatus.RESULT_EXCEPTION)));
+            assertThat(returnedTaskData.getTo(), is(equalTo(output_queue)));
+
+            final byte[] taskData = returnedTaskData.getTaskData();
+            final String exception = new String(taskData);
+
+            assertThat(exception, containsString("BatchDefinitionException Exception while reading the batch: "
+                       + "tenant4/batch10, it was not found"));
+
+            count++;
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+        closeQueue(consumerTag, output_queue);
+        assertThat(messageCount, is(equalTo(1)));
+    }
+
+    @Test
+    @DisplayName("Test non existing batch directory in multibatch")
+    void nonExistingDirectoryInMultiBatchTest() throws ApiException, InterruptedException, IOException
+    {
+        final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
+        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch10|batch2",
+                                         taskParams);
+        jobsApi.createOrUpdateJob(jobId, job, "");
+        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
+
+        Thread.sleep(30000L);
+
+        final int messageCount = setupQueue(output_queue);
+        final boolean autoAck = false;
+        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
+
+        int count = 0;
+        while (count < 1) {
+            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+
+            final String message = new String(delivery.getBody());
+            final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
+
+            assertThat(returnedTaskData, is(notNullValue()));
+            assertThat(returnedTaskData.getVersion(), is(equalTo(3)));
+            assertThat(returnedTaskData.getTaskClassifier(), is(equalTo("BatchWorker")));
+            assertThat(returnedTaskData.getTaskApiVersion(), is(equalTo(1)));
+            assertThat(returnedTaskData.getTaskStatus(), is(equalTo(TaskStatus.RESULT_EXCEPTION)));
+            assertThat(returnedTaskData.getTo(), is(equalTo(output_queue)));
+
+            final byte[] taskData = returnedTaskData.getTaskData();
+            final String exception = new String(taskData);
+
+            assertThat(exception, containsString("Exception while reading the batch: "
+                       + "tenant1/batch10, it was not found"));
+
+            count++;
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+        closeQueue(consumerTag, output_queue);
+        closeQueue(null, workflow_queue);
+        assertThat(messageCount, is(equalTo(1)));
+    }
+
+    @Test
+    @DisplayName("Test non existing directory in subbatch")
+    void nonExistingDirectoryInSubbatchTest() throws ApiException, InterruptedException, IOException
+    {
+        final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
+        final NewJob job = createNewJobs("Third Job", "Multiple batches", "subbatch:tenant4/batch10/20190314-100001-t04-json.batch",
+                                         taskParams);
+        jobsApi.createOrUpdateJob(jobId, job, "");
+        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
+
+        Thread.sleep(30000L);
+
+        final int messageCount = setupQueue(output_queue);
+        final boolean autoAck = false;
+        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
+
+        int count = 0;
+        while (count < 1) {
+            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+
+            final String message = new String(delivery.getBody());
+            final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
+
+            assertThat(returnedTaskData, is(notNullValue()));
+            assertThat(returnedTaskData.getVersion(), is(equalTo(3)));
+            assertThat(returnedTaskData.getTaskClassifier(), is(equalTo("BatchWorker")));
+            assertThat(returnedTaskData.getTaskApiVersion(), is(equalTo(1)));
+            assertThat(returnedTaskData.getTaskStatus(), is(equalTo(TaskStatus.RESULT_EXCEPTION)));
+            assertThat(returnedTaskData.getTo(), is(equalTo(output_queue)));
+
+            final byte[] taskData = returnedTaskData.getTaskData();
+            final String exception = new String(taskData);
+
+            assertThat(exception, containsString("Exception while reading subbatch: "
+                       + "subbatch:tenant4/batch10/20190314-100001-t04-json.batch, it does not exist"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -706,7 +851,9 @@ public class BatchWorkerAcceptanceIT
     private void closeQueue(final String consumerTag, final String queue) throws IOException
     {
         channel.queuePurge(queue);
-        channel.basicCancel(consumerTag);
+        if (consumerTag != null) {
+            channel.basicCancel(consumerTag);
+        }
         channel.queueDelete(queue);
     }
 
