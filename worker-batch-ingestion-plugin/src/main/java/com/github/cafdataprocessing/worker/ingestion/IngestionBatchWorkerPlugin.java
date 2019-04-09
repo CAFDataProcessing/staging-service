@@ -132,9 +132,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
 
             if (!Files.exists(pathOfSubBatches)) {
-                log.error("Exception while reading the batch: " + batchId + ", it was not found");
+                log.error("Exception while reading the batch: " + batchId + " was not found");
                 throw new BatchDefinitionException("Exception while reading the batch: " + batchId
-                    + ", it was not found");
+                    + " was not found");
             }
 
             final String[] extensions = {"batch"};
@@ -147,9 +147,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             }
         } catch (final IllegalArgumentException ex) {
             log.error("Exception while reading the batch: " + batchId
-                + ", it was not found");
+                + " was not found");
             throw new BatchDefinitionException("Exception while reading the batch: " + batchId
-                + ", it was not found");
+                + " was not found");
         } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
