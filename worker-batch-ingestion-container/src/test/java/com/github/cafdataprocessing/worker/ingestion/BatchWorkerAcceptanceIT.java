@@ -666,7 +666,7 @@ public class BatchWorkerAcceptanceIT
             final String exception = new String(taskData);
 
             assertThat(exception, containsString("BatchDefinitionException Exception while reading the batch: "
-                       + "tenant4/batch10, it was not found"));
+                       + "tenant4/batch10 was not found"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -714,7 +714,7 @@ public class BatchWorkerAcceptanceIT
             final String exception = new String(taskData);
 
             assertThat(exception, containsString("Exception while reading the batch: "
-                       + "tenant1/batch10, it was not found"));
+                       + "tenant1/batch10 was not found"));
 
             count++;
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);

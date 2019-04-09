@@ -361,7 +361,7 @@ public final class IngestionWorkerUnitTest
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
                                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
-        assertThat(ex.getMessage(), containsString("batch10, it was not found"));
+        assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
     
     @Test
@@ -381,7 +381,7 @@ public final class IngestionWorkerUnitTest
                                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNonExistingDirectory,
                                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
-        assertThat(ex.getMessage(), containsString("batch10, it was not found"));
+        assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
     
     @Test
