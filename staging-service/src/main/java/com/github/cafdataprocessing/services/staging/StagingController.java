@@ -101,7 +101,7 @@ public class StagingController implements StagingApi {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
             batchDao.deleteBatch(new TenantId(X_TENANT_ID), new BatchId(batchId));
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         catch (final InvalidTenantIdException ex) {
             LOGGER.error("Invalid X-TENANT-ID ", ex);
