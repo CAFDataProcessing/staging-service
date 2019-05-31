@@ -44,6 +44,8 @@
     </parent>
 
     <properties>
+        <copyrightYear>2018</copyrightYear>
+        <copyrightNotice>Copyright ${project.inceptionYear}-${copyrightYear} Micro Focus or one of its affiliates.</copyrightNotice>
         <dockerHubOrganization>cafinternal</dockerHubOrganization>
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
