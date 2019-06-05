@@ -34,6 +34,8 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -53,6 +55,8 @@ public class FileSystemDao implements BatchDao {
     private final int subbatchSize;
     private final String storagePath;
     private final int fieldValueSizeThreshold;
+    
+    private final Set<String> localRefFiles;
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold) {
@@ -60,6 +64,7 @@ public class FileSystemDao implements BatchDao {
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
+        this.localRefFiles = new HashSet<>();
     }
 
     @Override
@@ -150,10 +155,11 @@ public class FileSystemDao implements BatchDao {
                 final String contentType = fileItemStream.getContentType();
                 if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
-                    subBatchWriter.writeDocumentFile(fileItemStream::openStream,
-                                                     storageRefFolderPath.toString(),
-                                                     Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
-                                                     fieldValueSizeThreshold);
+                    localRefFiles.addAll(subBatchWriter
+                        .writeDocumentFile(fileItemStream::openStream,
+                                           storageRefFolderPath.toString(),
+                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                           fieldValueSizeThreshold));
                     fileNames.add(filename);
                 }
                 else
@@ -170,6 +176,7 @@ public class FileSystemDao implements BatchDao {
                     }
                 }
             }
+            validateUpload(localRefFiles, inProgressBatchFolderPath);
         }
         catch (IncompleteBatchException | InvalidBatchException | StagingException ex){
             LOGGER.error(String.format("Error saving batch [%s].", ex.getMessage()));
@@ -215,6 +222,20 @@ public class FileSystemDao implements BatchDao {
         } catch (IOException ex) {
             LOGGER.error(String.format("Failed to move in progress batch [%s]", batchId));
             throw new StagingException(ex);
+        }
+    }
+
+    private void validateUpload(final Set<String> localRefFiles, final Path inProgressBatchFolderPath) throws InvalidBatchException
+    {
+        final Path filesFolder = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES);
+        for (final String file : localRefFiles) {
+            final Path uploadedFile = Paths.get(filesFolder.toString(), file);
+            if (!Files.exists(uploadedFile)) {
+                LOGGER.error("One of the JSON documents uploaded has a local_ref for a file that has not been"
+                    + " uploaded. The missing file is {}", uploadedFile.toString());
+                throw new InvalidBatchException("One of the JSON documents uploaded has a local_ref for a file that has not been"
+                    + " uploaded. The missing file is " + uploadedFile.toString());
+            }
         }
     }
 

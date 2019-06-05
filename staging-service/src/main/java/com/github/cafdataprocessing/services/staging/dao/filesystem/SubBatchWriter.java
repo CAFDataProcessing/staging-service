@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * This class handles the sub-batching and storing of documents.
@@ -74,11 +76,13 @@ public class SubBatchWriter implements AutoCloseable {
         }
     }
 
-    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier,
+    public Set<String> writeDocumentFile(final InputStreamSupplier inputStreamSupplier,
                                   final String storageRefFolderPath,
                                   final String inprogressContentFolderPath,
                                   final int fieldValueSizeThreshold)
             throws StagingException, InvalidBatchException, IncompleteBatchException {
+        
+        Set<String> allLocalRefFiles = new HashSet<>();
 
         if(count >= subbatchSize)
         {
@@ -96,8 +100,8 @@ public class SubBatchWriter implements AutoCloseable {
 
         try(final InputStream inStream = inputStreamSupplier.get()){
             try {
-                JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
-                                                   inprogressContentFolderPath, fieldValueSizeThreshold);
+                allLocalRefFiles.addAll(JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
+                                                   inprogressContentFolderPath, fieldValueSizeThreshold));
                 count++;
             }
             catch (IOException | InvalidDocumentException ex){
@@ -110,6 +114,7 @@ public class SubBatchWriter implements AutoCloseable {
         }
 
         LOGGER.trace("Wrote minified document to  subbatchFile");
+        return allLocalRefFiles;
     }
 
     @Override

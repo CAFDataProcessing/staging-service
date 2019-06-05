@@ -31,11 +31,20 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import com.worldturner.medeia.api.ValidationFailedException;
+import java.util.List;
+import java.util.Set;
+import static java.util.stream.Collectors.toSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JsonMinifier {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonMinifier.class);
 
     private static final String DATA_FIELD = "data";
     private static final String ENCODING_FIELD = "encoding";
@@ -48,7 +57,7 @@ public final class JsonMinifier {
 
     private JsonMinifier(){}
 
-    public static final void validateAndMinifyJson(final InputStream inputStream,
+    public static final Set<String> validateAndMinifyJson(final InputStream inputStream,
                                                    final OutputStream outstream,
                                                    final String storageRefPath,
                                                    final String inprogressContentFolderPath,
@@ -59,6 +68,10 @@ public final class JsonMinifier {
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = DocumentValidator.getValidatingParser(inputStream);
+        
+        final Set<String> localRefFiles = findLocalRefFiles(parser);
+        LOGGER.trace("local_ref files found: {}", localRefFiles);
+
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
             try
@@ -71,6 +84,7 @@ public final class JsonMinifier {
             }
         }
         outstream.write('\n');
+        return localRefFiles;
     }
 
     public static final void minifyJson(final InputStream inputStream,
@@ -202,5 +216,17 @@ public final class JsonMinifier {
             FileUtils.writeByteArrayToFile(targetFile.toFile(), decodedData);
         }
         return contentFileName;
+    }
+    
+    private static Set<String> findLocalRefFiles(final JsonParser parser) throws IOException
+    {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final JsonNode jsonNode = objectMapper.readTree(parser);
+        final List<JsonNode> parents = jsonNode.findParents("encoding");
+        LOGGER.debug("Parents found: {}", parents);
+        return parents.stream()
+            .filter(n -> n.get("encoding").asText().equals("local_ref"))
+            .map(n -> n.get("data").asText())
+            .collect(toSet());
     }
 }
