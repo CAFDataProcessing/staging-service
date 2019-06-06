@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import com.worldturner.medeia.api.ValidationFailedException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import static java.util.stream.Collectors.toSet;
@@ -77,6 +78,10 @@ public final class JsonMinifier {
             {
                 final ObjectMapper objectMapper = new ObjectMapper();
                 final JsonNode jsonNodes = objectMapper.readTree(parser);
+                if(jsonNodes == null){
+                    LOGGER.error("The JSON document is null.");
+                    throw new InvalidDocumentException("The JSON document is null.");
+                }
                 localRefFiles = findLocalRefFiles(jsonNodes);
                 LOGGER.debug("local_ref files found: {}", localRefFiles);
                 processJsonTokens(jsonNodes.traverse(), gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);

@@ -230,9 +230,9 @@ public class FileSystemDao implements BatchDao {
             final Path uploadedFile = Paths.get(filesFolder.toString(), file);
             if (!Files.exists(uploadedFile)) {
                 LOGGER.error("One of the JSON documents uploaded has a local_ref for a file that has not been"
-                    + " uploaded. The missing file is {}", uploadedFile.toString());
+                    + " uploaded. The missing file is {}", file);
                 throw new InvalidBatchException("One of the JSON documents uploaded has a local_ref for a file that has not been"
-                    + " uploaded. The missing file is " + uploadedFile.toString());
+                    + " uploaded. The missing file is " + file);
             }
         }
     }

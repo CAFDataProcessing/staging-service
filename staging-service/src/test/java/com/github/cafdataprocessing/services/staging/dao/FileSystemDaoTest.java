@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
+import java.io.FileInputStream;
 
 public class FileSystemDaoTest {
 
@@ -94,6 +95,35 @@ public class FileSystemDaoTest {
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         assertTrue(files.contains(f2.getFieldName()));
+    }
+    
+    @Test
+    public void missingLocalRefFileTest() throws Exception {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("batch1.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toString()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("hello.txt");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f1, f2);
+        
+        try {
+            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fail("The exception has not been thrown!");
+        } catch (InvalidBatchException ex) {
+            assertTrue(ex.getMessage().contains("One of the JSON documents uploaded has a local_ref for a file "
+                + "that has not been uploaded"));
+        }
     }
 
     @Test

@@ -87,9 +87,29 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"empty.json"};
         final String tenantId = "tenant-testBatchEmptyDoc";
         final String batchId = "testBatchEmptyJson";
-        stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
-        final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertEquals(1, response.getEntries().size());
+        try{
+            stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+            stagingApi.getBatches(tenantId, batchId, batchId, 10);
+            fail("Exception should have been thrown");
+        }catch(ApiException e){
+            assertEquals(400, e.getCode());
+        }
+    }
+    
+    @Test
+    public void missingLocalRefFileTest() throws IOException, ApiException
+    {
+        final String tenantId = "tenant-testBatchMultiple";
+        final String batchId = "testBatchMultiple";
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{"batch1.json", "batch1_negative.json", "batch2.json", "batch3.json", "batch4.json",
+                                                    "batch5.json", "batch6.json"};
+        try {
+            stageMultiPartStreams(tenantId, batchId, contentFiles, documentFiles);
+            fail("Exception should have been thrown");
+        } catch (ApiException e) {
+            assertEquals(400, e.getCode());
+        }
     }
 
     @Test
@@ -281,13 +301,6 @@ public class StagingServiceIT {
         for (final String file : documentFiles) {
             uploadData.add(new MultiPartDocument(StagingServiceIT.class.getResource("/" + file)));
         }
-        try {
-            stagingApi.createOrReplaceBatch(tenantId, batchId, uploadData.stream());
-        } catch (final ApiException ex) {
-            fail("stageMultiPartStreams failed : " + ex.getMessage()
-                    + " response code : " + ex.getCode()
-                    + " response body : " + ex.getResponseBody());
-            throw ex;
-        }
+        stagingApi.createOrReplaceBatch(tenantId, batchId, uploadData.stream());
     }
 }
