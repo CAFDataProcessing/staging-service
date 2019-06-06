@@ -55,8 +55,6 @@ public class FileSystemDao implements BatchDao {
     private final int subbatchSize;
     private final String storagePath;
     private final int fieldValueSizeThreshold;
-    
-    private final Set<String> localRefFiles;
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold) {
@@ -64,7 +62,6 @@ public class FileSystemDao implements BatchDao {
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
-        this.localRefFiles = new HashSet<>();
     }
 
     @Override
@@ -128,6 +125,7 @@ public class FileSystemDao implements BatchDao {
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
+        final Set<String> localRefFiles = new HashSet<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
 
