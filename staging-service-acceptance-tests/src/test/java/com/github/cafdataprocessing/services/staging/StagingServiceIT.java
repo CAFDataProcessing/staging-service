@@ -89,7 +89,6 @@ public class StagingServiceIT {
         final String batchId = "testBatchEmptyJson";
         try{
             stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
-            stagingApi.getBatches(tenantId, batchId, batchId, 10);
             fail("Exception should have been thrown");
         }catch(ApiException e){
             assertEquals(400, e.getCode());
