@@ -69,14 +69,17 @@ public final class JsonMinifier {
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = DocumentValidator.getValidatingParser(inputStream);
         
-        final Set<String> localRefFiles = findLocalRefFiles(parser);
-        LOGGER.trace("local_ref files found: {}", localRefFiles);
+        Set<String> localRefFiles;
 
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
             try
             {
-                processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
+                final ObjectMapper objectMapper = new ObjectMapper();
+                final JsonNode jsonNodes = objectMapper.readTree(parser);
+                localRefFiles = findLocalRefFiles(jsonNodes);
+                LOGGER.debug("local_ref files found: {}", localRefFiles);
+                processJsonTokens(jsonNodes.traverse(), gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
             }
             catch(final ValidationFailedException e)
             {
@@ -218,12 +221,10 @@ public final class JsonMinifier {
         return contentFileName;
     }
     
-    private static Set<String> findLocalRefFiles(final JsonParser parser) throws IOException
+    private static Set<String> findLocalRefFiles(final JsonNode nodes) throws IOException
     {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final JsonNode jsonNode = objectMapper.readTree(parser);
-        final List<JsonNode> parents = jsonNode.findParents("encoding");
-        LOGGER.debug("Parents found: {}", parents);
+        final List<JsonNode> parents = nodes.findParents("encoding");
+        LOGGER.trace("Parents found: {}", parents);
         return parents.stream()
             .filter(n -> n.get("encoding").asText().equals("local_ref"))
             .map(n -> n.get("data").asText())
