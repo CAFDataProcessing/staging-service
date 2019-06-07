@@ -180,6 +180,7 @@ public class FileSystemDao implements BatchDao {
                                            Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
+                    jsonAlreadyRead = true;
                 }
             }
         }

@@ -89,12 +89,76 @@ public class FileSystemDaoTest {
 
         FileItemIterator fileItemIterator = mock(FileItemIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f1, f2);
+        when(fileItemIterator.next()).thenReturn(f2, f1);
 
         final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         assertTrue(files.contains(f2.getFieldName()));
+    }
+    
+    @Test
+    public void saveFilesWrongOrderNegativeTest() throws Exception
+    {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("hello.txt");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f1, f2);
+
+        try {
+            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fail("An exception should have been thrown");
+        } catch (InvalidBatchException ex) {
+            assertTrue(ex.getMessage().contains("Binary files should be sent before json documents in the upload request"));
+        }
+    }
+    
+    @Test
+    public void saveFilesWrongOrderMixedNegativeTest() throws Exception
+    {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("hello.txt");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        
+        FileItemStream f3 = mock(FileItemStream.class);
+        when(f3.getContentType()).thenReturn("application/text");
+        when(f3.getFieldName()).thenReturn("hello-hello.txt");
+        when(f3.isFormField()).thenReturn(true);
+        when(f3.openStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, true, false);
+        when(fileItemIterator.next()).thenReturn(f2, f1, f3);
+
+        try {
+            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fail("An exception should have been thrown");
+        } catch (InvalidBatchException ex) {
+            assertTrue(ex.getMessage().contains("Binary files should be sent before json documents in the upload request"));
+        }
     }
     
     @Test
