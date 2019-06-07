@@ -87,13 +87,10 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"empty.json"};
         final String tenantId = "tenant-testBatchEmptyDoc";
         final String batchId = "testBatchEmptyJson";
-        try{
             stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
-            fail("Exception should have been thrown");
-        }catch(ApiException e){
-            assertEquals(400, e.getCode());
+        final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
+        assertEquals(1, response.getEntries().size());
         }
-    }
     
     @Test
     public void missingLocalRefFileTest() throws IOException, ApiException
@@ -109,6 +106,35 @@ public class StagingServiceIT {
         } catch (ApiException e) {
             assertEquals(400, e.getCode());
         }
+    }
+    
+    @Test
+    public void missingLocalRefFileEncodingBeforeDataTest() throws IOException, ApiException
+    {
+        final String tenantId = "tenant-testBatchMultiple";
+        final String batchId = "testBatchMultiple";
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{"batch1.json", "batch7_negative_encoding_data.json", "batch2.json", "batch3.json",
+                                                    "batch4.json", "batch5.json", "batch6.json"};
+        try {
+            stageMultiPartStreams(tenantId, batchId, contentFiles, documentFiles);
+            fail("Exception should have been thrown");
+        } catch (ApiException e) {
+            assertEquals(400, e.getCode());
+        }
+    }
+    
+    @Test
+    public void encodingBeforeDataTest() throws IOException, ApiException
+    {
+        final String tenantId = "tenant-testBatchMultiple";
+        final String batchId = "testBatchMultiple";
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{"batch1.json", "batch7_encoding_data.json", "batch2.json", "batch3.json",
+                                                    "batch4.json", "batch5.json", "batch6.json"};
+        stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+        final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
+        assertEquals(1, response.getEntries().size());
     }
 
     @Test

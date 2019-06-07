@@ -157,6 +157,35 @@ public final class JsonMinifierTest {
         System.out.println("minifyLocalRefJsonTest : Minified Json : " + minifiedJson);
         assertTrue("minifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
     }
+    
+    @Test
+    public void storageAndLocalRefFirstTest() throws Exception {
+        System.out.println("minifyLocalRefJsonTest...");
+        String testJson =
+            "{"
+        + "    'document': {"
+        + "      'reference': 'batch2.msg',"
+        + "      'fields': {"
+        + "        'BINARY_FILE': {"
+        + "            'encoding': 'storage_ref',"
+        + "            'data': 'http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc'"
+        + "           },"
+        + "        'COVER_PIC': {"
+        + "            'encoding': 'local_ref',"
+        + "            'data': 'Front_Cover.jpg'"
+        + "          }"
+        + "      }"
+        + "    }"
+        + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                inprogressContentFolderPath, fieldValueSizeThreshold, new HashSet<>(Arrays.asList("Front_Cover.jpg")));
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifyLocalRefJsonTest : Minified Json : " + minifiedJson);
+        assertTrue("minifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+    }
 
     @Test
     public void minifySimpleDocJsonTest() throws Exception {

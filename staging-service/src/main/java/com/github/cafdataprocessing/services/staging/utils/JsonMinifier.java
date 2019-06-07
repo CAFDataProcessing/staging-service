@@ -114,6 +114,8 @@ public final class JsonMinifier {
         boolean bufferData = false;
         boolean bufferEncoding = false;
         boolean updateReference = false;
+        // mark if the updateRefernce is for a file that has been uploaded
+        boolean isLocalRefFile = false;
         while ((token = parser.nextToken()) != null) {
             switch (token) {
                 case FIELD_NAME:
@@ -145,14 +147,9 @@ public final class JsonMinifier {
                     if (bufferEncoding) {
                         encodingBuffer = parser.getText();
                         if (encodingBuffer.equalsIgnoreCase(LOCAL_REF)) {
-                            if (!binaryFilesUploaded.contains(dataBuffer)) {
-                                LOGGER.error("One of the json documents contains a local_ref to a file that has not been uploaded. "
-                                    + "The file is {}", dataBuffer);
-                                throw new InvalidBatchException("One of the json documents contains a local_ref to a file that has not "
-                                    + "been uploaded. The file is " + dataBuffer);
-                            }
                             encodingBuffer = STORAGE_REF;
                             updateReference = true;
+                            isLocalRefFile = true;
                         } else {
                             updateReference = false;
                         }
@@ -173,6 +170,12 @@ public final class JsonMinifier {
                             updateReference = true;
                         }
                         if (updateReference) {
+                            if (isLocalRefFile && !binaryFilesUploaded.contains(dataBuffer)) {
+                                LOGGER.error("One of the json documents contains a local_ref to a file that has not been uploaded. "
+                                    + "The file is {}", dataBuffer);
+                                throw new InvalidBatchException("One of the json documents contains a local_ref to a file that has not "
+                                    + "been uploaded. The file is " + dataBuffer);
+                            }
                             dataBuffer = storageRefPath + "/" + dataBuffer;
                         }
                         gen.writeFieldName(DATA_FIELD);
@@ -188,6 +191,7 @@ public final class JsonMinifier {
                     // reset checks
                     updateReference = false;
                     pauseWriting = false;
+                    isLocalRefFile = false;
                     break;
                 case START_OBJECT:
                 case START_ARRAY:
