@@ -87,7 +87,7 @@ public class StagingServiceIT {
         final String[] documentFiles = new String[]{"empty.json"};
         final String tenantId = "tenant-testBatchEmptyDoc";
         final String batchId = "testBatchEmptyJson";
-            stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+        stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertEquals(1, response.getEntries().size());
         }

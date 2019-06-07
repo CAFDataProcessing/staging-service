@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
-import java.util.HashSet;
 import java.util.Set;
 
 /*

@@ -31,15 +31,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import com.worldturner.medeia.api.ValidationFailedException;
-import java.util.List;
 import java.util.Set;
-import static java.util.stream.Collectors.toSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +110,7 @@ public final class JsonMinifier {
         boolean bufferData = false;
         boolean bufferEncoding = false;
         boolean updateReference = false;
-        // mark if the updateRefernce is for a file that has been uploaded
+        // mark if the updateReference is for a file that has been uploaded
         boolean isLocalRefFile = false;
         while ((token = parser.nextToken()) != null) {
             switch (token) {
