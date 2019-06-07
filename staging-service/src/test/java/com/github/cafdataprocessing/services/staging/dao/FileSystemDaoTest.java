@@ -121,8 +121,8 @@ public class FileSystemDaoTest {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("The exception has not been thrown!");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("One of the JSON documents uploaded has a local_ref for a file "
-                + "that has not been uploaded"));
+            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded."
+                + " The file is A_Christmas_Carol1.txt"));
         }
     }
 

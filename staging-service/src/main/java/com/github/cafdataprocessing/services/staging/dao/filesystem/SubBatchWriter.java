@@ -76,13 +76,12 @@ public class SubBatchWriter implements AutoCloseable {
         }
     }
 
-    public Set<String> writeDocumentFile(final InputStreamSupplier inputStreamSupplier,
+    public void writeDocumentFile(final InputStreamSupplier inputStreamSupplier,
                                   final String storageRefFolderPath,
                                   final String inprogressContentFolderPath,
-                                  final int fieldValueSizeThreshold)
+                                  final int fieldValueSizeThreshold,
+                                  final Set<String> binaryFilesUploaded)
             throws StagingException, InvalidBatchException, IncompleteBatchException {
-        
-        Set<String> allLocalRefFiles = new HashSet<>();
 
         if(count >= subbatchSize)
         {
@@ -100,8 +99,8 @@ public class SubBatchWriter implements AutoCloseable {
 
         try(final InputStream inStream = inputStreamSupplier.get()){
             try {
-                allLocalRefFiles.addAll(JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
-                                                   inprogressContentFolderPath, fieldValueSizeThreshold));
+                JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
+                                                   inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
                 count++;
             }
             catch (IOException | InvalidDocumentException ex){
@@ -114,7 +113,6 @@ public class SubBatchWriter implements AutoCloseable {
         }
 
         LOGGER.trace("Wrote minified document to  subbatchFile");
-        return allLocalRefFiles;
     }
 
     @Override

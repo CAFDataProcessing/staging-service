@@ -33,10 +33,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import com.worldturner.medeia.api.ValidationFailedException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import static java.util.stream.Collectors.toSet;
@@ -58,33 +58,22 @@ public final class JsonMinifier {
 
     private JsonMinifier(){}
 
-    public static final Set<String> validateAndMinifyJson(final InputStream inputStream,
+    public static final void validateAndMinifyJson(final InputStream inputStream,
                                                    final OutputStream outstream,
                                                    final String storageRefPath,
                                                    final String inprogressContentFolderPath,
-                                                   final int fieldValueSizeThreshold)
-            throws IOException, InvalidDocumentException
+                                                   final int fieldValueSizeThreshold,
+                                                   final Set<String> binaryFilesUploaded)
+            throws IOException, InvalidDocumentException, InvalidBatchException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = DocumentValidator.getValidatingParser(inputStream);
-        
-        Set<String> localRefFiles;
-
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
-            try
-            {
-                final ObjectMapper objectMapper = new ObjectMapper();
-                final JsonNode jsonNodes = objectMapper.readTree(parser);
-                if(jsonNodes == null){
-                    LOGGER.error("The JSON document is null.");
-                    throw new InvalidDocumentException("The JSON document is null.");
-                }
-                localRefFiles = findLocalRefFiles(jsonNodes);
-                LOGGER.debug("local_ref files found: {}", localRefFiles);
-                processJsonTokens(jsonNodes.traverse(), gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
+            try {
+                processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
             }
             catch(final ValidationFailedException e)
             {
@@ -92,14 +81,14 @@ public final class JsonMinifier {
             }
         }
         outstream.write('\n');
-        return localRefFiles;
     }
 
     public static final void minifyJson(final InputStream inputStream,
                                         final OutputStream outstream,
                                         final String storageRefPath,
                                         final String inprogressContentFolderPath,
-                                        final int fieldValueSizeThreshold) throws IOException
+                                        final int fieldValueSizeThreshold,
+                                        final Set<String> binaryFilesUploaded) throws IOException, InvalidBatchException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
@@ -107,7 +96,7 @@ public final class JsonMinifier {
         final JsonParser parser = factory.createParser(inputStream);
         try(final JsonGenerator gen = factory.createGenerator(outstream))
         {
-            processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold);
+            processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
         }
         outstream.write('\n');
     }
@@ -116,7 +105,8 @@ public final class JsonMinifier {
                                           final JsonGenerator gen,
                                           final String storageRefPath,
                                           final String inprogressContentFolderPath,
-                                          final int fieldValueSizeThreshold) throws IOException {
+                                          final int fieldValueSizeThreshold,
+                                          final Set<String> binaryFilesUploaded) throws IOException, InvalidBatchException {
         String dataBuffer = null;
         String encodingBuffer = null;
         JsonToken token;
@@ -155,6 +145,12 @@ public final class JsonMinifier {
                     if (bufferEncoding) {
                         encodingBuffer = parser.getText();
                         if (encodingBuffer.equalsIgnoreCase(LOCAL_REF)) {
+                            if (!binaryFilesUploaded.contains(dataBuffer)) {
+                                LOGGER.error("One of the json documents contains a local_ref to a file that has not been uploaded. "
+                                    + "The file is {}", dataBuffer);
+                                throw new InvalidBatchException("One of the json documents contains a local_ref to a file that has not "
+                                    + "been uploaded. The file is " + dataBuffer);
+                            }
                             encodingBuffer = STORAGE_REF;
                             updateReference = true;
                         } else {
@@ -224,15 +220,5 @@ public final class JsonMinifier {
             FileUtils.writeByteArrayToFile(targetFile.toFile(), decodedData);
         }
         return contentFileName;
-    }
-    
-    private static Set<String> findLocalRefFiles(final JsonNode nodes) throws IOException
-    {
-        final List<JsonNode> parents = nodes.findParents("encoding");
-        LOGGER.trace("Parents found: {}", parents);
-        return parents.stream()
-            .filter(n -> n.get("encoding").asText().equals("local_ref"))
-            .map(n -> n.get("data").asText())
-            .collect(toSet());
     }
 }

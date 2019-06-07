@@ -125,7 +125,11 @@ public class FileSystemDao implements BatchDao {
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
-        final Set<String> localRefFiles = new HashSet<>();
+        /*
+        Binary files must be sent before the json ones.
+        */
+        boolean jsonAlreadyRead = false;
+        final Set<String> binaryFilesUploaded = new HashSet<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
 
@@ -151,30 +155,33 @@ public class FileSystemDao implements BatchDao {
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
                 final String contentType = fileItemStream.getContentType();
-                if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
-                {
-                    localRefFiles.addAll(subBatchWriter
-                        .writeDocumentFile(fileItemStream::openStream,
-                                           storageRefFolderPath.toString(),
-                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
-                                           fieldValueSizeThreshold));
-                    fileNames.add(filename);
-                }
-                else
+                if(!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT) && jsonAlreadyRead == false)
                 {
                     final String normalizedFilename = Paths.get(filename).toFile().getName();
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
-                    try(final InputStream inStream = fileItemStream.openStream()){
+                    try (final InputStream inStream = fileItemStream.openStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
                         LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
                         fileNames.add(normalizedFilename);
-                    }
-                    catch(IOException ex){
+                        binaryFilesUploaded.add(filename);
+                    } catch (IOException ex) {
                         throw new StagingException(ex);
                     }
                 }
+                else if (!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT) && jsonAlreadyRead == true) {
+                    LOGGER.error("Binary files should be sent before json documents in the upload request");
+                    throw new InvalidBatchException("Binary files should be sent before json documents in the upload request");
+                }
+                else
+                {
+                    subBatchWriter
+                        .writeDocumentFile(fileItemStream::openStream,
+                                           storageRefFolderPath.toString(),
+                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                           fieldValueSizeThreshold, binaryFilesUploaded);
+                    fileNames.add(filename);
+                }
             }
-            validateUpload(localRefFiles, inProgressBatchFolderPath);
         }
         catch (IncompleteBatchException | InvalidBatchException | StagingException ex){
             LOGGER.error(String.format("Error saving batch [%s].", ex.getMessage()));
@@ -220,20 +227,6 @@ public class FileSystemDao implements BatchDao {
         } catch (IOException ex) {
             LOGGER.error(String.format("Failed to move in progress batch [%s]", batchId));
             throw new StagingException(ex);
-        }
-    }
-
-    private void validateUpload(final Set<String> localRefFiles, final Path inProgressBatchFolderPath) throws InvalidBatchException
-    {
-        final Path filesFolder = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES);
-        for (final String file : localRefFiles) {
-            final Path uploadedFile = Paths.get(filesFolder.toString(), file);
-            if (!Files.exists(uploadedFile)) {
-                LOGGER.error("One of the JSON documents uploaded has a local_ref for a file that has not been"
-                    + " uploaded. The missing file is {}", file);
-                throw new InvalidBatchException("One of the JSON documents uploaded has a local_ref for a file that has not been"
-                    + " uploaded. The missing file is " + file);
-            }
         }
     }
 
