@@ -47,8 +47,8 @@ Upload documents to a batch. The batch will be automatically created if it doesn
 
 #### curl -X PUT -i -v  http://localhost:8080/batches/abcBatch --data-binary @batches-put-payload.txt -H "Content-Type: multipart/mixed; boundary=efb8369b-607b-4dcf-9f92-e6cd8244db1e" -H "X-TENANT-ID: acme-com"
 
-##### Contents of batches-put-payload.txt (should have Windows line-endings and the binary files must be uploaded before 
-the JSON documents)
+##### Contents of batches-put-payload.txt (should have Windows line-endings)
+##### If an uploaded binary file is referenced in one of the JSON documents, then it _must_ be uploaded before the JSON document.
 ```
 --efb8369b-607b-4dcf-9f92-e6cd8244db1e
 Content-Disposition: form-data; name="A_Christmas_Carol1.txt"

@@ -125,10 +125,6 @@ public class FileSystemDao implements BatchDao {
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
-        /*
-        Binary files must be sent before the json ones.
-        */
-        boolean jsonAlreadyRead = false;
         final Set<String> binaryFilesUploaded = new HashSet<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
@@ -155,7 +151,7 @@ public class FileSystemDao implements BatchDao {
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
                 final String contentType = fileItemStream.getContentType();
-                if(!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT) && jsonAlreadyRead == false)
+                if(!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
                 {
                     final String normalizedFilename = Paths.get(filename).toFile().getName();
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
@@ -168,10 +164,6 @@ public class FileSystemDao implements BatchDao {
                         throw new StagingException(ex);
                     }
                 }
-                else if (!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT) && jsonAlreadyRead == true) {
-                    LOGGER.error("Binary files should be sent before json documents in the upload request");
-                    throw new InvalidBatchException("Binary files should be sent before json documents in the upload request");
-                }
                 else
                 {
                     subBatchWriter
@@ -180,7 +172,6 @@ public class FileSystemDao implements BatchDao {
                                            Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
-                    jsonAlreadyRead = true;
                 }
             }
         }

@@ -106,11 +106,11 @@ public class FileSystemDaoTest {
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
         FileItemStream f2 = mock(FileItemStream.class);
         when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("hello.txt");
+        when(f2.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
         when(f2.isFormField()).thenReturn(true);
         when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
@@ -122,7 +122,8 @@ public class FileSystemDaoTest {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("Binary files should be sent before json documents in the upload request"));
+            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded. "
+                + "The file is A_Christmas_Carol1.txt"));
         }
     }
     
@@ -131,33 +132,47 @@ public class FileSystemDaoTest {
     {
         final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        FileItemStream jsonDocOk = mock(FileItemStream.class);
+        when(jsonDocOk.getContentType()).thenReturn("application/document+json");
+        when(jsonDocOk.getFieldName()).thenReturn("jsonDocument.json");
+        when(jsonDocOk.isFormField()).thenReturn(true);
+        when(jsonDocOk.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("hello.txt");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        FileItemStream localRefOneOk = mock(FileItemStream.class);
+        when(localRefOneOk.getContentType()).thenReturn("application/text");
+        when(localRefOneOk.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
+        when(localRefOneOk.isFormField()).thenReturn(true);
+        when(localRefOneOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
         
-        FileItemStream f3 = mock(FileItemStream.class);
-        when(f3.getContentType()).thenReturn("application/text");
-        when(f3.getFieldName()).thenReturn("hello-hello.txt");
-        when(f3.isFormField()).thenReturn(true);
-        when(f3.openStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
+        FileItemStream localRefTwoOk = mock(FileItemStream.class);
+        when(localRefTwoOk.getContentType()).thenReturn("application/text");
+        when(localRefTwoOk.getFieldName()).thenReturn("A_Christmas_Carol2.txt");
+        when(localRefTwoOk.isFormField()).thenReturn(true);
+        when(localRefTwoOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        
+        FileItemStream jsonDocNotOk = mock(FileItemStream.class);
+        when(jsonDocNotOk.getContentType()).thenReturn("application/document+json");
+        when(jsonDocNotOk.getFieldName()).thenReturn("jsonDocument.json");
+        when(jsonDocNotOk.isFormField()).thenReturn(true);
+        when(jsonDocNotOk.openStream()).thenReturn(new FileInputStream(
+            Paths.get("src", "test", "resources", "batch1MissingLocalRef.json").toFile()));
+        
+        FileItemStream localRefThreeTooLate = mock(FileItemStream.class);
+        when(localRefThreeTooLate.getContentType()).thenReturn("application/text");
+        when(localRefThreeTooLate.getFieldName()).thenReturn("hello-hello.txt");
+        when(localRefThreeTooLate.isFormField()).thenReturn(true);
+        when(localRefThreeTooLate.openStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
 
         FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, true, false);
-        when(fileItemIterator.next()).thenReturn(f2, f1, f3);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, true, true, true, false);
+        when(fileItemIterator.next()).thenReturn(localRefOneOk, localRefTwoOk, jsonDocOk, jsonDocNotOk, localRefThreeTooLate);
 
         try {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("Binary files should be sent before json documents in the upload request"));
+            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded. "
+                + "The file is A_Christmas_Carol3.txt"));
         }
     }
     
