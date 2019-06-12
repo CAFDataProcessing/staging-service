@@ -151,8 +151,14 @@ public class FileSystemDao implements BatchDao {
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
                 final String contentType = fileItemStream.getContentType();
-                if(!contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
-                {
+                if (contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT)) {
+                    subBatchWriter
+                        .writeDocumentFile(fileItemStream::openStream,
+                                           storageRefFolderPath.toString(),
+                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                           fieldValueSizeThreshold, binaryFilesUploaded);
+                    fileNames.add(filename);
+                } else {
                     final String normalizedFilename = Paths.get(filename).toFile().getName();
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
                     try (final InputStream inStream = fileItemStream.openStream()) {
@@ -163,15 +169,6 @@ public class FileSystemDao implements BatchDao {
                     } catch (IOException ex) {
                         throw new StagingException(ex);
                     }
-                }
-                else
-                {
-                    subBatchWriter
-                        .writeDocumentFile(fileItemStream::openStream,
-                                           storageRefFolderPath.toString(),
-                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
-                                           fieldValueSizeThreshold, binaryFilesUploaded);
-                    fileNames.add(filename);
                 }
             }
         }
