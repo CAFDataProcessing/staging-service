@@ -122,8 +122,8 @@ public class FileSystemDaoTest {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded. "
-                + "The file is A_Christmas_Carol1.txt"));
+            assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the JSON "
+                + "documents. Check file A_Christmas_Carol1.txt"));
         }
     }
     
@@ -171,8 +171,8 @@ public class FileSystemDaoTest {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded. "
-                + "The file is A_Christmas_Carol3.txt"));
+            assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the "
+                + "JSON documents. Check file A_Christmas_Carol3.txt"));
         }
     }
     
@@ -200,8 +200,8 @@ public class FileSystemDaoTest {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("The exception has not been thrown!");
         } catch (InvalidBatchException ex) {
-            assertTrue(ex.getMessage().contains("One of the json documents contains a local_ref to a file that has not been uploaded."
-                + " The file is A_Christmas_Carol1.txt"));
+            assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the JSON "
+                + "documents. Check file A_Christmas_Carol1.txt"));
         }
     }
 

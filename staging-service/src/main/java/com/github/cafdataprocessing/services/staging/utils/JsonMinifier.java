@@ -167,10 +167,10 @@ public final class JsonMinifier {
                         }
                         if (updateReference) {
                             if (isLocalRefFile && !binaryFilesUploaded.contains(dataBuffer)) {
-                                LOGGER.error("One of the json documents contains a local_ref to a file that has not been uploaded. "
-                                    + "The file is {}", dataBuffer);
-                                throw new InvalidBatchException("One of the json documents contains a local_ref to a file that has not "
-                                    + "been uploaded. The file is " + dataBuffer);
+                                LOGGER.error("Binary files referenced in the JSON documents must be uploaded before the JSON documents. "
+                                    + "Check file {}", dataBuffer);
+                                throw new InvalidBatchException("Binary files referenced in the JSON documents must be uploaded before "
+                                    + "the JSON documents. Check file " + dataBuffer);
                             }
                             dataBuffer = storageRefPath + "/" + dataBuffer;
                         }
