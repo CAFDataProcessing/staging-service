@@ -34,6 +34,8 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -123,6 +125,7 @@ public class FileSystemDao implements BatchDao {
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
+        final Set<String> binaryFilesUploaded = new HashSet<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
 
@@ -148,24 +151,22 @@ public class FileSystemDao implements BatchDao {
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
                 final String contentType = fileItemStream.getContentType();
-                if(contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT))
-                {
-                    subBatchWriter.writeDocumentFile(fileItemStream::openStream,
-                                                     storageRefFolderPath.toString(),
-                                                     Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
-                                                     fieldValueSizeThreshold);
+                if (contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT)) {
+                    subBatchWriter
+                        .writeDocumentFile(fileItemStream::openStream,
+                                           storageRefFolderPath.toString(),
+                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                           fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
-                }
-                else
-                {
+                } else {
                     final String normalizedFilename = Paths.get(filename).toFile().getName();
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
-                    try(final InputStream inStream = fileItemStream.openStream()){
+                    try (final InputStream inStream = fileItemStream.openStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
                         LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
                         fileNames.add(normalizedFilename);
-                    }
-                    catch(IOException ex){
+                        binaryFilesUploaded.add(filename);
+                    } catch (IOException ex) {
                         throw new StagingException(ex);
                     }
                 }

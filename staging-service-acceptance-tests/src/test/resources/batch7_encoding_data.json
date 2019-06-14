@@ -1,0 +1,35 @@
+{
+  "document": {
+    "reference": "fav-book.msg",
+    "fields": {
+      "FROM": [{"data": "Mark Roberts"}],
+      "TO": [{"data": "Gene Simmons"}],
+      "SUBJECT": [{"data": "Favourite book"}],
+      "CONTENT": [{"data": "This is the book that popularised the use of the phrase \"Merry Christmas\"."}]
+    },
+    "subdocuments": [{
+      "reference": "xmas-carol.doc",
+      "fields": {
+        "BINARY_FILE": [{
+           "data": "http://www.lang.nagoya-u.ac.jp/~matsuoka/misc/urban/cd-carol.doc",
+           "encoding": "storage_ref"
+          }],
+        "TITLE": [{"data": "A Christmas Carol"}],
+        "AUTHOR": [{"data": "Charles Dickens"}],
+        "PUB_DATE": [{"data": "December 19, 1843"}],
+        "CONTENT": [{
+           "data": "A_Christmas_Carol1.txt",
+           "encoding": "local_ref"
+          }],
+        "SUMMARY": [{
+            "encoding": "local_ref",
+            "data": "A_Christmas_Carol2.txt"
+          }],
+        "PUBLISHER": [
+          {"data": "Chapman and Hall"},
+          {"data": "Elliot Stock"}
+        ]
+      }
+    }]
+  }
+}
