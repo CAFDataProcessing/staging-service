@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import java.io.FileInputStream;
+import org.apache.commons.io.FilenameUtils;
 
 public class FileSystemDaoTest {
 
@@ -94,7 +95,97 @@ public class FileSystemDaoTest {
         final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
-        assertTrue(files.contains(f2.getFieldName()));
+        files.remove(f1.getFieldName());
+        assertTrue(files.size() == 1);
+        assertTrue(FilenameUtils.getExtension(files.get(0)).equals("txt"));
+        assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
+    }
+    
+    @Test
+    public void saveFilesWindowsPathTest() throws Exception {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("C:\\test\\hello.pdf");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f2, f1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        assertEquals(2, files.size());
+        assertTrue(files.contains(f1.getFieldName()));
+        files.remove(f1.getFieldName());
+        assertTrue(files.size() == 1);
+        assertTrue(FilenameUtils.getExtension(files.get(0)).equals("pdf"));
+        assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
+    }
+    
+    @Test
+    public void saveFilesLinuxPathTest() throws Exception {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("/mnt/c/test/hello");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f2, f1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        assertEquals(2, files.size());
+        assertTrue(files.contains(f1.getFieldName()));
+        files.remove(f1.getFieldName());
+        assertTrue(files.size() == 1);
+        assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
+        assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
+    }
+    
+    @Test
+    public void saveInvalidLinuxPathTest() throws Exception {
+        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+        final BatchId batchId = new BatchId(UUID.randomUUID().toString());
+        FileItemStream f1 = mock(FileItemStream.class);
+        when(f1.getContentType()).thenReturn("application/document+json");
+        when(f1.getFieldName()).thenReturn("jsonDocument.json");
+        when(f1.isFormField()).thenReturn(true);
+        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+
+        FileItemStream f2 = mock(FileItemStream.class);
+        when(f2.getContentType()).thenReturn("application/text");
+        when(f2.getFieldName()).thenReturn("../../mnt/c/test/hello");
+        when(f2.isFormField()).thenReturn(true);
+        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
+        when(fileItemIterator.next()).thenReturn(f2, f1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        assertEquals(2, files.size());
+        assertTrue(files.contains(f1.getFieldName()));
+        files.remove(f1.getFieldName());
+        assertTrue(files.size() == 1);
+        assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
+        assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
     
     @Test
@@ -345,6 +436,12 @@ public class FileSystemDaoTest {
 
     private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception {
         return Files.createDirectories(Paths.get(baseDir , tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
+    }
+    
+    private boolean isUUIDvalid(final String uuid)
+    {
+        LOGGER.debug("Validating UUID {}", uuid);
+        return uuid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     }
 
 }
