@@ -25,9 +25,7 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,6 +34,7 @@ public final class JsonMinifierTest {
     final String inprogressContentFolderPath = "/etc/store/batches/acme-com/in_progress/test_batch/files";
     final int fieldValueSizeThreshold = 8192; // 8KB
 
+    @SuppressWarnings("serial")
     @Test
     public void minifyJsonTest() throws Exception {
         System.out.println("minifyJsonTest...");
@@ -134,6 +133,7 @@ public final class JsonMinifierTest {
         assertTrue("minifyStorageRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void minifyLocalRefJsonTest() throws Exception {
         System.out.println("minifyLocalRefJsonTest...");
@@ -173,6 +173,7 @@ public final class JsonMinifierTest {
         assertTrue("minifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
     }
     
+    @SuppressWarnings("serial")
     @Test
     public void storageAndLocalRefFirstTest() throws Exception {
         System.out.println("minifyLocalRefJsonTest...");
@@ -317,6 +318,7 @@ public final class JsonMinifierTest {
         }
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void validateAndMinifyJsonTest() throws Exception {
         System.out.println("validateAndMinifyJsonTest...");
@@ -415,6 +417,7 @@ public final class JsonMinifierTest {
         assertTrue("validateAndMinifyStorageRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void validateAndMinifyLocalRefJsonTest() throws Exception {
         System.out.println("validateAndMinifyLocalRefJsonTest...");
@@ -559,6 +562,7 @@ public final class JsonMinifierTest {
         assertTrue("validateAndMinifyNoRefMultiValueJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void validateAndMinifyLocalRefMultiValueJsonTest() throws Exception {
         System.out.println("validateAndMinifyLocalRefMultiValueJsonTest...");
@@ -593,6 +597,7 @@ public final class JsonMinifierTest {
         assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", minifiedJson.contains("\"PUBLISHER\":[{\"data\":\"Chapman and Hall\"}"));
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void minifyLargeDataJsonTest() throws Exception {
         System.out.println("minifyLargeDataJsonTest...");
@@ -612,6 +617,7 @@ public final class JsonMinifierTest {
         assertTrue("minifyLargeDataJsonTest", minifiedJson.contains("\"SUBJECT\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"));
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void minifyLargeBase64DataJsonTest() throws Exception {
         System.out.println("minifyLargeBase64DataJsonTest...");
