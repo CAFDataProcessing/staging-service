@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
-import java.util.Set;
+import java.util.Map;
 
 /*
  * This class handles the sub-batching and storing of documents.
@@ -79,7 +79,7 @@ public class SubBatchWriter implements AutoCloseable {
                                   final String storageRefFolderPath,
                                   final String inprogressContentFolderPath,
                                   final int fieldValueSizeThreshold,
-                                  final Set<String> binaryFilesUploaded)
+                                  final Map<String, String> binaryFilesUploaded)
             throws StagingException, InvalidBatchException, IncompleteBatchException {
 
         if(count >= subbatchSize)

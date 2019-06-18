@@ -34,13 +34,15 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +127,7 @@ public class FileSystemDao implements BatchDao {
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
-        final Set<String> binaryFilesUploaded = new HashSet<>();
+        final Map<String, String> binaryFilesUploaded = new HashMap<>();
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
 
@@ -159,13 +161,15 @@ public class FileSystemDao implements BatchDao {
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
                 } else {
-                    final String normalizedFilename = Paths.get(filename).toFile().getName();
-                    final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, normalizedFilename);
+                    final String fileExtension = FilenameUtils.getExtension(filename);
+                    final String targetFileName = fileExtension.isEmpty()
+                        ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
+                    final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName);
                     try (final InputStream inStream = fileItemStream.openStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
                         LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
-                        fileNames.add(normalizedFilename);
-                        binaryFilesUploaded.add(filename);
+                        fileNames.add(targetFileName);
+                        binaryFilesUploaded.put(filename, targetFileName);
                     } catch (IOException ex) {
                         throw new StagingException(ex);
                     }

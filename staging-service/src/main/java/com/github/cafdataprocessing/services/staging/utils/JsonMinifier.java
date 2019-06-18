@@ -35,7 +35,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchExce
 import com.microfocus.caf.worker.document.schema.validator.DocumentValidator;
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import com.worldturner.medeia.api.ValidationFailedException;
-import java.util.Set;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public final class JsonMinifier {
                                                    final String storageRefPath,
                                                    final String inprogressContentFolderPath,
                                                    final int fieldValueSizeThreshold,
-                                                   final Set<String> binaryFilesUploaded)
+                                                   final Map<String, String> binaryFilesUploaded)
             throws IOException, InvalidDocumentException, InvalidBatchException
     {
         final JsonFactory factory = new JsonFactory();
@@ -84,7 +84,7 @@ public final class JsonMinifier {
                                         final String storageRefPath,
                                         final String inprogressContentFolderPath,
                                         final int fieldValueSizeThreshold,
-                                        final Set<String> binaryFilesUploaded) throws IOException, InvalidBatchException
+                                        final Map<String, String> binaryFilesUploaded) throws IOException, InvalidBatchException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
@@ -102,7 +102,7 @@ public final class JsonMinifier {
                                           final String storageRefPath,
                                           final String inprogressContentFolderPath,
                                           final int fieldValueSizeThreshold,
-                                          final Set<String> binaryFilesUploaded) throws IOException, InvalidBatchException {
+                                          final Map<String, String> binaryFilesUploaded) throws IOException, InvalidBatchException {
         String dataBuffer = null;
         String encodingBuffer = null;
         JsonToken token;
@@ -166,13 +166,18 @@ public final class JsonMinifier {
                             updateReference = true;
                         }
                         if (updateReference) {
-                            if (isLocalRefFile && !binaryFilesUploaded.contains(dataBuffer)) {
+                            if (isLocalRefFile && !binaryFilesUploaded.keySet().contains(dataBuffer)) {
                                 LOGGER.error("Binary files referenced in the JSON documents must be uploaded before the JSON documents. "
                                     + "Check file {}", dataBuffer);
                                 throw new InvalidBatchException("Binary files referenced in the JSON documents must be uploaded before "
                                     + "the JSON documents. Check file " + dataBuffer);
+                            } else if (isLocalRefFile && binaryFilesUploaded.keySet().contains(dataBuffer)) {
+                                LOGGER.debug("The binary file has been uploaded {}, its new file name is {}",
+                                             dataBuffer, binaryFilesUploaded.get(dataBuffer));
+                                dataBuffer = storageRefPath + "/" + binaryFilesUploaded.get(dataBuffer);
+                            } else {
+                                dataBuffer = storageRefPath + "/" + dataBuffer;
                             }
-                            dataBuffer = storageRefPath + "/" + dataBuffer;
                         }
                         gen.writeFieldName(DATA_FIELD);
                         gen.writeString(dataBuffer);
