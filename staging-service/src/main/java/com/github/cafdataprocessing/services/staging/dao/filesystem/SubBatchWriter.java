@@ -64,6 +64,10 @@ public class SubBatchWriter implements AutoCloseable {
         //Make a new subbatch file
         final String subBatchFileName = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT))
                  + SUBBATCH_FILE_SUFFIX;
+        /*
+        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+        inProgressBatchFolder is retrieved using properties or env variables.
+        */
         final File subBatch = Paths.get(inProgressBatchFolder.toString(), subBatchFileName).toFile();
         LOGGER.debug("Created new subbatchFile : {} ", subBatch);
         //Open new stream to start writing to subbatch file

@@ -76,6 +76,10 @@ public class FileSystemDao implements BatchDao {
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
 
         final Path batchesPath = batchPathProvider.getPathForBatches(tenantId);
+        /*
+        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath is retrieved using
+        properties or env variables.
+        */
         if(!batchesPath.toFile().exists()){
             return new ArrayList<>();
         }
@@ -108,12 +112,20 @@ public class FileSystemDao implements BatchDao {
     @Override
     public void deleteBatch(final TenantId tenantId, final BatchId batchId)
             throws BatchNotFoundException, StagingException {
+        /*
+        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath is retrieved using
+        properties or env variables.
+        */
         final Path batchPath = batchPathProvider.getPathForBatch(tenantId, batchId);
         if(!batchPath.toFile().exists()){
             throw new BatchNotFoundException(batchId.getValue());
         }
 
         try {
+            /*
+            SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath is retrieved using
+            properties or env variables.
+            */
             FileUtils.deleteDirectory(batchPath.toFile());
         } catch (IOException ex) {
             throw new StagingException(ex);
@@ -128,6 +140,10 @@ public class FileSystemDao implements BatchDao {
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
         final Map<String, String> binaryFilesUploaded = new HashMap<>();
+        /*
+        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from inProgressBatchFolderPath is retrieved using
+        properties or env variables.
+        */
         try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
             while(true){
 
@@ -157,6 +173,11 @@ public class FileSystemDao implements BatchDao {
                     subBatchWriter
                         .writeDocumentFile(fileItemStream::openStream,
                                            storageRefFolderPath.toString(),
+                                           /*
+                                           SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. 
+                                           The value of basePath from inProgressBatchFolderPath is retrieved using 
+                                           properties or env variables.
+                                           */
                                            Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
@@ -164,9 +185,21 @@ public class FileSystemDao implements BatchDao {
                     final String fileExtension = FilenameUtils.getExtension(filename);
                     final String targetFileName = fileExtension.isEmpty()
                         ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
+                    /*
+                    SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+                    inProgressBatchFolderPath is retrieved using properties or env variables.
+                    */
                     final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName);
                     try (final InputStream inStream = fileItemStream.openStream()) {
+                        /*
+                        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+                        targetFile is retrieved using properties or env variables.
+                        */
                         FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
+                        /*
+                        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+                        targetFile is retrieved using properties or env variables.
+                        */
                         LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
                         fileNames.add(targetFileName);
                         binaryFilesUploaded.put(filename, targetFileName);
@@ -183,6 +216,10 @@ public class FileSystemDao implements BatchDao {
         }
         catch (Throwable t){
             LOGGER.error(String.format("Error saving batch [%s].", t.getMessage()));
+            /*
+            SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+            inProgressBatchFolderPath is retrieved using properties or env variables.
+            */
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }
@@ -206,6 +243,10 @@ public class FileSystemDao implements BatchDao {
             throws StagingException {
 
         final Path batchFolder = batchPathProvider.getPathForBatch(tenantId, batchId);
+        /*
+        SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+        batchFolder is retrieved using properties or env variables.
+        */
         if(batchFolder.toFile().exists()){
             try {
                 FileUtils.deleteDirectory(batchFolder.toFile());
@@ -216,6 +257,10 @@ public class FileSystemDao implements BatchDao {
         }
 
         try {
+            /*
+            SCMOD-7274: FALSE POSITIVE on FORTIFY SCAN for Path manipulation. The value of basePath from 
+            inProgressBatchFolderPath is retrieved using properties or env variables.
+            */
             FileUtils.moveDirectory(inProgressBatchFolderPath.toFile(), batchFolder.toFile());
         } catch (IOException ex) {
             LOGGER.error(String.format("Failed to move in progress batch [%s]", batchId));
