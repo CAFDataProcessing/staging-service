@@ -16,19 +16,19 @@ The [integration tests](../staging-service-acceptance-tests) show how the stagin
 
 #### getStatus(String tenantId) returns StagingStatusResponse
 Returns status information about the staging service. A client should use this to check that the service is functional before uploading a large batch.
-- **tenantId**: Tenant identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
+- **tenantId**: Tenant identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
 
 #### createOrReplaceBatch(String tenantId, String batchId, Stream<MultiPart> uploadData)
 Upload documents to a batch. The batch will be automatically created if it doesn't already exist.
 
-- **tenantId**: Tenant identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
-- **batchId**: Batch identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
+- **tenantId**: Tenant identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
+- **batchId**: Batch identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
 - **uploadData**: Stream of multiple document families and associated files
 
 #### getBatches(String tenantId, String startsWith, String from, Integer limit) returns StagingBatchList
 Retrieve the current list of batches in alphabetical order.
 
-- **tenantId**: Tenant identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
+- **tenantId**: Tenant identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
 - **startsWith**: Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.
 - **from**: Specifies the identifier to fetch batches that follow it alphabetically.
 - **limit**: Specifies the number of results to return (defaults to 25).
@@ -36,8 +36,8 @@ Retrieve the current list of batches in alphabetical order.
 #### deleteBatch(String tenantId, String batchId)
 Delete specified batch.
 
-- **tenantId**: Tenant identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
-- **batchId**: Batch identifier (should match the following regex : "^[a-z0-9,.()\\-+_!]{1,128}$")
+- **tenantId**: Tenant identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
+- **batchId**: Batch identifier (should match the following regex : "^[a-zA-Z0-9,.()\\-+_!]{1,128}$")
 
 #### Sample code snippet
 ```
