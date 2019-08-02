@@ -21,7 +21,7 @@ public class BatchId {
     private final String value;
 
     public BatchId(final String value) throws InvalidBatchIdException{
-        if(!value.matches("^[a-z0-9,.()\\-+_!]{1,128}+")){
+        if(!value.matches("^[a-z0-9,.()\\-+_!]{1,128}+$")){
             throw new InvalidBatchIdException(value);
         }
         this.value = value;
