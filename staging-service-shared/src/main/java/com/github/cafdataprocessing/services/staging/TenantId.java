@@ -21,7 +21,7 @@ public class TenantId {
     private final String value;
 
     public TenantId(final String value) throws InvalidTenantIdException{
-        if(!value.matches("^[a-z0-9,.()\\-+_!]{1,128}$")){
+        if(!value.matches("^[a-zA-Z0-9,.()\\-+_!]{1,128}$")){
             throw new InvalidTenantIdException(value);
         }
         this.value = value;
