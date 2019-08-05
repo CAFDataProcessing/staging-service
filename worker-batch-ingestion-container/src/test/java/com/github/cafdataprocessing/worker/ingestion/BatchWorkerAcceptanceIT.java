@@ -221,7 +221,7 @@ public class BatchWorkerAcceptanceIT
     void countMessagesManySubbatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final NewJob job = createNewJobs("Last Job", "Multiple batches", "tenant5/batchBig", new HashMap<>());
+        final NewJob job = createNewJobs("Last Job", "Multiple batches", "tenant5/batch-big", new HashMap<>());
         jobsApi.createOrUpdateJob(jobId, job, "");
         final Job jobRetrieved = jobsApi.getJob(jobId, "");
 

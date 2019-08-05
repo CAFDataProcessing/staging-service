@@ -107,7 +107,7 @@ public class StagingServiceWindowsIT
 
         System.out.println("Document prepared:\n" + document.toString());
         final String[] documentFiles = new String[]{document.toString()};
-        final String batchId = "testBatch1";
+        final String batchId = "test-batch1";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);

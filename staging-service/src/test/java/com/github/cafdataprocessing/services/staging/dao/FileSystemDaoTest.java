@@ -336,10 +336,10 @@ public class FileSystemDaoTest {
 
         final String completedDirectoryName = getCompletedBatchDir(tenantId,baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
-        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
+        final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
@@ -355,10 +355,10 @@ public class FileSystemDaoTest {
         final Integer limit = 10;
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
-        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
+        final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
@@ -369,19 +369,19 @@ public class FileSystemDaoTest {
     @Test
     public void getFilesPaginateFromTest() throws Exception {
         final String startsWith = "test"; 
-        final String from = "testBatch8";
+        final String from = "test-batch8";
         final Integer limit = 10;
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch7"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch8"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch9"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch6"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch7"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch8"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch9"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch10"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
-        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
-        final File f2 = new File(completedDirectoryName + "/testBatch/A_Christmas_Carol2.txt");
+        final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
@@ -392,17 +392,17 @@ public class FileSystemDaoTest {
     @Test
     public void getFilesPaginate() throws Exception {
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch/files"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch6/files"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch7"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch8"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch9"));
-        Files.createDirectories(Paths.get(completedDirectoryName + "/testBatch10"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch/files"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch6"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch6/files"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch7"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch8"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch9"));
+        Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch10"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
-        final File f1 = new File(completedDirectoryName + "/testBatch/files/test_Christmas_Carol1.txt");
-        final File f2 = new File(completedDirectoryName + "/testBatch/files/A_Christmas_Carol2.txt");
+        final File f1 = new File(completedDirectoryName + "/test-batch/files/test_Christmas_Carol1.txt");
+        final File f2 = new File(completedDirectoryName + "/test-batch/files/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
@@ -412,11 +412,11 @@ public class FileSystemDaoTest {
 
     @Test
     public void deleteFilesTest() throws Exception {
-        final BatchId batchId = new BatchId("testBatch");
+        final BatchId batchId = new BatchId("test-batch");
 
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
-        Files.createDirectories(Paths.get(completedDirectoryName , "/testBatch"));
-        final File f1 = new File(completedDirectoryName + "/testBatch/test_Christmas_Carol1.txt");
+        Files.createDirectories(Paths.get(completedDirectoryName , "/test-batch"));
+        final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
         FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
