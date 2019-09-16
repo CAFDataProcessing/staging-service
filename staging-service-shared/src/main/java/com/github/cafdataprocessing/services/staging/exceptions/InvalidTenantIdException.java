@@ -15,9 +15,10 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class InvalidTenantIdException extends Exception {
-    public InvalidTenantIdException(final String batchId){
-        super(batchId);
+public class InvalidTenantIdException extends Exception
+{
+    public InvalidTenantIdException(final String tenantId)
+    {
+        super("Invalid tenant id: " + tenantId);
     }
-
 }

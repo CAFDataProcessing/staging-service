@@ -15,9 +15,10 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class InvalidBatchIdException extends Exception {
-    public InvalidBatchIdException(final String batchId){
-        super(batchId);
+public class InvalidBatchIdException extends Exception
+{
+    public InvalidBatchIdException(final String batchId)
+    {
+        super("Invalid batch id: " + batchId);
     }
-
 }
