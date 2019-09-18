@@ -15,6 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.*;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class StagingController implements StagingApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingController.class);
+
+    private static final String DEFAULT_BASEPATH = "/batches/";
+    private static final long DEFAULT_DISK_SIZE_THRESHOLD = 536870912;
 
     private final BatchDao batchDao;
 
@@ -167,9 +172,44 @@ public class StagingController implements StagingApi {
             @ApiParam(value = "Identifies the tenant making the request." ,required=true)
             @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID
             ) {
-        StatusResponse status = new StatusResponse();
+        final StatusResponse status = new StatusResponse();
         status.setMessage("Service available");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
+        final File basePath = new File(getBasePath());
+        final long diskSizeThreshold = getDiskSizeThreshold();
+        final long diskFreeInBytes = basePath.getUsableSpace();
+
+        if (diskFreeInBytes >= diskSizeThreshold) {
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
+        }
+        else {
+            final String message =
+                         String.format("Service unavailable due to low disk space. Total disk space: %d, free : %d, threshold: %d",
+                                       basePath.getTotalSpace(), diskFreeInBytes, diskSizeThreshold);
+            status.setMessage(message);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .body(status);
+        }
+    }
+
+    private String getBasePath() {
+        final String basePath = StringUtils.isNotEmpty(System.getenv("CAF_STAGING_SERVICE_BASEPATH"))
+                ? System.getenv("CAF_STAGING_SERVICE_BASEPATH")
+                : DEFAULT_BASEPATH;
+        return basePath;
+    }
+
+    private long getDiskSizeThreshold() {
+        try {
+            final long diskSizeThreshold = StringUtils.isNotEmpty(System.getenv("CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD")) 
+                    ? Long.parseLong(System.getenv("CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD"))
+                    : DEFAULT_DISK_SIZE_THRESHOLD;
+            return diskSizeThreshold;
+        }
+        catch(final NumberFormatException e) {
+            LOGGER.error("Error parsing 'CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD' value", e);
+            return DEFAULT_DISK_SIZE_THRESHOLD;
+        }
     }
 
 }
