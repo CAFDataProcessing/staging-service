@@ -24,9 +24,14 @@ management:
     port: 8081
   endpoints:
     web:
+      exposure:
+        include: health
       base-path: /
       path-mapping:
         health: healthcheck
+    jmx:
+      exposure:
+        exclude: "*"
   endpoint:
     health:
       show-details: ALWAYS
