@@ -57,6 +57,11 @@ public class StagingController implements StagingApi {
 
     private final HttpServletRequest request;
 
+    // Force the basePath to be created if it does not exist already before the DiskSpaceHealthIndicator
+    // is created. It needs the basePath to exist
+    @Autowired
+    private BasePathCreator basePathCreator;
+
     @Autowired
     private DiskSpaceHealthIndicator diskSpaceHealthIndicator;
 
