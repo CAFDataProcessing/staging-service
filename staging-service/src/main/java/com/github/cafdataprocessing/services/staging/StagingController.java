@@ -184,7 +184,7 @@ public class StagingController implements StagingApi {
         }
         else
         {
-            status.setMessage("Service available due to low disk space. " + health.getDetails().toString());
+            status.setMessage("Service unavailable due to low disk space. " + health.getDetails().toString());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(status);
