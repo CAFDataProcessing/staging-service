@@ -30,6 +30,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +56,9 @@ public class StagingController implements StagingApi {
     private final BatchDao batchDao;
 
     private final HttpServletRequest request;
+
+    @Autowired
+    private DiskSpaceHealthIndicator diskSpaceHealthIndicator;
 
     @Autowired
     public StagingController(final BatchDao fileSystemDao, final HttpServletRequest request) {
@@ -167,9 +173,22 @@ public class StagingController implements StagingApi {
             @ApiParam(value = "Identifies the tenant making the request." ,required=true)
             @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID
             ) {
-        StatusResponse status = new StatusResponse();
-        status.setMessage("Service available");
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
+        final StatusResponse status = new StatusResponse();
+
+        final Health health = diskSpaceHealthIndicator.health();
+
+        if(health.getStatus() == Status.UP)
+        {
+            status.setMessage("Service available");
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
+        }
+        else
+        {
+            status.setMessage("Service unavailable due to low disk space. " + health.getDetails().toString());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(status);
+        }
     }
 
 }
