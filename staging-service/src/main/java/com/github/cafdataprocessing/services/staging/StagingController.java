@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@DependsOn({"basePathCreator"})
 public class StagingController implements StagingApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingController.class);
