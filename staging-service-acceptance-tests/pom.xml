@@ -85,6 +85,11 @@
             <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -214,7 +219,7 @@
                                     <SSL_KEYSTORE>staging.keystore</SSL_KEYSTORE>
                                     <SSL_KEYSTORE_PASSWORD>changeit</SSL_KEYSTORE_PASSWORD>
                                     <SSL_KEYSTORE_PATH>/test-keystore</SSL_KEYSTORE_PATH>
-                                    <CAF_STAGING_SERVICE_LOG_LEVEL>TRACE</CAF_STAGING_SERVICE_LOG_LEVEL>
+                                    <CAF_LOG_LEVEL>DEBUG</CAF_LOG_LEVEL>
                                     <CAF_STAGING_SERVICE_SUBBATCH_SIZE>4</CAF_STAGING_SERVICE_SUBBATCH_SIZE>
                                     <!--<CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=6005</CAF_SERVICE_JAVA_OPTS>-->
                                 </env>
