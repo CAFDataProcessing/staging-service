@@ -204,9 +204,11 @@ public class FileSystemDao implements BatchDao {
 
     private void completeInProgressBatch(final TenantId tenantId, final Path inProgressBatchFolderPath, final BatchId batchId)
             throws StagingException {
+        LOGGER.info("Completing batch with id {} for {}...", batchId, tenantId);
 
         final Path batchFolder = batchPathProvider.getPathForBatch(tenantId, batchId);
         if(batchFolder.toFile().exists()){
+            LOGGER.warn("Batch {} has been previously uploaded.  Removing previously uploaded batch...", batchId);
             try {
                 FileUtils.deleteDirectory(batchFolder.toFile());
             } catch (IOException ex) {
@@ -215,12 +217,16 @@ public class FileSystemDao implements BatchDao {
             }
         }
 
+        LOGGER.debug("Moving {} to completed folder...", batchId);
+
         try {
             FileUtils.moveDirectory(inProgressBatchFolderPath.toFile(), batchFolder.toFile());
         } catch (IOException ex) {
             LOGGER.error(String.format("Failed to move in progress batch [%s]", batchId));
             throw new StagingException(ex);
         }
+
+        LOGGER.debug("Batch {} completed successfully.", batchId);
     }
 
 }

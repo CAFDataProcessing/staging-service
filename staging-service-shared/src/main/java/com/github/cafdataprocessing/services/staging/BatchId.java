@@ -30,4 +30,10 @@ public class BatchId {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public String toString()
+    {
+        return value;
+    }
 }
