@@ -86,8 +86,8 @@ public class StagingController implements StagingApi {
         }
         try
         {
-            final List<String> savedFiles = batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
-            LOGGER.debug("Staged batch: {}, entries: {}", batchId, savedFiles);
+            batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
+            LOGGER.debug("Staged batch: {}", batchId);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch(final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
