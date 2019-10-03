@@ -164,10 +164,10 @@ public class FileSystemDao implements BatchDao {
                     final String fileExtension = FilenameUtils.getExtension(filename);
                     final String targetFileName = fileExtension.isEmpty()
                         ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
-                    final Path targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName);
+                    final File targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName).toFile();
                     try (final InputStream inStream = fileItemStream.openStream()) {
-                        FileUtils.copyInputStreamToFile(inStream, targetFile.toFile());
-                        LOGGER.trace("Wrote content file '{}'", targetFile.toFile());
+                        FileUtils.copyInputStreamToFile(inStream, targetFile);
+                        LOGGER.trace("Wrote content file '{}'", targetFile);
                         fileNames.add(targetFileName);
                         binaryFilesUploaded.put(filename, targetFileName);
                     } catch (IOException ex) {
