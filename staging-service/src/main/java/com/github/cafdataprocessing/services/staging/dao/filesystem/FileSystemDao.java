@@ -133,7 +133,9 @@ public class FileSystemDao implements BatchDao {
 
                 final FileItemStream fileItemStream;
                 try{
+                    LOGGER.debug("Retrieving next part...");
                     if (!fileItemIterator.hasNext()){
+                        LOGGER.debug("No further parts.");
                         break;
                     }
                     fileItemStream = fileItemIterator.next();
@@ -154,6 +156,7 @@ public class FileSystemDao implements BatchDao {
                 }
                 final String contentType = fileItemStream.getContentType();
                 if (contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT)) {
+                    LOGGER.debug("Part type: document; field name: {}", filename);
                     subBatchWriter
                         .writeDocumentFile(fileItemStream::openStream,
                                            storageRefFolderPath.toString(),
@@ -161,13 +164,15 @@ public class FileSystemDao implements BatchDao {
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
                 } else {
+                    LOGGER.debug("Part type: loose file; field name: {}", filename);
                     final String fileExtension = FilenameUtils.getExtension(filename);
                     final String targetFileName = fileExtension.isEmpty()
                         ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
                     final File targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName).toFile();
+                    LOGGER.debug("Reading loose file...");
                     try (final InputStream inStream = fileItemStream.openStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile);
-                        LOGGER.trace("Wrote content file '{}'", targetFile);
+                        LOGGER.debug("Loose file written to {}", targetFile);
                         fileNames.add(targetFileName);
                         binaryFilesUploaded.put(filename, targetFileName);
                     } catch (IOException ex) {
