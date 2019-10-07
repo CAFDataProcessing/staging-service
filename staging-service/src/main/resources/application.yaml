@@ -25,10 +25,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, threaddump
       base-path: /
       path-mapping:
         health: healthcheck
+        threaddump: threads
     jmx:
       exposure:
         exclude: "*"
