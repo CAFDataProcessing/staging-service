@@ -69,7 +69,7 @@ public class SubBatchWriter implements AutoCloseable {
         //Open new stream to start writing to subbatch file
 
         try {
-            outStream = new BufferedOutputStream(new FileOutputStream(subBatch, true));
+            outStream = new BufferedOutputStream(SlowOutputStream.create(new FileOutputStream(subBatch, true)));
         } catch (FileNotFoundException e) {
             throw new StagingException(e);
         }
