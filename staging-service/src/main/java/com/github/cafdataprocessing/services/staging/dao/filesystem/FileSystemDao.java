@@ -171,7 +171,7 @@ public class FileSystemDao implements BatchDao {
                     final File targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName).toFile();
                     LOGGER.debug("Reading loose file...");
                     try (final InputStream inStream = fileItemStream.openStream()) {
-                        FileUtils.copyInputStreamToFile(inStream, targetFile);
+                        StagingFileUtils.sleepyCopyInputStreamToFile(inStream, targetFile);
                         LOGGER.debug("Loose file written to {}", targetFile);
                         fileNames.add(targetFileName);
                         binaryFilesUploaded.put(filename, targetFileName);
