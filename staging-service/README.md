@@ -21,6 +21,18 @@ The base storage folder where the content files will be staged. Defaults to /etc
 #### CAF_STAGING_SERVICE_FIELDVALUE_SIZE_THRESHOLD
 The maximum data value size in bytes allowed for a field in a document before it is extracted into a separate file. Defaults to 8192 (which is 8KB)
 
+#### CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP  
+Skip the cleanup of abandoned batches that are no longer being worked on, these batches can be left behind if the service crashes during processing.  
+`Default: false`  
+
+#### CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD  
+How old an inprogress batch is allowed to be before it is deleted as stale. This is measured in hours. 
+`Default: 1`  
+
+#### CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL  
+How often the staging service should run the clean up of stale batch files. This is measured in hours.
+`Default: 1`  
+
 ### Logging Configuration
 
 #### CAF_LOG_LEVEL
