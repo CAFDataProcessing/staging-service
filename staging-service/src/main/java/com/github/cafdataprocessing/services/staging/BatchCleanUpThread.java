@@ -35,6 +35,7 @@ public final class BatchCleanUpThread implements Runnable
             try {
                 Thread.sleep(waitPeriod * 60 * 60 * 1000);
             } catch (final InterruptedException ex) {
+                LOG.error("Clean up thread caught InterruptedException: ", ex);
                 throw new RuntimeException(ex);
             }
         }
