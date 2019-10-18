@@ -47,12 +47,12 @@ public final class BatchCleanUp
         final File[] directoryIndex = batchFileStorageDirectory.listFiles();
         if (directoryIndex != null) {
             for (final File file : directoryIndex) {
-                if (file.isDirectory()) {
-                    if (isDirectoryStale(file.lastModified(), this.threshold)) {
+                if (isDirectoryStale(file.lastModified(), this.threshold)) {
+                    if (file.isDirectory()) {
                         deleteFilesInFolder(file);
-                        LOG.debug("Deleting: {}", file.getPath());
-                        file.delete();
                     }
+                    LOG.debug("Deleting: {}", file.getPath());
+                    file.delete();
                 }
             }
         }
