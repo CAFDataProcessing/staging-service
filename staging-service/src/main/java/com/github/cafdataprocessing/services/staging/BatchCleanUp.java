@@ -36,7 +36,7 @@ public final class BatchCleanUp
     }
 
     /**
-     * Deletes batches directories that have not been modified in more time than the configured threshold allows.
+     * Deletes stale batch directories that have not been modified in more time than the configured threshold allows.
      */
     public void deleteStaleBatches()
     {
