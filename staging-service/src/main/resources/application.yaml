@@ -52,8 +52,8 @@ staging:
     storagePath: ${CAF_STAGING_SERVICE_STORAGEPATH:/etc/store/batches/}
     # Default field value size limit is 8KB
     fieldValueSizeThreshold: ${CAF_STAGING_SERVICE_FIELDVALUE_SIZE_THRESHOLD:8192}
-    fileAgeThreshold: ${CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD:60000}
-    fileCleanUpInterval: ${CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL:60000}
+    fileAgeThreshold: ${CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD:3600000}
+    fileCleanUpInterval: ${CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL:86400000}
     skipFileCleanUp: ${CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP:false}
 logging:
   level:
