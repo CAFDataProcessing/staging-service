@@ -61,8 +61,7 @@ public class StagingApplication implements WebMvcConfigurer {
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
         SpringApplication.run(StagingApplication.class, args);
-        if (!Boolean.parseBoolean(
-            BatchCleanUpThread.getEnvVariableOrDefault("CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP", "true"))) {
+        if (!Boolean.parseBoolean(BatchCleanUpThread.getEnvVariableOrDefault("CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP", "false"))) {
             new Thread(new BatchCleanUpThread()).start();
         }
     }

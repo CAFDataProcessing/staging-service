@@ -16,6 +16,8 @@
 package com.github.cafdataprocessing.services.staging;
 
 import java.io.File;
+import java.util.Locale;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,17 +25,23 @@ public final class BatchCleanUpThread implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger(BatchCleanUpThread.class);
 
+    /**
+     * Runs the stale batch clean up thread
+     * 
+     * This thread checks the file system at set intervals to remove stale batch files left behind unintentionally
+     */
     @Override
     public void run()
     {
-        final long threshold = Long.parseLong(getEnvVariableOrDefault("CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD", "1")) * 60 * 60 * 1000;
-        final long waitPeriod = Long.parseLong(
-                                             getEnvVariableOrDefault("CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL", "1")) * 60 * 60 * 1000;
-        final String storageFilPath = System.getenv("CAF_STAGING_SERVICE_STORAGEPATH");
+        final long threshold = convertTimeToLong(getEnvVariableOrDefault("CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD", "1"),
+                                                 getEnvVariableOrDefault("CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD_TIME_UNIT", "hours"));
+        final long waitPeriod = convertTimeToLong(getEnvVariableOrDefault("CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL", "1"),
+                                                  getEnvVariableOrDefault("CAF_STAGING_SERVICE_CLEAN_UP_INTERVAL_TIME_UNIT", "hours"));
+        final String storageFilPath = getEnvVariableOrDefault("CAF_STAGING_SERVICE_STORAGEPATH", "/etc/store/batches/");
         while (true) {
-            recurseAndDeleteOldBatches(threshold, storageFilPath);
+            deleteStaleBatches(threshold, storageFilPath);
             try {
-                Thread.sleep(waitPeriod * 60 * 60 * 1000);
+                Thread.sleep(waitPeriod);
             } catch (final InterruptedException ex) {
                 LOG.error("Clean up thread caught InterruptedException: ", ex);
                 throw new RuntimeException(ex);
@@ -41,34 +49,99 @@ public final class BatchCleanUpThread implements Runnable
         }
     }
 
-    private static void recurseAndDeleteOldBatches(final long threshold, final String storageFilePath)
+    /**
+     * Deletes batches directories that have not been modified in more time than the configured threshold allows.
+     *
+     * @param threshold How long a file can remain unmodified before it will be removed
+     * @param storageFilePath The base path for the batches directory
+     */
+    private static void deleteStaleBatches(final long threshold, final String storageFilePath)
     {
-        final File directory = new File(storageFilePath);
-        final File[] directoryListing = directory.listFiles();
-        for (final File batchFile : directoryListing) {
-            if (batchFile.isDirectory()) {
-                recurseAndDeleteOldBatches(threshold, batchFile.getPath());
-                if (batchFile.list().length == 0) {
-                    LOG.debug("Directory now empty, deleting directory {}", batchFile.getAbsolutePath());
-                    batchFile.delete();
-                }
-            }
-            if (batchFile.isFile()) {
-                if (isFileOlderThan(batchFile.lastModified(), threshold)) {
-                    LOG.debug("File is older than threshold of {}, deleting file {}", threshold, batchFile.getAbsolutePath());
-                    batchFile.delete();
+        Objects.requireNonNull(storageFilePath);
+        final File batchFileStorageDirectory = new File(storageFilePath);
+        final File[] directoryIndex = batchFileStorageDirectory.listFiles();
+        if (directoryIndex != null) {
+            for (final File file : directoryIndex) {
+                if (file.isDirectory()) {
+                    if (isDirectoryStale(file.lastModified(), threshold)) {
+                        deleteFilesInFolder(file);
+                        file.delete();
+                    }
                 }
             }
         }
     }
 
-    private static boolean isFileOlderThan(final long lastModifiedTime, final long ageThreshold)
+    /**
+     * Deletes all files within a given directory
+     *
+     * @param file Directory represented by a File object.
+     */
+    private static void deleteFilesInFolder(final File file)
+    {
+        if (file.list().length == 0) {
+            return;
+        }
+
+        for (final File fileToDelete : file.listFiles()) {
+            if (fileToDelete.isDirectory()) {
+                deleteFilesInFolder(fileToDelete);
+            }
+            fileToDelete.delete();
+        }
+    }
+
+    /**
+     * Determines if the current time minus the ageThreshold is larger than the last modified time supplied.
+     *
+     * @param lastModifiedTime Last time a file was modified
+     * @param ageThreshold How long a file should remain unmodified before being removed
+     * @return true if lastModifiedTime is larger than the current time minus the ageThreshold else it will return false
+     */
+    private static boolean isDirectoryStale(final long lastModifiedTime, final long ageThreshold)
     {
         return (System.currentTimeMillis() - ageThreshold) > lastModifiedTime;
     }
 
+    /**
+     * Retrieves and returns the environment variable value for the given key, else returns the default value supplied if no environment
+     * variable was set for the supplied key
+     *
+     * @param environmentKey Key to use in lookup
+     * @param defaultValue default value to return if no key was found in the environment
+     * @return Either the value picked up from the environment or the default value if the key could not be found in the environment
+     */
     public static String getEnvVariableOrDefault(final String environmentKey, final String defaultValue)
     {
         return System.getenv(environmentKey) != null ? System.getenv(environmentKey) : defaultValue;
+    }
+
+    /**
+     * Converts the supplied string time to a long value using the time units to calculate the time specified in milliseconds.
+     *
+     * @param time The time to be converted
+     * @param timeUnit The time unit to use when converting to milliseconds
+     * @return The time converted to milliseconds
+     */
+    private static long convertTimeToLong(final String time, final String timeUnit)
+    {
+        final double timeValue = Double.parseDouble(time);
+        switch (timeUnit.toUpperCase(Locale.US)) {
+            case "HOURS": {
+                return (long) (timeValue * 60 * 60 * 1000);
+            }
+            case "MINUTES": {
+                return (long) (timeValue * 60 * 1000);
+            }
+            case "SECONDS": {
+                return (long) (timeValue * 1000);
+            }
+            case "MILLISECONDS": {
+                return (long) timeValue;
+            }
+            default: {
+                return (long) (timeValue * 60 * 60 * 1000);
+            }
+        }
     }
 }

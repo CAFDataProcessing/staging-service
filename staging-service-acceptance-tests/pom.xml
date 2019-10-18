@@ -222,6 +222,8 @@
                                     <CAF_LOG_LEVEL>DEBUG</CAF_LOG_LEVEL>
                                     <CAF_STAGING_SERVICE_SUBBATCH_SIZE>4</CAF_STAGING_SERVICE_SUBBATCH_SIZE>
                                     <!--<CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=6005</CAF_SERVICE_JAVA_OPTS>-->
+                                    <CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL>0.02</CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL>
+                                    <CAF_STAGING_SERVICE_STORAGEPATH>/batches/</CAF_STAGING_SERVICE_STORAGEPATH>
                                 </env>
                                 <volumes>
                                     <from>
