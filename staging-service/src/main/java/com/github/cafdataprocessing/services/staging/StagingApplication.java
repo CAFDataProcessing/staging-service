@@ -41,8 +41,12 @@ import org.springframework.web.util.UrlPathHelper;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @SpringBootApplication
+@EnableScheduling
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer {
@@ -56,11 +60,20 @@ public class StagingApplication implements WebMvcConfigurer {
     private final String keyStorePath = System.getenv("SSL_KEYSTORE_PATH");
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
+    @Autowired
+    private BatchCleanUp batchCleanUp;
+
     public static void main(String[] args) {
         //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
         SpringApplication.run(StagingApplication.class, args);
+    }
+
+    @Scheduled(fixedDelayString = "${staging.fileCleanUpInterval}")
+    public void cleanUpAbandonedBatches()
+    {
+        batchCleanUp.deleteStaleBatches();
     }
 
     @Override

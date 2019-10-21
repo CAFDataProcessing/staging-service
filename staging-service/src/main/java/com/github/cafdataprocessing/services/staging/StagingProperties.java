@@ -24,6 +24,9 @@ public class StagingProperties {
     private int subbatchSize;
     private String storagePath;
     private int fieldValueSizeThreshold;
+    private long fileAgeThreshold;
+    private long fileCleanUpInterval;
+    private boolean skipFileCleanUp;
 
     public String getBasePath() {
         return basePath;
@@ -55,5 +58,35 @@ public class StagingProperties {
 
     public void setFieldValueSizeThreshold(int fieldValueSizeThreshold) {
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
+    }
+
+    public long getFileAgeThreshold()
+    {
+        return fileAgeThreshold;
+    }
+
+    public void setFileAgeThreshold(final long fileAgeThreshold)
+    {
+        this.fileAgeThreshold = fileAgeThreshold;
+    }
+
+    public long getFileCleanUpInterval()
+    {
+        return fileCleanUpInterval;
+    }
+
+    public void setFileCleanUpInterval(final long fileCleanUpInterval)
+    {
+        this.fileCleanUpInterval = fileCleanUpInterval;
+    }
+
+    public boolean getSkipFileCleanUp()
+    {
+        return skipFileCleanUp;
+    }
+
+    public void setSkipFileCleanUp(final boolean skipFileCleanUp)
+    {
+        this.skipFileCleanUp = skipFileCleanUp;
     }
 }
