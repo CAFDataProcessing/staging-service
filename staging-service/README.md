@@ -26,11 +26,11 @@ Skip the cleanup of abandoned batches that are no longer being worked on, these 
 `Default: false`  
 
 #### CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD  
-How old an inprogress batch is allowed to be before it is deleted as stale. This is measured in milliseconds. 
+How old an inprogress batch is allowed to be before it is deleted as stale. This is measured in milliseconds and defaults to one hour. 
 `Default: 3600000`  
 
 #### CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL  
-How often the staging service should run the clean up of stale batch files. This is measured in milliseconds.
+How long the service should wait between the completion of one clean up run and starting another, this is measured in milliseconds and defaults to one day.
 `Default: 86400000`  
 
 ### Logging Configuration
