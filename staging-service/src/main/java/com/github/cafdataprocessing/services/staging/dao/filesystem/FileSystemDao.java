@@ -33,9 +33,12 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -56,14 +59,19 @@ public class FileSystemDao implements BatchDao {
     private final BatchPathProvider batchPathProvider;
     private final int subbatchSize;
     private final String storagePath;
+    private final String basePath;
     private final int fieldValueSizeThreshold;
+    private final long fileAgeThreshold;
 
     public FileSystemDao(final String basePath, final int subbatchSize,
-                         final String storagePath, final int fieldValueSizeThreshold) {
+                         final String storagePath, final int fieldValueSizeThreshold,
+                         final long fileAgeThreshold) {
         batchPathProvider = new BatchPathProvider(basePath);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
+        this.basePath = basePath;
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
+        this.fileAgeThreshold = fileAgeThreshold;
     }
 
     @Override
@@ -234,4 +242,84 @@ public class FileSystemDao implements BatchDao {
         LOGGER.debug("Batch {} completed successfully.", batchId);
     }
 
+    /**
+     *
+     */
+    @Override
+    public void cleanUpStaleInprogressBatches()
+    {
+        try {
+            final List<Path> batchesToClean = Files.list(Paths.get(basePath))
+                .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
+                .flatMap(p -> getAllBatchFilesForAllDirectories(p.get()))
+                .filter(p -> BatchNameProvider.validateFileName(p.getFileName().toString()))
+                .filter(p -> shouldDelete(p.getFileName().toString()))
+                .filter(p -> checkAllSubfilesSafely(p))
+                .collect(Collectors.toList());
+            for (final Path filepath : batchesToClean) {
+                try {
+                    FileUtils.deleteDirectory(filepath.toFile());
+                } catch (final IOException | IllegalArgumentException ex) {
+                    LOGGER.error("Unable to delete directory {}", filepath);
+                    LOGGER.debug("An error occured while attempting to delete folder {}", filepath, ex);
+                }
+            }
+        } catch (final IOException ex) {
+            LOGGER.error("An exception occured trying to read the files in the base directory.", ex);
+        }
+    }
+
+    private boolean checkAllSubfilesSafely(final Path path)
+    {
+        try {
+            return Files.list(path).filter(p -> !shouldDelete(p.getFileName().toString())).collect(Collectors.toList()).isEmpty();
+        } catch (final IOException ex) {
+            LOGGER.error("Unable to open directory {}", path, ex);
+            return false;
+        }
+    }
+
+    /**
+     * Obtain a path to the tenants in_progress folder, if the string provided is not a valid tenant id this method will return 
+     * an empty Optional
+     * @param tenantIdFolderName The name of the tenant
+     * @return An Optional of paths to the tenants in_progress folder
+     */
+    private Optional<Path> getTenantInprogressDirectorySafely(final String tenantIdFolderName)
+    {
+        try{
+            final TenantId tenantId = new TenantId(tenantIdFolderName);
+            return Optional.ofNullable(batchPathProvider.getTenantInprogressDirectory(tenantId));
+        } catch (final InvalidTenantIdException ex){
+            LOGGER.debug("Ignoring folder {} as it does not represent a valid tenantId.", tenantIdFolderName);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns a list of the path to all sub files in all folders provide
+     * @param tenantFolders List of Path objects that represent all current tenant in_progress folders
+     * @return return a Stream of paths to all subfiles under all folders provided
+     */
+    private Stream<Path> getAllBatchFilesForAllDirectories(final Path tenantFolder)
+    {
+        try {
+            return Files.list(tenantFolder);
+        } catch (final IOException ex) {
+            LOGGER.error("Unable to list files in directory {}", tenantFolder, ex);
+            return Stream.empty();
+        }
+    }
+
+     /**
+     * Determines if the file was created longer ago than the file age threshold
+     *
+     * @param filename A filename to be used to obtain the file creation time
+     * @return true if file creation time is longer than the file age threshold ago
+     */
+    private boolean shouldDelete(final String filename)
+    {
+        final long fileCreationTime = BatchNameProvider.getFileCreationTime(filename);
+        return (Instant.now().toEpochMilli() - fileAgeThreshold) >= fileCreationTime;
+    }
 }

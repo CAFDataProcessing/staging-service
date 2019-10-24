@@ -61,7 +61,7 @@ public class StagingApplication implements WebMvcConfigurer {
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
     @Autowired
-    private BatchCleanUp batchCleanUp;
+    private InprogressBatchCleanUpController batchCleanUpController;
 
     public static void main(String[] args) {
         //TODO Verify this is needed for staging service
@@ -73,7 +73,8 @@ public class StagingApplication implements WebMvcConfigurer {
     @Scheduled(fixedDelayString = "${staging.fileCleanUpInterval}")
     public void cleanUpAbandonedBatches()
     {
-        batchCleanUp.deleteStaleBatches();
+        System.out.println("Its In HERE!");
+        batchCleanUpController.cleanUpStaleInprogressBatches();
     }
 
     @Override
@@ -116,7 +117,8 @@ public class StagingApplication implements WebMvcConfigurer {
         return new FileSystemDao(stagingProperties.getBasePath(),
                                  stagingProperties.getSubbatchSize(),
                                  stagingProperties.getStoragePath(),
-                                 stagingProperties.getFieldValueSizeThreshold());
+                                 stagingProperties.getFieldValueSizeThreshold(),
+                                 stagingProperties.getFileAgeThreshold());
     }
 
     @Override

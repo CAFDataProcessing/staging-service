@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
@@ -45,8 +43,6 @@ import java.util.Map;
  */
 public class SubBatchWriter implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubBatchWriter.class);
-    private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
-    private static final String TIMESTAMP_FORMAT = "yyyyMMdd-HHmmssSSS";
 
     private final File inProgressBatchFolder;
     private final int subbatchSize;
@@ -62,8 +58,7 @@ public class SubBatchWriter implements AutoCloseable {
     private void createSubBatchOutStream() throws StagingException
     {
         //Make a new subbatch file
-        final String subBatchFileName = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT))
-                 + SUBBATCH_FILE_SUFFIX;
+        final String subBatchFileName = BatchNameProvider.getSubBatchName();
         final File subBatch = Paths.get(inProgressBatchFolder.toString(), subBatchFileName).toFile();
         LOGGER.debug("Created new subbatchFile : {} ", subBatch);
         //Open new stream to start writing to subbatch file

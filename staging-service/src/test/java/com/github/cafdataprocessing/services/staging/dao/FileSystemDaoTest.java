@@ -55,12 +55,14 @@ public class FileSystemDaoTest {
     private TenantId tenantId;
     private String baseDirName;
     private String storageDirName;
+    private FileSystemDao fileSystemDao;
     final int fieldValueSizeThreshold = 8192; // 8KB
 
     @Before
     public void setUp() throws Exception {
         tenantId = new TenantId(TEST_TENANT_ID);
         baseDirName = getTempBaseBatchDir();
+        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000);
     }
 
     @After
@@ -74,7 +76,7 @@ public class FileSystemDaoTest {
 
     @Test
     public void saveFilesTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
+       
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -103,7 +105,6 @@ public class FileSystemDaoTest {
     
     @Test
     public void saveFilesWindowsPathTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -132,7 +133,6 @@ public class FileSystemDaoTest {
     
     @Test
     public void saveFilesLinuxPathTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -161,7 +161,6 @@ public class FileSystemDaoTest {
     
     @Test
     public void saveInvalidLinuxPathTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -191,7 +190,6 @@ public class FileSystemDaoTest {
     @Test
     public void saveFilesWrongOrderNegativeTest() throws Exception
     {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -221,7 +219,6 @@ public class FileSystemDaoTest {
     @Test
     public void saveFilesWrongOrderMixedNegativeTest() throws Exception
     {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream jsonDocOk = mock(FileItemStream.class);
         when(jsonDocOk.getContentType()).thenReturn("application/document+json");
@@ -269,7 +266,6 @@ public class FileSystemDaoTest {
     
     @Test
     public void missingLocalRefFileTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -298,7 +294,6 @@ public class FileSystemDaoTest {
 
     @Test
     public void saveInvalidJsonTest() throws Exception {
-        final FileSystemDao fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
         FileItemStream f1 = mock(FileItemStream.class);
@@ -342,9 +337,8 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
 
-        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
+        final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
     }
 
@@ -361,8 +355,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
-        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
+        final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
     }
 
@@ -384,8 +377,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/test-batch/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
-        final List<String> fileNames = fsDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
+        final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
     }
 
@@ -405,8 +397,7 @@ public class FileSystemDaoTest {
         final File f2 = new File(completedDirectoryName + "/test-batch/files/A_Christmas_Carol2.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
-        final List<String> fileNames = fsDao.getBatches(tenantId, null, null, 25);
+        final List<String> fileNames = fileSystemDao.getBatches(tenantId, null, null, 25);
         assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
     }
 
@@ -419,14 +410,13 @@ public class FileSystemDaoTest {
         final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
-        FileSystemDao fsDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold);
-        final List<String> batches = fsDao.getBatches(tenantId, null, null, null);
+        final List<String> batches = fileSystemDao.getBatches(tenantId, null, null, null);
         assertEquals(1, batches.size());
         assertTrue(batches.contains(batchId.getValue()));
 
-        fsDao.deleteBatch(tenantId, batchId);
+        fileSystemDao.deleteBatch(tenantId, batchId);
 
-        final List<String> batchesAfterDelete = fsDao.getBatches(tenantId, null, null, null);
+        final List<String> batchesAfterDelete = fileSystemDao.getBatches(tenantId, null, null, null);
         assertEquals(0, batchesAfterDelete.size());
     }
 
