@@ -91,9 +91,9 @@
                 <version>2.8.1</version>
             </dependency>
             <dependency>
-                <groupId>com.github.cafapi</groupId>
-                <artifactId>caf-logging</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <groupId>com.github.cafapi.logging</groupId>
+                <artifactId>caf-logging-logback</artifactId>
+                <version>1.0.0-36</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
