@@ -69,8 +69,8 @@
             <artifactId>caf-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafapi</groupId>
-            <artifactId>caf-logging</artifactId>
+            <groupId>com.github.cafapi.logging</groupId>
+            <artifactId>caf-logging-logback</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.cafapi.codec</groupId>
