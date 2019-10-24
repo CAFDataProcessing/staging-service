@@ -62,15 +62,17 @@ public class FileSystemDao implements BatchDao {
     private final String basePath;
     private final int fieldValueSizeThreshold;
     private final long fileAgeThreshold;
+    private final boolean skipBatchFileCleanup;
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold,
-                         final long fileAgeThreshold) {
+                         final long fileAgeThreshold, final boolean skipBatchFileCleanup) {
         batchPathProvider = new BatchPathProvider(basePath);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
         this.basePath = basePath;
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
+        this.skipBatchFileCleanup = skipBatchFileCleanup;
         this.fileAgeThreshold = fileAgeThreshold;
     }
 
@@ -248,6 +250,9 @@ public class FileSystemDao implements BatchDao {
     @Override
     public void cleanUpStaleInprogressBatches()
     {
+        if (skipBatchFileCleanup) {
+            return;
+        }
         try {
             final List<Path> batchesToClean = Files.list(Paths.get(basePath))
                 .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))

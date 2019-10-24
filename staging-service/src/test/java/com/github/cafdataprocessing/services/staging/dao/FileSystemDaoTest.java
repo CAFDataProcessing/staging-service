@@ -62,7 +62,7 @@ public class FileSystemDaoTest {
     public void setUp() throws Exception {
         tenantId = new TenantId(TEST_TENANT_ID);
         baseDirName = getTempBaseBatchDir();
-        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000);
+        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000, true);
     }
 
     @After

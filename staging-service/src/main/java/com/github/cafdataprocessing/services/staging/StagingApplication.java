@@ -41,8 +41,12 @@ import org.springframework.web.util.UrlPathHelper;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @SpringBootApplication
+@EnableScheduling
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer {
@@ -114,7 +118,8 @@ public class StagingApplication implements WebMvcConfigurer {
                                  stagingProperties.getSubbatchSize(),
                                  stagingProperties.getStoragePath(),
                                  stagingProperties.getFieldValueSizeThreshold(),
-                                 stagingProperties.getFileAgeThreshold());
+                                 stagingProperties.getFileAgeThreshold(),
+                                 stagingProperties.getSkipFileCleanUp());
     }
 
     @Override
