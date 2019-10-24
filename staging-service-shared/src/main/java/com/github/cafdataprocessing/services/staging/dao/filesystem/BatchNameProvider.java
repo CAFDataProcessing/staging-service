@@ -20,7 +20,7 @@ import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
-public class BatchNameProvider
+public final class BatchNameProvider
 {
     private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
 
