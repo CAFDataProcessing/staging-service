@@ -41,9 +41,7 @@ import org.springframework.web.util.UrlPathHelper;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 @SpringBootApplication
 @EnableScheduling
