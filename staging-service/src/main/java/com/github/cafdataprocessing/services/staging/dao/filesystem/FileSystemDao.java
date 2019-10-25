@@ -48,7 +48,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
+@EnableScheduling
 public class FileSystemDao implements BatchDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemDao.class);
 
@@ -247,6 +250,7 @@ public class FileSystemDao implements BatchDao {
     /**
      *
      */
+    @Scheduled(fixedDelayString = "${staging.fileCleanUpInterval}")
     @Override
     public void cleanUpStaleInprogressBatches()
     {

@@ -70,7 +70,6 @@ public final class BatchNameProvider
 
     public static boolean validateFileName(final String fileName)
     {
-        System.out.println("File name: " + fileName);
         return fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}.[0-9]{3}Z-.*-.*-.*");
     }
 }

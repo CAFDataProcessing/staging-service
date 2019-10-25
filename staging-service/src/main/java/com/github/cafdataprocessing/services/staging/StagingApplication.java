@@ -60,21 +60,11 @@ public class StagingApplication implements WebMvcConfigurer {
     private final String keyStorePath = System.getenv("SSL_KEYSTORE_PATH");
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
-    @Autowired
-    private InprogressBatchCleanUpHandler batchCleanUpController;
-
     public static void main(String[] args) {
         //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
         SpringApplication.run(StagingApplication.class, args);
-    }
-
-    @Scheduled(fixedDelayString = "${staging.fileCleanUpInterval}")
-    public void cleanUpAbandonedBatches()
-    {
-        System.out.println("Its In HERE!");
-        batchCleanUpController.cleanUpStaleInprogressBatches();
     }
 
     @Override
