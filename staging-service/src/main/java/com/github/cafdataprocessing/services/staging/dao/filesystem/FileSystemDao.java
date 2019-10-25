@@ -277,7 +277,11 @@ public class FileSystemDao implements BatchDao {
     private boolean checkAllSubfilesSafely(final Path path)
     {
         try {
-            return Files.list(path).filter(p -> !shouldDelete(p.getFileName().toString())).collect(Collectors.toList()).isEmpty();
+            return Files.list(path)
+                .filter(p -> BatchNameProvider.validateFileName(p.getFileName().toString()))
+                .filter(p -> !shouldDelete(p.getFileName().toString()))
+                .collect(Collectors.toList())
+                .isEmpty();
         } catch (final IOException ex) {
             LOGGER.error("Unable to open directory {}", path, ex);
             return false;
