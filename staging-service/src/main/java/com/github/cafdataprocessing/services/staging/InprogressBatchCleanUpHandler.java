@@ -18,19 +18,19 @@ package com.github.cafdataprocessing.services.staging;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import org.springframework.stereotype.Component;
 
-@Component("batchCleanUpController")
-public class InprogressBatchCleanUpController
+@Component
+public class InprogressBatchCleanUpHandler
 {
-    private final BatchDao fileSystemDao;
+    private final BatchDao batchDao;
 
-    public InprogressBatchCleanUpController(final BatchDao fileSystemDao)
+    public InprogressBatchCleanUpHandler(final BatchDao batchDao)
     {
-        this.fileSystemDao = fileSystemDao;
+        this.batchDao = batchDao;
     }
 
     public void cleanUpStaleInprogressBatches()
     {
         System.out.println("Its NOW In HERE!");
-        fileSystemDao.cleanUpStaleInprogressBatches();
+        batchDao.cleanUpStaleInprogressBatches();
     }
 }

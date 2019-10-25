@@ -61,7 +61,7 @@ public class StagingApplication implements WebMvcConfigurer {
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
     @Autowired
-    private InprogressBatchCleanUpController batchCleanUpController;
+    private InprogressBatchCleanUpHandler batchCleanUpController;
 
     public static void main(String[] args) {
         //TODO Verify this is needed for staging service
