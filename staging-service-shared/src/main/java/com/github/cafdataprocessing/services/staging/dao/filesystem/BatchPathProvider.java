@@ -18,19 +18,15 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class BatchPathProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchPathProvider.class);
-    private static final String TIMESTAMP_FORMAT = "yyyyMMdd-HHmmssSSS";
     private static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
@@ -67,10 +63,7 @@ public class BatchPathProvider {
         If the batch folder existed under the staging root, it will be deleted before copying the new data
         */
         //Make a temporary folder with name like, timestamp+threadid+serviceid+batchID in a separate "in_progress" folder
-        final String inProgressBatchFolderName = LocalDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT))
-                .concat("-").concat("" + Thread.currentThread().getId())
-                .concat("-").concat(ServiceIdentifier.getServiceId())
-                .concat("-").concat(batchId.getValue());
+        final String inProgressBatchFolderName = BatchNameProvider.getBatchDirectoryName(batchId);
 
         final Path inProgressPath = Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER, inProgressBatchFolderName);
         final File inProgressFile = inProgressPath.toFile();
@@ -88,6 +81,11 @@ public class BatchPathProvider {
             }
         }
         return inProgressPath;
+    }
+    
+    public Path getTenantInprogressDirectory(final TenantId tenantId)
+    {
+        return Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER);
     }
 
     public Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,

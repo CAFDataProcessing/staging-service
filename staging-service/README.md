@@ -19,7 +19,19 @@ The minimum usable disk space in bytes that should be available to the service. 
 The base storage folder where the content files will be staged. Defaults to /etc/store/batches/.
 
 #### CAF_STAGING_SERVICE_FIELDVALUE_SIZE_THRESHOLD
-The maximum data value size in bytes allowed for a field in a document before it is extracted into a separate file. Defaults to 8192 (which is 8KB)
+The maximum data value size in bytes allowed for a field in a document before it is extracted into a separate file. Defaults to 8192 (which is 8KB)  
+
+#### CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP  
+Skip the cleanup of abandoned batches that are no longer being worked on, these batches can be left behind if the service crashes during processing.  
+`Default: false`  
+
+#### CAF_STAGING_SERVICE_FILE_AGE_THRESHOLD  
+How old an inprogress batch is allowed to be before it is deleted as stale. This is measured in milliseconds and defaults to one hour. 
+`Default: 3600000`  
+
+#### CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL  
+How long the service should wait between the completion of one clean up run and starting another, this is measured in milliseconds and defaults to one day.  
+`Default: 86400000`  
 
 ### Logging Configuration
 

@@ -40,4 +40,6 @@ public interface BatchDao {
 
     void deleteBatch(TenantId tenantId, @Size(min = 1) BatchId BatchId) throws BatchNotFoundException, StagingException;
 
+    void cleanUpStaleInprogressBatches();
+
 }
