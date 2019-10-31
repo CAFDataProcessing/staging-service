@@ -37,6 +37,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdE
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -257,17 +258,17 @@ public class FileSystemDao implements BatchDao {
         if (skipBatchFileCleanup) {
             return;
         }
-        try {
-            // "Each mapped stream is closed after its contents have been placed into this stream."-
-            final Stream<Path> batchesToClean = Files.list(Paths.get(basePath))
-                .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
-                .flatMap(p -> getAllBatchFilesForAllDirectories(p.get()))
-                .filter(p -> BatchNameProvider.validateFileName(p.getFileName().toString()))
-                .filter(p -> shouldDelete(p.getFileName().toString()))
-                .filter(p -> checkAllSubfilesSafely(p));
+        // "Each mapped stream is closed after its contents have been placed into this stream."-
+        try (final Stream<Path> batchesToClean = Files.list(Paths.get(basePath))
+            .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
+            .flatMap(p -> getAllBatchFilesForAllDirectories(p.get()))
+            .filter(p -> BatchNameProvider.validateFileName(p.getFileName().toString()))
+            .filter(p -> shouldDelete(p.getFileName().toString()))
+            .filter(p -> checkAllSubfilesSafely(p))) {
 
-            while (batchesToClean.iterator().hasNext()) {
-                final Path path = batchesToClean.iterator().next();
+            final Iterator<Path> paths = batchesToClean.iterator();
+            while (paths.hasNext()) {
+                final Path path = paths.next();
                 try {
                     FileUtils.deleteDirectory(path.toFile());
                 } catch (final IOException | IllegalArgumentException ex) {
