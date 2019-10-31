@@ -257,6 +257,7 @@ public class FileSystemDao implements BatchDao {
         if (skipBatchFileCleanup) {
             return;
         }
+        final List<Path> pathes;
         // "Each mapped stream is closed after its contents have been placed into this stream."-
         try (final Stream<Path> batchesToClean = Files.list(Paths.get(basePath))
             .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
@@ -265,17 +266,17 @@ public class FileSystemDao implements BatchDao {
             .filter(p -> shouldDelete(p.getFileName().toString()))
             .filter(p -> checkAllSubfilesSafely(p))) {
 
-            while (batchesToClean.iterator().hasNext()) {
-                final Path path = batchesToClean.iterator().next();
-                try {
-                    FileUtils.deleteDirectory(path.toFile());
-                } catch (final IOException | IllegalArgumentException ex) {
-                    LOGGER.error("Unable to delete directory {}", path);
-                    LOGGER.debug("An error occured while attempting to delete folder {}", path, ex);
-                }
-            }
+            pathes = batchesToClean.collect(Collectors.toList());
         } catch (final IOException ex) {
             LOGGER.error("An exception occured trying to read the files in the base directory.", ex);
+        }
+        for (final Path path : pathes) {
+            try {
+                FileUtils.deleteDirectory(path.toFile());
+            } catch (final IOException | IllegalArgumentException ex) {
+                LOGGER.error("Unable to delete directory {}", path);
+                LOGGER.debug("An error occured while attempting to delete folder {}", path, ex);
+            }
         }
     }
 
