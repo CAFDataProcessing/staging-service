@@ -268,12 +268,12 @@ public class FileSystemDao implements BatchDao {
 
             final Iterator<Path> paths = batchesToClean.iterator();
             while (paths.hasNext()) {
-                final Path nextPath = paths.next();
+                final Path path = paths.next();
                 try {
-                    FileUtils.deleteDirectory(nextPath.toFile());
+                    FileUtils.deleteDirectory(path.toFile());
                 } catch (final IOException | IllegalArgumentException ex) {
-                    LOGGER.error("Unable to delete directory {}", nextPath);
-                    LOGGER.debug("An error occured while attempting to delete folder {}", nextPath, ex);
+                    LOGGER.error("Unable to delete directory {}", path);
+                    LOGGER.debug("An error occured while attempting to delete folder {}", path, ex);
                 }
             }
         } catch (final IOException ex) {
