@@ -37,6 +37,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdE
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -257,7 +258,6 @@ public class FileSystemDao implements BatchDao {
         if (skipBatchFileCleanup) {
             return;
         }
-        final List<Path> pathes = new ArrayList<>();
         // "Each mapped stream is closed after its contents have been placed into this stream."-
         try (final Stream<Path> batchesToClean = Files.list(Paths.get(basePath))
             .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
@@ -266,17 +266,18 @@ public class FileSystemDao implements BatchDao {
             .filter(p -> shouldDelete(p.getFileName().toString()))
             .filter(p -> checkAllSubfilesSafely(p))) {
 
-            pathes.addAll(batchesToClean.collect(Collectors.toList()));
+            final Iterator<Path> paths = batchesToClean.iterator();
+            while (paths.hasNext()) {
+                final Path nextPath = paths.next();
+                try {
+                    FileUtils.deleteDirectory(nextPath.toFile());
+                } catch (final IOException | IllegalArgumentException ex) {
+                    LOGGER.error("Unable to delete directory {}", nextPath);
+                    LOGGER.debug("An error occured while attempting to delete folder {}", nextPath, ex);
+                }
+            }
         } catch (final IOException ex) {
             LOGGER.error("An exception occured trying to read the files in the base directory.", ex);
-        }
-        for (final Path path : pathes) {
-            try {
-                FileUtils.deleteDirectory(path.toFile());
-            } catch (final IOException | IllegalArgumentException ex) {
-                LOGGER.error("Unable to delete directory {}", path);
-                LOGGER.debug("An error occured while attempting to delete folder {}", path, ex);
-            }
         }
     }
 
