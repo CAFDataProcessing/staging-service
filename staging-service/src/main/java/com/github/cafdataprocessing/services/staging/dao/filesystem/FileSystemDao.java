@@ -257,7 +257,7 @@ public class FileSystemDao implements BatchDao {
         if (skipBatchFileCleanup) {
             return;
         }
-        final List<Path> pathes;
+        final List<Path> pathes = new ArrayList<>();
         // "Each mapped stream is closed after its contents have been placed into this stream."-
         try (final Stream<Path> batchesToClean = Files.list(Paths.get(basePath))
             .map(p -> getTenantInprogressDirectorySafely(p.getFileName().toString()))
@@ -266,7 +266,7 @@ public class FileSystemDao implements BatchDao {
             .filter(p -> shouldDelete(p.getFileName().toString()))
             .filter(p -> checkAllSubfilesSafely(p))) {
 
-            pathes = batchesToClean.collect(Collectors.toList());
+            pathes.addAll(batchesToClean.collect(Collectors.toList()));
         } catch (final IOException ex) {
             LOGGER.error("An exception occured trying to read the files in the base directory.", ex);
         }
