@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-public class HealthcheckInterceptor extends HandlerInterceptorAdapter
+public final class HealthcheckInterceptor extends HandlerInterceptorAdapter
 {
     private final int adminPort;
 
@@ -28,7 +28,7 @@ public class HealthcheckInterceptor extends HandlerInterceptorAdapter
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception
     {
         if (request.getLocalPort() == adminPort && request.getServletPath().equals("/")) {
            response.sendRedirect("/healthcheck");
