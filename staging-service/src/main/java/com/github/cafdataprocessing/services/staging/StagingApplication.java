@@ -42,6 +42,7 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 @SpringBootApplication
 @EnableScheduling
@@ -52,7 +53,10 @@ public class StagingApplication implements WebMvcConfigurer {
 
     @Value("${https.port}")
     private int httpsPort;
-
+    
+    @Value("${management.server.port}")
+    private int adminPort;
+    
     private final String keyAlias = System.getenv("SSL_CERT_ALIAS");
     private final String keyStore = System.getenv("SSL_KEYSTORE");
     private final String keyStorePath = System.getenv("SSL_KEYSTORE_PATH");
@@ -119,6 +123,12 @@ public class StagingApplication implements WebMvcConfigurer {
                 .defaultContentType(MediaType.APPLICATION_JSON, MediaType.ALL);
     }
 
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry){
+        registry.addInterceptor(new SwaggerInterceptor(adminPort));
+        registry.addInterceptor(new HealthcheckInterceptor(adminPort));
+    }
+    
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/swagger/").setViewName("forward:/swagger/index.html");
