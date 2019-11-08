@@ -32,6 +32,7 @@ public class HealthcheckInterceptor extends HandlerInterceptorAdapter
     {
         if (request.getLocalPort() == adminPort && request.getServletPath().equals("/")) {
            response.sendRedirect("/healthcheck");
+           return false;
         }
         return true;
     }
