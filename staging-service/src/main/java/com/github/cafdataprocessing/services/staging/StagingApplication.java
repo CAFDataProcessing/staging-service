@@ -125,6 +125,7 @@ public class StagingApplication implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry){
+        registry.addInterceptor(new LoggingMDCInterceptor());
         registry.addInterceptor(new SwaggerInterceptor(adminPort));
         registry.addInterceptor(new HealthcheckInterceptor(adminPort));
     }
