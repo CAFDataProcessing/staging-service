@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
@@ -97,9 +98,13 @@ public class SubBatchWriter implements AutoCloseable {
                                                    inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
                 count++;
             }
-            catch (IOException | InvalidDocumentException ex){
+            catch (final JsonProcessingException | InvalidDocumentException ex){
                 LOGGER.error("Error staging document", ex);
                 throw new InvalidBatchException(ex);
+            }
+            catch (final IOException ioe){
+                LOGGER.error("IOException when staging document", ioe);
+                throw new StagingException(ioe);
             }
         }
         catch (IOException ex){
