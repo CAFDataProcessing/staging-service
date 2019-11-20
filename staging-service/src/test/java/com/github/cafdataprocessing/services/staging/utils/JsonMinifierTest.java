@@ -1,6 +1,5 @@
-package com.github.cafdataprocessing.services.staging.utils;
 /*
- * Copyright 2015-2018 Micro Focus or one of its affiliates.
+ * Copyright 2018-2020 Micro Focus or one of its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +13,7 @@ package com.github.cafdataprocessing.services.staging.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.cafdataprocessing.services.staging.utils;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
