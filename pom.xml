@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2018-2020 Micro Focus or one of its affiliates.
+    Copyright 2019-2020 Micro Focus or one of its affiliates.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@
         <version>2.1.0-129</version>
     </parent>
     
-    <inceptionYear>2018</inceptionYear>
+    <inceptionYear>2019</inceptionYear>
 
     <properties>
         <copyrightYear>2020</copyrightYear>
