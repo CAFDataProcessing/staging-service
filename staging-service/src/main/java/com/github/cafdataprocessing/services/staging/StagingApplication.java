@@ -15,10 +15,9 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import java.io.File;
+
 import com.github.cafapi.CAFSwaggerUI;
-import com.github.cafdataprocessing.services.staging.dao.BatchDao;
-import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,13 +31,16 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.util.UrlPathHelper;
-import java.io.File;
+
+import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 @SpringBootApplication
 @EnableScheduling
