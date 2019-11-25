@@ -154,6 +154,11 @@
             <groupId>com.worldturner.medeia</groupId>
             <artifactId>medeia-validator-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.cafapi</groupId>
+            <artifactId>swagger-ui-annotation</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <!--Test dependencies-->
         <dependency>
             <groupId>junit</groupId>

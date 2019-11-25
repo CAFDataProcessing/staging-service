@@ -15,8 +15,10 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import java.io.File;
-
+import com.github.cafapi.CAFSwaggerUI;
+import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,22 +32,17 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.resource.PathResourceResolver;
-import org.springframework.web.util.UrlPathHelper;
-
-import com.github.cafdataprocessing.services.staging.dao.BatchDao;
-import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.util.UrlPathHelper;
+import java.io.File;
 
 @SpringBootApplication
 @EnableScheduling
+@CAFSwaggerUI("com.github.cafdataprocessing.services.staging.contract")
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer {
@@ -126,29 +123,7 @@ public class StagingApplication implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry){
         registry.addInterceptor(new LoggingMDCInterceptor());
-        registry.addInterceptor(new SwaggerInterceptor(adminPort));
         registry.addInterceptor(new HealthcheckInterceptor(adminPort));
     }
     
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/swagger/").setViewName("forward:/swagger/index.html");
-        registry.addViewController("/swagger").setViewName("redirect:./swagger/");
-        registry.addViewController("/").setViewName("redirect:./swagger/");
-        registry.addViewController("/swagger-ui").setViewName("redirect:./swagger/");
-        registry.addViewController("/swagger-ui/").setViewName("redirect:/swagger-ui");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry
-                .addResourceHandler("/swagger/**")
-                .addResourceLocations(
-                        "classpath:/swagger/",
-                        "classpath:/com/github/cafdataprocessing/services/staging/contract/",
-                        "classpath:/META-INF/resources/webjars/swagger-ui-dist/3.20.6/")
-                .resourceChain(true)
-                .addResolver(new PathResourceResolver());
-    }
-
 }
