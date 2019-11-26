@@ -71,9 +71,34 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-templates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/templates</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.github.cafapi</groupId>
+                                    <artifactId>swagger-client-templates</artifactId>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <version>3.0.14</version>
                 <!--Using 2.2.3 for client generation for compatibility reasons-->
                 <dependencies>
                     <dependency>
@@ -96,6 +121,7 @@
                             <modelPackage>com.github.cafdataprocessing.services.staging.client</modelPackage>
                             <apiPackage>com.github.cafdataprocessing.services.staging.client.internal</apiPackage>
                             <invokerPackage>com.github.cafdataprocessing.services.staging.client</invokerPackage>
+                            <templateDirectory>${project.build.directory}/templates/3.x</templateDirectory>
                             <modelNamePrefix>Staging</modelNamePrefix>
                             <configOptions>
                                 <groupId>${project.groupId}</groupId>
@@ -127,50 +153,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>modify-swagger-apiclient-logging</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>targetDir</name>
-                                    <value>${project.build.directory}</value>
-                                </property>
-                            </properties>
-                            <scripts>
-                                <script><![CDATA[
-                                    def apiClientFile = new File(targetDir + "/swagger/com/github/cafdataprocessing/services/staging/client/ApiClient.java")
-                                    def apiClientFileContents = apiClientFile.text
-                                    if(apiClientFileContents==null){
-                                        throw Exception();
-                                    }
-
-                                    def loggerDefinition = 'public class ApiClient \\{ \n    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ApiClient.class);'
-                                    def loggerDefinedAddedText = apiClientFileContents.replaceAll('public class ApiClient \\{', loggerDefinition)
-                                    def logInterceptorModifiedText = loggerDefinedAddedText.replaceAll('HttpLoggingInterceptor\\(', 'HttpLoggingInterceptor\\(msg -> \\{ LOGGER.debug(msg); \\}')
-                                    apiClientFile.write(logInterceptorModifiedText)
-                                ]]></script>
-                            </scripts>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-all</artifactId>
-                        <version>2.4.7</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
