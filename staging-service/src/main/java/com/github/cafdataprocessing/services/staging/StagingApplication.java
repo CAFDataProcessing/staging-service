@@ -17,6 +17,7 @@ package com.github.cafdataprocessing.services.staging;
 
 import java.io.File;
 
+import com.github.cafapi.CAFSwaggerUI;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 @SpringBootApplication
 @EnableScheduling
+@CAFSwaggerUI("com.github.cafdataprocessing.services.staging.contract")
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer {
