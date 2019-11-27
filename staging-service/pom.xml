@@ -31,10 +31,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.cafapi</groupId>
-            <artifactId>swagger-ui-annotation</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.cafapi.logging</groupId>
             <artifactId>caf-logging-logback</artifactId>
             <scope>runtime</scope>
