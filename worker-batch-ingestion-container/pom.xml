@@ -414,7 +414,7 @@
                             <alias>worker-ingestion</alias>
                             <name>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}worker-ingestion${dockerProjectVersion}</name>
                             <build>
-                                <from>cafinternal/prereleases:opensuse-jre8-2.0.0-SNAPSHOT</from>
+                                <from>cafapi/opensuse-jre8:2</from>
                                 <labels>
                                     <caf.worker-framework.version>${caf.worker-batch-framework.version}</caf.worker-framework.version>
                                     <Build.Number>${project.version}</Build.Number>
