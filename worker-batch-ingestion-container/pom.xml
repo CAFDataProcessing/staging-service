@@ -377,7 +377,7 @@
                                 </ports>
                                 <wait>
                                     <log>PostgreSQL init process complete</log>
-                                    <time>20000</time>
+                                    <time>120000</time>
                                     <shutdown>500</shutdown>
                                 </wait>
                             </run>
@@ -407,6 +407,13 @@
                                     <link>rabbitmq</link>
                                     <link>postgres</link>
                                 </links>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${job-service.adminport}</url>
+                                    </http>
+                                    <time>300000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
                             </run>
                         </image>
                         <!-- Begin Worker Ingestion image -->
