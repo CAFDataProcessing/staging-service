@@ -57,6 +57,16 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!--Need changes to the test BatchWorkerAcceptanceIT.java. Using deprecated API
+            https://github.com/rabbitmq/rabbitmq-java-client/blob/master/src/test/java/com/rabbitmq/client
+            /QueueingConsumer.java-->
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>3.5.3</version>
+            </dependency>
+
             <!--Centralized CAF dependency BOM-->
             <dependency>
                 <groupId>com.github.cafapi</groupId>
