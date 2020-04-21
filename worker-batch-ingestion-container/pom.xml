@@ -399,7 +399,6 @@
                             <build>
                                 <from>cafapi/opensuse-jre8:2</from>
                                 <labels>
-                                    <caf.worker-framework.version>${caf.worker-batch-framework.version}</caf.worker-framework.version>
                                     <Build.Number>${project.version}</Build.Number>
                                     <Build.Date>${maven.build.timestamp}</Build.Date>
                                     <Git.Repo>${gitRepo}</Git.Repo>
@@ -468,7 +467,7 @@
                                 </log>
                                 <wait>
                                     <http>
-                                        <url>http://${docker.host.address}:${worker.adminport}</url>
+                                        <url>http://${docker.host.address}:${worker.adminport}/healthcheck</url>
                                     </http>
                                     <time>120000</time>
                                     <shutdown>500</shutdown>
