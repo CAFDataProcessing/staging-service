@@ -362,7 +362,7 @@
                         <!-- Job Service and DB -->
                         <image>
                             <alias>postgres</alias>
-                            <name>postgres:9.6</name>
+                            <name>postgres:11.7</name>
                             <run>
                                 <env>
                                     <POSTGRES_DB>${jobServiceDatabaseName}</POSTGRES_DB>
