@@ -492,7 +492,7 @@
                                 </log>
                                 <wait>
                                     <http>
-                                        <url>http://${docker.host.address}:${worker.adminport}</url>
+                                        <url>http://${docker.host.address}:${worker.adminport}/healthcheck</url>
                                     </http>
                                     <time>120000</time>
                                     <shutdown>500</shutdown>

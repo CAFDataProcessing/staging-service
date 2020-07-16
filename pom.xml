@@ -55,9 +55,9 @@
         <okhttp-version>2.7.5</okhttp-version>
         <enforceBannedDependencies>true</enforceBannedDependencies>
         <enforceCorrectDependencies>true</enforceCorrectDependencies>
-        <fasterxmlVersion>2.9.9</fasterxmlVersion>
+        <fasterxmlVersion>2.10.3</fasterxmlVersion>
         <springDataVersion>2.0.9.RELEASE</springDataVersion>
-        <caf.worker-batch-framework.version>3.2.1-350</caf.worker-batch-framework.version>
+        <caf.worker-batch-framework.version>3.3.0-SNAPSHOT</caf.worker-batch-framework.version>
         <junit.jupiter.version>5.4.1</junit.jupiter.version>
         <hamcrest.version>1.3</hamcrest.version>
         <lombok.version>1.18.6</lombok.version>
