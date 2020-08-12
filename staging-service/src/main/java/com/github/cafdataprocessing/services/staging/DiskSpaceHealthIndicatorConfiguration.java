@@ -25,10 +25,12 @@ public class DiskSpaceHealthIndicatorConfiguration
 {
     @Bean
     public DiskSpaceHealthIndicator diskSpaceHealthIndicator(
-        final DiskSpaceHealthIndicatorProperties properties,
+        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties,
         final StagingProperties stagingProperties)
     {
         return new DiskSpaceHealthIndicatorWithTimeout(
-            properties.getPath(), properties.getThreshold(), stagingProperties.getHealthcheckTimeoutSeconds());
+            diskSpaceHealthIndicatorProperties.getPath(),
+            diskSpaceHealthIndicatorProperties.getThreshold(),
+            stagingProperties.getHealthcheckTimeoutSeconds());
     }
 }
