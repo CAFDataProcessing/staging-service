@@ -95,6 +95,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 } catch (final InvalidBatchIdException ex) {
                     log.error("Invalid Batch Id Exception! " + ex.getMessage());
                     throw new BatchDefinitionException("Invalid Batch Id Exception! " + ex.getMessage());
+                } catch (final InvalidTenantIdException ex) {
+                    log.error("Invalid Tenant Id Exception! " + ex.getMessage());
+                    throw new BatchDefinitionException("Invalid Tenant Id Exception! " + ex.getMessage());
                 }
             } else {
                 log.error("Invalid format of the batch definition: " + batchDefinition);
