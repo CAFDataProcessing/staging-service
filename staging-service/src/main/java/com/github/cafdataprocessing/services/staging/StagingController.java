@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +46,7 @@ import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
 
 import io.swagger.annotations.ApiParam;
+import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -59,13 +59,21 @@ public class StagingController implements StagingApi {
 
     private final HttpServletRequest request;
 
-    @Autowired(required=false)
-    private DiskSpaceHealthIndicator diskSpaceHealthIndicator;
+    private final DiskSpaceHealthIndicatorWithTimeout diskSpaceHealthIndicatorWithTimeout;
 
     @Autowired
-    public StagingController(final BatchDao fileSystemDao, final HttpServletRequest request) {
+    public StagingController(
+        final BatchDao fileSystemDao,
+        final HttpServletRequest request,
+        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties,
+        final StagingProperties stagingProperties)
+    {
         this.batchDao = fileSystemDao;
         this.request = request;
+        this.diskSpaceHealthIndicatorWithTimeout = new DiskSpaceHealthIndicatorWithTimeout(
+            diskSpaceHealthIndicatorProperties.getPath(),
+            diskSpaceHealthIndicatorProperties.getThreshold(),
+            stagingProperties.getHealthcheckTimeoutSeconds());
     }
 
     public ResponseEntity<Void> createOrReplaceBatch(
@@ -177,7 +185,7 @@ public class StagingController implements StagingApi {
             ) {
         final StatusResponse status = new StatusResponse();
 
-        final Health health = diskSpaceHealthIndicator.health();
+        final Health health = diskSpaceHealthIndicatorWithTimeout.health();
 
         if(health.getStatus() == Status.UP)
         {
@@ -186,7 +194,8 @@ public class StagingController implements StagingApi {
         }
         else
         {
-            status.setMessage("Service unavailable due to low disk space. " + health.getDetails().toString());
+            status.setMessage("Service unavailable due to unavailable batches directory or low disk space. "
+                + health.getDetails().toString());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(status);

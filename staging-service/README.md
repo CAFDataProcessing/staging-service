@@ -33,6 +33,10 @@ How old an inprogress batch is allowed to be before it is deleted as stale. This
 How long the service should wait between the completion of one clean up run and starting another, this is measured in milliseconds and defaults to one day.  
 `Default: 86400000`  
 
+#### CAF_STAGING_SERVICE_HEALTHCHECK_TIMEOUT_SECONDS  
+The timeout in seconds allowed for the healthcheck to return, after which the healthcheck will report an unhealthy status. Defaults to 10 seconds.
+`Default: 10`  
+
 ### Logging Configuration
 
 #### CAF_LOG_LEVEL

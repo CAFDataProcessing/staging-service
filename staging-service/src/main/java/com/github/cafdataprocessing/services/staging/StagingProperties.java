@@ -27,6 +27,7 @@ public class StagingProperties {
     private long fileAgeThreshold;
     private long fileCleanUpInterval;
     private boolean skipFileCleanUp;
+    private int healthcheckTimeoutSeconds;
 
     public String getBasePath() {
         return basePath;
@@ -88,5 +89,15 @@ public class StagingProperties {
     public void setSkipFileCleanUp(final boolean skipFileCleanUp)
     {
         this.skipFileCleanUp = skipFileCleanUp;
+    }
+
+    public int getHealthcheckTimeoutSeconds()
+    {
+        return healthcheckTimeoutSeconds;
+    }
+
+    public void setHealthcheckTimeoutSeconds(final int healthcheckTimeoutSeconds)
+    {
+        this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
     }
 }
