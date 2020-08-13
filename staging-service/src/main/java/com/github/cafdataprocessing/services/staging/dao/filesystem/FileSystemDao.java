@@ -306,7 +306,7 @@ public class FileSystemDao implements BatchDao {
         try{
             final TenantId tenantId = new TenantId(tenantIdFolderName);
             return Optional.ofNullable(batchPathProvider.getTenantInprogressDirectory(tenantId));
-        } catch (final InvalidTenantIdException ex){
+        } catch (final InvalidTenantIdException | StagingException ex){
             LOGGER.debug("Ignoring folder {} as it does not represent a valid tenantId.", tenantIdFolderName);
             return Optional.empty();
         }
