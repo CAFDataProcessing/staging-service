@@ -33,6 +33,7 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import java.time.Instant;
@@ -89,9 +90,16 @@ public class FileSystemDao implements BatchDao {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
 
-        final Path batchesPath = batchPathProvider.getPathForBatches(tenantId);
-        if(!batchesPath.toFile().exists()){
-            return new ArrayList<>();
+        final Path batchesPath;
+        try
+        {
+            batchesPath = batchPathProvider.getPathForBatches(tenantId);
+            if(!batchesPath.toFile().exists()){
+                return new ArrayList<>();
+            }
+        } catch (final InvalidTenantIdException e)
+        {
+            throw new StagingException(e);
         }
         //Retrieve the current list of batches in alphabetical order
         try(final Stream<Path> pathStream =
@@ -122,14 +130,13 @@ public class FileSystemDao implements BatchDao {
     @Override
     public void deleteBatch(final TenantId tenantId, final BatchId batchId)
             throws BatchNotFoundException, StagingException {
-        final Path batchPath = batchPathProvider.getPathForBatch(tenantId, batchId);
-        if(!batchPath.toFile().exists()){
-            throw new BatchNotFoundException(batchId.getValue());
-        }
-
         try {
+            final Path batchPath = batchPathProvider.getPathForBatch(tenantId, batchId);
+            if(!batchPath.toFile().exists()){
+                throw new BatchNotFoundException(batchId.getValue());
+            }
             FileUtils.deleteDirectory(batchPath.toFile());
-        } catch (IOException ex) {
+        } catch (final IOException | InvalidBatchIdException | InvalidTenantIdException ex) {
             throw new StagingException(ex);
         }
     }
@@ -205,7 +212,12 @@ public class FileSystemDao implements BatchDao {
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }
-        completeInProgressBatch(tenantId, inProgressBatchFolderPath, batchId);
+        try {
+            completeInProgressBatch(tenantId, inProgressBatchFolderPath, batchId);
+        }
+        catch (final InvalidBatchIdException | InvalidTenantIdException e) {
+            throw new StagingException(e);
+        }
         return fileNames;
     }
 
@@ -222,7 +234,7 @@ public class FileSystemDao implements BatchDao {
     }
 
     private void completeInProgressBatch(final TenantId tenantId, final Path inProgressBatchFolderPath, final BatchId batchId)
-            throws StagingException {
+            throws StagingException, InvalidBatchIdException, InvalidTenantIdException {
         LOGGER.info("Completing batch with id {} for {}...", batchId, tenantId);
 
         final Path batchFolder = batchPathProvider.getPathForBatch(tenantId, batchId);
@@ -306,7 +318,7 @@ public class FileSystemDao implements BatchDao {
         try{
             final TenantId tenantId = new TenantId(tenantIdFolderName);
             return Optional.ofNullable(batchPathProvider.getTenantInprogressDirectory(tenantId));
-        } catch (final InvalidTenantIdException | StagingException ex){
+        } catch (final InvalidTenantIdException ex){
             LOGGER.debug("Ignoring folder {} as it does not represent a valid tenantId.", tenantIdFolderName);
             return Optional.empty();
         }
