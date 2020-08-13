@@ -54,7 +54,7 @@ public class FileSystemDaoTest {
     private static String TEST_TENANT_ID = "12345";
     private TenantId tenantId;
     private String baseDirName;
-    private String storageDirName;
+    private String storageDirName = "/etc/store/batches";
     private FileSystemDao fileSystemDao;
     final int fieldValueSizeThreshold = 8192; // 8KB
 
