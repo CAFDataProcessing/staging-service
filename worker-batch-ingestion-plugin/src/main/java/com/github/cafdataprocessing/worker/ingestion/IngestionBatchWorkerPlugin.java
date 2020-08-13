@@ -158,7 +158,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
                                 final Map<String, String> taskMessageParams)
-        throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
+        throws InvalidBatchIdException, InvalidTenantIdException, BatchWorkerTransientException, BatchDefinitionException
     {
         final Subbatch subbatchObj = extractSubbatch(subbatch);
         final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(subbatchObj.getTenantId(), subbatchObj.getBatchId());
