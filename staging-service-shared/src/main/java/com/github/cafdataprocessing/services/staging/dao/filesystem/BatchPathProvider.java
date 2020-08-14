@@ -52,9 +52,9 @@ public class BatchPathProvider {
     }
 
     public Path getPathForBatch(final TenantId tenantId, final BatchId batchId) throws InvalidBatchIdException, InvalidTenantIdException {
-        final Path tenantPath = getPathForBatches(tenantId);
-        final Path batchPath = tenantPath.resolve(batchId.getValue());
-        if (!batchPath.normalize().startsWith(tenantPath))
+        final Path pathForBatches = getPathForBatches(tenantId);
+        final Path batchPath = pathForBatches.resolve(batchId.getValue());
+        if (!batchPath.normalize().startsWith(pathForBatches))
         {
             throw new InvalidBatchIdException("Invalid batch id : " + batchPath);
         }
