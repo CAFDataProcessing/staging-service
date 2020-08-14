@@ -47,7 +47,8 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDa
 import java.io.FileInputStream;
 import org.apache.commons.io.FilenameUtils;
 
-public class FileSystemDaoTest {
+public class FileSystemDaoTest
+{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemDaoTest.class);
     private static final String BATCH_BASE_FOLDER = "batchBase";
@@ -59,7 +60,8 @@ public class FileSystemDaoTest {
     final int fieldValueSizeThreshold = 8192; // 8KB
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         tenantId = new TenantId(TEST_TENANT_ID);
         baseDirName = getTempBaseBatchDir();
         this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000, true);
@@ -69,14 +71,15 @@ public class FileSystemDaoTest {
     public void tearDown() throws IOException
     {
         final File baseDir = new File(baseDirName);
-        if(baseDir.exists()){
+        if (baseDir.exists()) {
             FileUtils.deleteDirectory(baseDir);
         }
     }
 
     @Test
-    public void saveFilesTest() throws Exception {
-       
+    public void saveFilesTest() throws Exception
+    {
+
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -102,9 +105,10 @@ public class FileSystemDaoTest {
         assertTrue(FilenameUtils.getExtension(files.get(0)).equals("txt"));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
-    
+
     @Test
-    public void saveFilesWindowsPathTest() throws Exception {
+    public void saveFilesWindowsPathTest() throws Exception
+    {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -130,9 +134,10 @@ public class FileSystemDaoTest {
         assertTrue(FilenameUtils.getExtension(files.get(0)).equals("pdf"));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
-    
+
     @Test
-    public void saveFilesLinuxPathTest() throws Exception {
+    public void saveFilesLinuxPathTest() throws Exception
+    {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -158,9 +163,10 @@ public class FileSystemDaoTest {
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
-    
+
     @Test
-    public void saveInvalidLinuxPathTest() throws Exception {
+    public void saveInvalidLinuxPathTest() throws Exception
+    {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -186,7 +192,7 @@ public class FileSystemDaoTest {
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
-    
+
     @Test
     public void saveFilesWrongOrderNegativeTest() throws Exception
     {
@@ -215,7 +221,7 @@ public class FileSystemDaoTest {
                 + "documents. Check file A_Christmas_Carol1.txt"));
         }
     }
-    
+
     @Test
     public void saveFilesWrongOrderMixedNegativeTest() throws Exception
     {
@@ -231,20 +237,20 @@ public class FileSystemDaoTest {
         when(localRefOneOk.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
         when(localRefOneOk.isFormField()).thenReturn(true);
         when(localRefOneOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
-        
+
         FileItemStream localRefTwoOk = mock(FileItemStream.class);
         when(localRefTwoOk.getContentType()).thenReturn("application/text");
         when(localRefTwoOk.getFieldName()).thenReturn("A_Christmas_Carol2.txt");
         when(localRefTwoOk.isFormField()).thenReturn(true);
         when(localRefTwoOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
-        
+
         FileItemStream jsonDocNotOk = mock(FileItemStream.class);
         when(jsonDocNotOk.getContentType()).thenReturn("application/document+json");
         when(jsonDocNotOk.getFieldName()).thenReturn("jsonDocument.json");
         when(jsonDocNotOk.isFormField()).thenReturn(true);
         when(jsonDocNotOk.openStream()).thenReturn(new FileInputStream(
             Paths.get("src", "test", "resources", "batch1MissingLocalRef.json").toFile()));
-        
+
         FileItemStream localRefThreeTooLate = mock(FileItemStream.class);
         when(localRefThreeTooLate.getContentType()).thenReturn("application/text");
         when(localRefThreeTooLate.getFieldName()).thenReturn("hello-hello.txt");
@@ -263,9 +269,10 @@ public class FileSystemDaoTest {
                 + "JSON documents. Check file A_Christmas_Carol3.txt"));
         }
     }
-    
+
     @Test
-    public void missingLocalRefFileTest() throws Exception {
+    public void missingLocalRefFileTest() throws Exception
+    {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
         FileItemStream f1 = mock(FileItemStream.class);
         when(f1.getContentType()).thenReturn("application/document+json");
@@ -282,7 +289,7 @@ public class FileSystemDaoTest {
         FileItemIterator fileItemIterator = mock(FileItemIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f1, f2);
-        
+
         try {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("The exception has not been thrown!");
@@ -293,7 +300,8 @@ public class FileSystemDaoTest {
     }
 
     @Test
-    public void saveInvalidJsonTest() throws Exception {
+    public void saveInvalidJsonTest() throws Exception
+    {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
         FileItemStream f1 = mock(FileItemStream.class);
@@ -307,29 +315,28 @@ public class FileSystemDaoTest {
         when(fileItemIterator.hasNext()).thenReturn(true, false);
         when(fileItemIterator.next()).thenReturn(f1);
 
-        try
-        {
+        try {
             fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
             fail("Incorrectly uploaded invalid batch");
-        }
-        catch(final InvalidBatchException e)
-        {
+        } catch (final InvalidBatchException e) {
             assertTrue("Expected InvalidBatchException thrown", true);
         }
     }
 
     @Test(expected = InvalidBatchIdException.class)
-    public void putFilesInvalidBatchIdTest() throws Exception {
+    public void putFilesInvalidBatchIdTest() throws Exception
+    {
         new BatchId("../../MyBadBatchId");
     }
 
     @Test
-    public void getFilesTest() throws Exception {
-        final String startsWith = "test"; 
+    public void getFilesTest() throws Exception
+    {
+        final String startsWith = "test";
         final String from = "test";
         final Integer limit = 10;
 
-        final String completedDirectoryName = getCompletedBatchDir(tenantId,baseDirName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/abcBatch"));
@@ -343,8 +350,9 @@ public class FileSystemDaoTest {
     }
 
     @Test
-    public void getFilesInvalidFromTest() throws Exception {
-        final String startsWith = "test"; 
+    public void getFilesInvalidFromTest() throws Exception
+    {
+        final String startsWith = "test";
         final String from = "best";
         final Integer limit = 10;
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
@@ -360,8 +368,9 @@ public class FileSystemDaoTest {
     }
 
     @Test
-    public void getFilesPaginateFromTest() throws Exception {
-        final String startsWith = "test"; 
+    public void getFilesPaginateFromTest() throws Exception
+    {
+        final String startsWith = "test";
         final String from = "test-batch8";
         final Integer limit = 10;
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
@@ -382,7 +391,8 @@ public class FileSystemDaoTest {
     }
 
     @Test
-    public void getFilesPaginate() throws Exception {
+    public void getFilesPaginate() throws Exception
+    {
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch"));
         Files.createDirectories(Paths.get(completedDirectoryName + "/test-batch/files"));
@@ -402,11 +412,12 @@ public class FileSystemDaoTest {
     }
 
     @Test
-    public void deleteFilesTest() throws Exception {
+    public void deleteFilesTest() throws Exception
+    {
         final BatchId batchId = new BatchId("test-batch");
 
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
-        Files.createDirectories(Paths.get(completedDirectoryName , "/test-batch"));
+        Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch"));
         final File f1 = new File(completedDirectoryName + "/test-batch/test_Christmas_Carol1.txt");
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
 
@@ -420,14 +431,16 @@ public class FileSystemDaoTest {
         assertEquals(0, batchesAfterDelete.size());
     }
 
-    private String getTempBaseBatchDir() throws Exception {
+    private String getTempBaseBatchDir() throws Exception
+    {
         return Files.createTempDirectory(BATCH_BASE_FOLDER).toString();
     }
 
-    private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception {
-        return Files.createDirectories(Paths.get(baseDir , tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
+    private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception
+    {
+        return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
     }
-    
+
     private boolean isUUIDvalid(final String uuid)
     {
         LOGGER.debug("Validating UUID {}", uuid);

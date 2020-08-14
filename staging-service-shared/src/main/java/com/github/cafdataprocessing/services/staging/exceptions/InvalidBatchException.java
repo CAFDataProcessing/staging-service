@@ -15,17 +15,21 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class InvalidBatchException extends Exception {
+public class InvalidBatchException extends Exception
+{
 
-    public InvalidBatchException() {
+    public InvalidBatchException()
+    {
         super();
     }
 
-    public InvalidBatchException(final String message) {
+    public InvalidBatchException(final String message)
+    {
         super(message);
     }
 
-    public InvalidBatchException(final Throwable cause) {
+    public InvalidBatchException(final Throwable cause)
+    {
         super(cause);
     }
 

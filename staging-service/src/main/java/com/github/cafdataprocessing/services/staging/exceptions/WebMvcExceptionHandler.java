@@ -22,10 +22,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class WebMvcExceptionHandler extends ResponseEntityExceptionHandler {
+public class WebMvcExceptionHandler extends ResponseEntityExceptionHandler
+{
 
     @ExceptionHandler(WebMvcHandledRuntimeException.class)
-    public final ResponseEntity<Object> handleStagingException(Exception ex, WebRequest webRequest) {
-        return new ResponseEntity<>(ex.getMessage(), ((WebMvcHandledRuntimeException)ex).getStatus());
+    public final ResponseEntity<Object> handleStagingException(Exception ex, WebRequest webRequest)
+    {
+        return new ResponseEntity<>(ex.getMessage(), ((WebMvcHandledRuntimeException) ex).getStatus());
     }
 }

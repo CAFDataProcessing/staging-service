@@ -17,7 +17,8 @@ package com.github.cafdataprocessing.services.staging.utils;
 
 import java.util.Random;
 
-public final class ServiceIdentifier {
+public final class ServiceIdentifier
+{
 
     /**
      * A unique identifier for the current service.

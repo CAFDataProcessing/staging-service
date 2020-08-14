@@ -23,12 +23,14 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public final class LoggingMDCInterceptor extends HandlerInterceptorAdapter {
+public final class LoggingMDCInterceptor extends HandlerInterceptorAdapter
+{
 
     private static final String TENANT_HEADER = "X-TENANT-ID";
 
     @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
+    {
         final String tenant = request.getHeader(TENANT_HEADER);
         if (StringUtils.isNotEmpty(tenant)) {
             MDC.put("tenantId", tenant);
@@ -38,7 +40,8 @@ public final class LoggingMDCInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler,
-                           final ModelAndView modelAndView) {
+                           final ModelAndView modelAndView)
+    {
         MDC.remove(TENANT_HEADER);
     }
 }

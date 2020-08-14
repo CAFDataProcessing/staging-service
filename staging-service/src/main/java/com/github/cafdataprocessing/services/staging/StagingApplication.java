@@ -47,21 +47,23 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 @CAFSwaggerUI("com.github.cafdataprocessing.services.staging.contract")
 @ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
-public class StagingApplication implements WebMvcConfigurer {
+public class StagingApplication implements WebMvcConfigurer
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingApplication.class);
 
     @Value("${https.port}")
     private int httpsPort;
-    
+
     @Value("${management.server.port}")
     private int adminPort;
-    
+
     private final String keyAlias = System.getenv("SSL_CERT_ALIAS");
     private final String keyStore = System.getenv("SSL_KEYSTORE");
     private final String keyStorePath = System.getenv("SSL_KEYSTORE_PATH");
     private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
@@ -69,15 +71,16 @@ public class StagingApplication implements WebMvcConfigurer {
     }
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    public void configurePathMatch(PathMatchConfigurer configurer)
+    {
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         urlPathHelper.setUrlDecode(false);
         configurer.setUrlPathHelper(urlPathHelper);
     }
 
-
     @Bean
-    public ServletWebServerFactory servletContainer() {
+    public ServletWebServerFactory servletContainer()
+    {
         final TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         if (validateConnectorParameters()) {
             tomcat.addAdditionalTomcatConnectors(createStandardConnector());
@@ -85,7 +88,8 @@ public class StagingApplication implements WebMvcConfigurer {
         return tomcat;
     }
 
-    private Connector createStandardConnector() {
+    private Connector createStandardConnector()
+    {
         final Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setPort(httpsPort);
         connector.setScheme("https");
@@ -97,9 +101,10 @@ public class StagingApplication implements WebMvcConfigurer {
         return connector;
     }
 
-    private boolean validateConnectorParameters() {
-        return !StringUtils.isEmpty(keyAlias) && !StringUtils.isEmpty(keyStore) &&
-                !StringUtils.isEmpty(keyStorePassword) && !StringUtils.isEmpty(keyStorePath);
+    private boolean validateConnectorParameters()
+    {
+        return !StringUtils.isEmpty(keyAlias) && !StringUtils.isEmpty(keyStore)
+            && !StringUtils.isEmpty(keyStorePassword) && !StringUtils.isEmpty(keyStorePath);
     }
 
     @Bean
@@ -117,16 +122,16 @@ public class StagingApplication implements WebMvcConfigurer {
     public void configureContentNegotiation(final ContentNegotiationConfigurer configurer)
     {
         configurer.favorPathExtension(true)
-                .ignoreAcceptHeader(true)
-                .useRegisteredExtensionsOnly(false)
-                .defaultContentType(MediaType.APPLICATION_JSON, MediaType.ALL);
+            .ignoreAcceptHeader(true)
+            .useRegisteredExtensionsOnly(false)
+            .defaultContentType(MediaType.APPLICATION_JSON, MediaType.ALL);
     }
 
     @Override
-    public void addInterceptors(final InterceptorRegistry registry){
+    public void addInterceptors(final InterceptorRegistry registry)
+    {
         registry.addInterceptor(new LoggingMDCInterceptor());
         registry.addInterceptor(new HealthcheckInterceptor(adminPort));
     }
-    
 
 }

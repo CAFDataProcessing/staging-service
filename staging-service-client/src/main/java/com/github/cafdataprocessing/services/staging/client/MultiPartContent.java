@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class MultiPartContent implements MultiPart{
+public class MultiPartContent implements MultiPart
+{
 
     private final String name;
     private final InputStreamSupplier streamSupplier;
@@ -45,17 +46,20 @@ public class MultiPartContent implements MultiPart{
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     @Override
-    public String getContentType() {
+    public String getContentType()
+    {
         return "application/octet-stream";
     }
 
     @Override
-    public InputStream openInputStream() throws IOException {
+    public InputStream openInputStream() throws IOException
+    {
         return streamSupplier.get();
     }
 

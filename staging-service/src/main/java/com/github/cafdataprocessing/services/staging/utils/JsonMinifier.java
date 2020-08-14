@@ -39,8 +39,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JsonMinifier {
-    
+public final class JsonMinifier
+{
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonMinifier.class);
 
     private static final String DATA_FIELD = "data";
@@ -52,7 +53,9 @@ public final class JsonMinifier {
     private static final String TXT_ENTENSION = ".txt";
     private static final String BINARY_ENTENSION = ".bin";
 
-    private JsonMinifier(){}
+    private JsonMinifier()
+    {
+    }
 
     public static final void validateAndMinifyJson(final InputStream inputStream,
                                                    final OutputStream outstream,
@@ -60,19 +63,16 @@ public final class JsonMinifier {
                                                    final String inprogressContentFolderPath,
                                                    final int fieldValueSizeThreshold,
                                                    final Map<String, String> binaryFilesUploaded)
-            throws IOException, InvalidDocumentException, InvalidBatchException
+        throws IOException, InvalidDocumentException, InvalidBatchException
     {
         final JsonFactory factory = new JsonFactory();
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = DocumentValidator.getValidatingParser(inputStream);
-        try(final JsonGenerator gen = factory.createGenerator(outstream))
-        {
+        try (final JsonGenerator gen = factory.createGenerator(outstream)) {
             try {
                 processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
-            }
-            catch(final ValidationFailedException e)
-            {
+            } catch (final ValidationFailedException e) {
                 throw new InvalidDocumentException(e);
             }
         }
@@ -90,8 +90,7 @@ public final class JsonMinifier {
         factory.configure(Feature.FLUSH_PASSED_TO_STREAM, false);
         factory.configure(Feature.AUTO_CLOSE_TARGET, false);
         final JsonParser parser = factory.createParser(inputStream);
-        try(final JsonGenerator gen = factory.createGenerator(outstream))
-        {
+        try (final JsonGenerator gen = factory.createGenerator(outstream)) {
             processJsonTokens(parser, gen, storageRefPath, inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
         }
         outstream.write('\n');
@@ -102,7 +101,8 @@ public final class JsonMinifier {
                                           final String storageRefPath,
                                           final String inprogressContentFolderPath,
                                           final int fieldValueSizeThreshold,
-                                          final Map<String, String> binaryFilesUploaded) throws IOException, InvalidBatchException {
+                                          final Map<String, String> binaryFilesUploaded) throws IOException, InvalidBatchException
+    {
         String dataBuffer = null;
         String encodingBuffer = null;
         JsonToken token;
@@ -156,8 +156,7 @@ public final class JsonMinifier {
                     // values and write them out
                     if (pauseWriting) {
                         // check size of data field value
-                        if(dataBuffer.getBytes().length > fieldValueSizeThreshold)
-                        {
+                        if (dataBuffer.getBytes().length > fieldValueSizeThreshold) {
                             // write it out to a loose file
                             final String fileName = RandomStringUtils.randomAlphanumeric(10);
                             final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);
@@ -209,15 +208,14 @@ public final class JsonMinifier {
     }
 
     private static String writeDataToFile(final String data, final String fileName,
-                                        final String inprogressContentFolderPath, final String encoding) throws IOException {
+                                          final String inprogressContentFolderPath, final String encoding) throws IOException
+    {
         String contentFileName = fileName;
         if (encoding == null || encoding.equalsIgnoreCase(UTF8_ENCODING)) {
             contentFileName = fileName + TXT_ENTENSION;
             final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             FileUtils.writeStringToFile(targetFile.toFile(), data, StandardCharsets.UTF_8);
-        }
-        else if (encoding.equalsIgnoreCase(BASE64_ENCODING))
-        {
+        } else if (encoding.equalsIgnoreCase(BASE64_ENCODING)) {
             contentFileName = fileName + BINARY_ENTENSION;
             final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             // If encoding is base64, write file after base64 decoding the data

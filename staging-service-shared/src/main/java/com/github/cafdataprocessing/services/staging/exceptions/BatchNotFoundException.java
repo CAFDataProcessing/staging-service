@@ -15,17 +15,21 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class BatchNotFoundException extends Exception {
+public class BatchNotFoundException extends Exception
+{
 
-    public BatchNotFoundException() {
+    public BatchNotFoundException()
+    {
         super();
     }
 
-    public BatchNotFoundException(final String message) {
+    public BatchNotFoundException(final String message)
+    {
         super(message);
     }
 
-    public BatchNotFoundException(final Throwable cause) {
+    public BatchNotFoundException(final Throwable cause)
+    {
         super(cause);
     }
 

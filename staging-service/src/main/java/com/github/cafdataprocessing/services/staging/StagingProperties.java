@@ -18,7 +18,8 @@ package com.github.cafdataprocessing.services.staging;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "staging")
-public class StagingProperties {
+public class StagingProperties
+{
 
     private String basePath;
     private int subbatchSize;
@@ -29,38 +30,46 @@ public class StagingProperties {
     private boolean skipFileCleanUp;
     private int healthcheckTimeoutSeconds;
 
-    public String getBasePath() {
+    public String getBasePath()
+    {
         return basePath;
     }
 
-    public void setBasePath(String basePath) {
+    public void setBasePath(String basePath)
+    {
         this.basePath = basePath;
     }
 
-    public int getSubbatchSize() {
+    public int getSubbatchSize()
+    {
         return subbatchSize;
     }
 
-    public void setSubbatchSize(int subbatchSize) {
+    public void setSubbatchSize(int subbatchSize)
+    {
         this.subbatchSize = subbatchSize;
     }
 
-    public String getStoragePath() {
+    public String getStoragePath()
+    {
         return storagePath;
     }
 
-    public void setStoragePath(String storagePath) {
+    public void setStoragePath(String storagePath)
+    {
         this.storagePath = storagePath;
     }
 
-    public int getFieldValueSizeThreshold() {
+    public int getFieldValueSizeThreshold()
+    {
         return fieldValueSizeThreshold;
     }
 
-    public void setFieldValueSizeThreshold(int fieldValueSizeThreshold) {
+    public void setFieldValueSizeThreshold(int fieldValueSizeThreshold)
+    {
         this.fieldValueSizeThreshold = fieldValueSizeThreshold;
     }
-    
+
     public long getFileAgeThreshold()
     {
         return fileAgeThreshold;

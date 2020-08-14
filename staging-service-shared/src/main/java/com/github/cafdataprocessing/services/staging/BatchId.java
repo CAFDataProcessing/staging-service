@@ -17,17 +17,20 @@ package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 
-public class BatchId {
+public class BatchId
+{
     private final String value;
 
-    public BatchId(final String value) throws InvalidBatchIdException{
-        if(!value.matches("^[a-z0-9,.()\\-+_!]{0,127}[a-z0-9,()\\-+_!]$")){
+    public BatchId(final String value) throws InvalidBatchIdException
+    {
+        if (!value.matches("^[a-z0-9,.()\\-+_!]{0,127}[a-z0-9,()\\-+_!]$")) {
             throw new InvalidBatchIdException(value);
         }
         this.value = value;
     }
 
-    public String getValue() {
+    public String getValue()
+    {
         return value;
     }
 

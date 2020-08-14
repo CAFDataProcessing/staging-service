@@ -43,7 +43,8 @@ import java.util.Map;
  * It writes the metadata of each document family out into the subbatch file in minified json format.
  * When a configurable subbatch size is reached the subbatch file will be closed and a new one will be opened.
  */
-public class SubBatchWriter implements AutoCloseable {
+public class SubBatchWriter implements AutoCloseable
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(SubBatchWriter.class);
 
     private final File inProgressBatchFolder;
@@ -52,7 +53,8 @@ public class SubBatchWriter implements AutoCloseable {
     //Track number of document files processed
     private int count = 0;
 
-    public SubBatchWriter(final File inProgressBatchFolder, final int subbatchSize) {
+    public SubBatchWriter(final File inProgressBatchFolder, final int subbatchSize)
+    {
         this.inProgressBatchFolder = inProgressBatchFolder;
         this.subbatchSize = subbatchSize;
     }
@@ -64,8 +66,7 @@ public class SubBatchWriter implements AutoCloseable {
         final Path inProgressPath = Paths.get(inProgressBatchFolder.toString());
         final Path subBatchPath = inProgressPath.resolve(subBatchFileName);
 
-        if(!subBatchPath.normalize().startsWith(inProgressPath))
-        {
+        if (!subBatchPath.normalize().startsWith(inProgressPath)) {
             throw new StagingException("Sub batch path was not created. Invalid path : " + subBatchPath);
         }
 
@@ -85,10 +86,10 @@ public class SubBatchWriter implements AutoCloseable {
                                   final String inprogressContentFolderPath,
                                   final int fieldValueSizeThreshold,
                                   final Map<String, String> binaryFilesUploaded)
-            throws StagingException, InvalidBatchException, IncompleteBatchException {
+        throws StagingException, InvalidBatchException, IncompleteBatchException
+    {
 
-        if(count >= subbatchSize)
-        {
+        if (count >= subbatchSize) {
             //Close the stream for the current subbatch file
             try {
                 close();
@@ -97,26 +98,23 @@ public class SubBatchWriter implements AutoCloseable {
             }
         }
 
-        if(outStream==null){
+        if (outStream == null) {
             createSubBatchOutStream();
         }
 
-        try(final InputStream inStream = inputStreamSupplier.get()){
+        try (final InputStream inStream = inputStreamSupplier.get()) {
             try {
                 JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
                                                    inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
                 count++;
-            }
-            catch (final JsonProcessingException | InvalidDocumentException ex){
+            } catch (final JsonProcessingException | InvalidDocumentException ex) {
                 LOGGER.error("Error staging document", ex);
                 throw new InvalidBatchException(ex);
-            }
-            catch (final IOException ioe){
+            } catch (final IOException ioe) {
                 LOGGER.error("IOException when staging document", ioe);
                 throw new StagingException(ioe);
             }
-        }
-        catch (IOException ex){
+        } catch (IOException ex) {
             throw new IncompleteBatchException(ex);
         }
 
@@ -124,9 +122,9 @@ public class SubBatchWriter implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        if(outStream != null)
-        {
+    public void close() throws Exception
+    {
+        if (outStream != null) {
             LOGGER.debug("Closing subbatchFile");
             count = 0;
             outStream.flush();

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.github.cafdataprocessing.services.staging;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -31,8 +32,8 @@ public final class HealthcheckInterceptor extends HandlerInterceptorAdapter
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception
     {
         if (request.getLocalPort() == adminPort && request.getServletPath().equals("/")) {
-           response.sendRedirect("/healthcheck");
-           return false;
+            response.sendRedirect("/healthcheck");
+            return false;
         }
         return true;
     }
