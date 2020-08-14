@@ -92,8 +92,8 @@ public class BatchPathProvider
         return Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER);
     }
 
-    public Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
-                                                final String contentFolder)
+    public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
+                                                       final String contentFolder)
     {
         return Paths.get(storePath, tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue(), contentFolder);
     }
