@@ -31,7 +31,7 @@ public class BatchPathProvider
     private static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
-    private Path basePath;
+    private final Path basePath;
 
     public BatchPathProvider(final String basePath)
     {
