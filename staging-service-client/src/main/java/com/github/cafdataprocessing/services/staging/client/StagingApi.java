@@ -36,22 +36,23 @@ import okio.Source;
  * Extension of the generated client to support uploading file streams.
  *
  */
-public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi {
+public class StagingApi extends com.github.cafdataprocessing.services.staging.client.internal.StagingApi
+{
     private final String TENANT_HEADER_NAME = "X-TENANT-ID";
     private final String PUT_API_PATH = "/batches/";
 
     public void createOrReplaceBatch(final String tenantId, final String batchId, final Stream<MultiPart> uploadData)
-            throws ApiException {
+        throws ApiException
+    {
         final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();
-        while(uploadDataIterator.hasNext())
-        {
+        while (uploadDataIterator.hasNext()) {
             final MultiPart fileToStage = uploadDataIterator.next();
             mpBuilder.addFormDataPart(fileToStage.getName(),
-                                       null,
-                                       new StreamingBody(MediaType.parse(fileToStage.getContentType()),
-                                               fileToStage::openInputStream)
-                                     );
+                                      null,
+                                      new StreamingBody(MediaType.parse(fileToStage.getContentType()),
+                                                        fileToStage::openInputStream)
+            );
         }
         final RequestBody requestBody = mpBuilder.build();
         final String apiPath = getApiClient().getBasePath() + PUT_API_PATH + batchId;
@@ -60,40 +61,43 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
         final Request.Builder reqBuilder = new Request.Builder();
         getApiClient().processHeaderParams(stagingHeaders, reqBuilder);
         final Request request = reqBuilder
-                .url(apiPath)
-                .put(requestBody)
-                .build();
+            .url(apiPath)
+            .put(requestBody)
+            .build();
         try {
             final Response response = getApiClient().getHttpClient().newCall(request).execute();
-            if (!response.isSuccessful())
-            {
+            if (!response.isSuccessful()) {
                 throw new ApiException("Error uploading documents for tenant " + tenantId + " batch: " + batchId,
-                                           response.code(),
-                                           null,
-                                           response.message());
+                                       response.code(),
+                                       null,
+                                       response.message());
             }
         } catch (IOException e) {
             throw new ApiException(e);
         }
     }
 
-    class StreamingBody extends RequestBody {
+    class StreamingBody extends RequestBody
+    {
         private final InputStreamSupplier inputStreamSupplier;
         private final MediaType contentType;
 
         //Try to maker this a supplier
-        StreamingBody(final MediaType contentType, final InputStreamSupplier inputStreamSupplier) {
-          this.inputStreamSupplier = inputStreamSupplier;
-          this.contentType = contentType;
+        StreamingBody(final MediaType contentType, final InputStreamSupplier inputStreamSupplier)
+        {
+            this.inputStreamSupplier = inputStreamSupplier;
+            this.contentType = contentType;
         }
 
         @Override
-        public MediaType contentType() {
-          return contentType;
+        public MediaType contentType()
+        {
+            return contentType;
         }
 
         @Override
-        public void writeTo(final BufferedSink sink) throws IOException {
+        public void writeTo(final BufferedSink sink) throws IOException
+        {
             Source source = null;
             try {
                 source = Okio.source(inputStreamSupplier.get());
@@ -102,6 +106,6 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
                 Util.closeQuietly(source);
             }
         }
-      }
+    }
 
 }

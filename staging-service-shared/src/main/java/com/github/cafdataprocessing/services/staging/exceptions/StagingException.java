@@ -15,19 +15,23 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
-public class StagingException extends Exception {
+public class StagingException extends Exception
+{
 
     private static final long serialVersionUID = 4824589557352664145L;
 
-    public StagingException() {
+    public StagingException()
+    {
         super();
     }
 
-    public StagingException(final String message) {
+    public StagingException(final String message)
+    {
         super(message);
     }
 
-    public StagingException(final Throwable cause) {
+    public StagingException(final Throwable cause)
+    {
         super(cause);
     }
 

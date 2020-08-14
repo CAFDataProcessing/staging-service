@@ -25,30 +25,36 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class BatchPathProvider {
+public class BatchPathProvider
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchPathProvider.class);
     private static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
     private Path basePath;
 
-    public BatchPathProvider(final String basePath){
+    public BatchPathProvider(final String basePath)
+    {
         this.basePath = Paths.get(basePath);
     }
 
-    public Path getPathForTenant(final TenantId tenantId){
+    public Path getPathForTenant(final TenantId tenantId)
+    {
         return Paths.get(basePath.toString(), tenantId.getValue());
     }
 
-    public Path getPathForBatches(final TenantId tenantId){
+    public Path getPathForBatches(final TenantId tenantId)
+    {
         return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER);
     }
 
-    public Path getPathForBatch(final TenantId tenantId, final BatchId batchId){
+    public Path getPathForBatch(final TenantId tenantId, final BatchId batchId)
+    {
         return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue());
     }
 
-    public Path getInProgressPathForBatch(final TenantId tenantId, final BatchId batchId) throws StagingException {
+    public Path getInProgressPathForBatch(final TenantId tenantId, final BatchId batchId) throws StagingException
+    {
         /*
         - It will create a temporary folder for the batch to store files while the entire batch is being processed
         - It will open a subbatch file with the following naming pattern "YYYYMMDD-HHMMSS-xxx-json.batch"
@@ -61,7 +67,7 @@ public class BatchPathProvider {
         If there are any failures while processing the batch, the temporary folder will be deleted
         If the entire batch was processed without errors the temporary folder will be renamed and moved to the staging root folder
         If the batch folder existed under the staging root, it will be deleted before copying the new data
-        */
+         */
         //Make a temporary folder with name like, timestamp+threadid+serviceid+batchID in a separate "in_progress" folder
         final String inProgressBatchFolderName = BatchNameProvider.getBatchDirectoryName(batchId);
 
@@ -73,23 +79,21 @@ public class BatchPathProvider {
             final boolean dirCreated = inProgressFile.mkdirs();
             if (dirCreated) {
                 LOGGER.debug("Created in-progress folder for batch: {}", inProgressPath);
-            }
-            else
-            {
+            } else {
                 LOGGER.error("Error creating in-progress folder for batch: {}", inProgressPath);
                 throw new StagingException("In-progress folder for batch was not created : " + inProgressPath);
             }
         }
         return inProgressPath;
     }
-    
+
     public Path getTenantInprogressDirectory(final TenantId tenantId)
     {
         return Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER);
     }
 
     public Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
-            final String contentFolder)
+                                                final String contentFolder)
     {
         return Paths.get(storePath, tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue(), contentFolder);
     }

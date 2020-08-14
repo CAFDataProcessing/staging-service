@@ -17,17 +17,20 @@ package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 
-public class TenantId {
+public class TenantId
+{
     private final String value;
 
-    public TenantId(final String value) throws InvalidTenantIdException{
-        if(!value.matches("^[a-z0-9,.()\\-+_!]{0,127}[a-z0-9,()\\-+_!]$")){
+    public TenantId(final String value) throws InvalidTenantIdException
+    {
+        if (!value.matches("^[a-z0-9,.()\\-+_!]{0,127}[a-z0-9,()\\-+_!]$")) {
             throw new InvalidTenantIdException(value);
         }
         this.value = value;
     }
 
-    public String getValue() {
+    public String getValue()
+    {
         return value;
     }
 

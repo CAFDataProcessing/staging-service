@@ -25,15 +25,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BasePathCreator {
+public class BasePathCreator
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePathCreator.class);
 
     @Autowired
-    public BasePathCreator(final StagingProperties stagingProperties){
+    public BasePathCreator(final StagingProperties stagingProperties)
+    {
         createFolder(stagingProperties.getBasePath());
     }
 
-    private void createFolder(final String path) {
+    private void createFolder(final String path)
+    {
         final Path baseStagingPath = Paths.get(path);
         final File batchesFile = baseStagingPath.toFile();
         if (!batchesFile.exists()) {
@@ -41,9 +44,7 @@ public class BasePathCreator {
             final boolean dirCreated = batchesFile.mkdirs();
             if (dirCreated) {
                 LOGGER.debug("Created base staging folder: {}", baseStagingPath);
-            }
-            else
-            {
+            } else {
                 LOGGER.error("Error creating base staging folder: {}", baseStagingPath);
             }
         }

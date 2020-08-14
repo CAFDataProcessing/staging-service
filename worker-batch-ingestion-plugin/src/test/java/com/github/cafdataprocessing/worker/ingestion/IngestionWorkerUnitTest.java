@@ -343,7 +343,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("Exception while reading subbatch: "));
         assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, it does not exist"));
     }
-    
+
     @Test
     @DisplayName("Test non existing directory (batch)")
     void testNonExistingDirectory()
@@ -363,7 +363,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
         assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
-    
+
     @Test
     @DisplayName("Test non existing directory (batch) in the a multiple batch")
     void testNonExistingDirectoryInMultiBatch()
@@ -383,7 +383,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("Exception while reading the batch: "));
         assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
-    
+
     @Test
     @DisplayName("Test non existing directory (batch) in a subbatch")
     void testNonExistingDirectoryInSubbatch()

@@ -30,13 +30,14 @@ import com.github.cafdataprocessing.services.staging.exceptions.StagingException
 
 import org.apache.commons.fileupload.FileItemIterator;
 
-public interface BatchDao {
+public interface BatchDao
+{
 
     List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
-            throws IncompleteBatchException, InvalidBatchException, StagingException;
+        throws IncompleteBatchException, InvalidBatchException, StagingException;
 
     List<String> getBatches(TenantId tenantId, @Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,
-            @Min(1) @Valid Integer limit) throws StagingException;
+                            @Min(1) @Valid Integer limit) throws StagingException;
 
     void deleteBatch(TenantId tenantId, @Size(min = 1) BatchId BatchId) throws BatchNotFoundException, StagingException;
 

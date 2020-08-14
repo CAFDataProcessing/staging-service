@@ -51,7 +51,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @DependsOn({"basePathCreator"})
-public class StagingController implements StagingApi {
+public class StagingController implements StagingApi
+{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingController.class);
 
@@ -77,102 +78,91 @@ public class StagingController implements StagingApi {
     }
 
     public ResponseEntity<Void> createOrReplaceBatch(
-            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
-            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
-            @Size(min=1) @ApiParam(value = "Identifies the batch.",required=true)
-            @PathVariable("batchId") String batchId,
-            Object body) {
+        @ApiParam(value = "Identifies the tenant making the request.", required = true)
+        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
+        @Size(min = 1) @ApiParam(value = "Identifies the batch.", required = true)
+        @PathVariable("batchId") String batchId,
+        Object body)
+    {
 
         final ServletFileUpload fileUpload = new ServletFileUpload();
         final FileItemIterator fileItemIterator;
-        try{
+        try {
             fileItemIterator = fileUpload.getItemIterator(request);
-        }
-        catch(final FileUploadException | IOException ex){
+        } catch (final FileUploadException | IOException ex) {
             LOGGER.error("Error getting FileItemIterator", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-        try
-        {
+        try {
             batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
             LOGGER.debug("Staged batch: {}", batchId);
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        catch(final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex){
+        } catch (final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex) {
             LOGGER.error("Error getting multipart files", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
 
-        }
-        catch(final StagingException ex){
+        } catch (final StagingException ex) {
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     public ResponseEntity<Void> deleteBatch(
-            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
-            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
-            @Size(min=1)
-            @ApiParam(value = "Identifies the batch.",required=true)
-            @PathVariable("batchId") String batchId) {
+        @ApiParam(value = "Identifies the tenant making the request.", required = true)
+        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
+        @Size(min = 1)
+        @ApiParam(value = "Identifies the batch.", required = true)
+        @PathVariable("batchId") String batchId)
+    {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
             batchDao.deleteBatch(new TenantId(X_TENANT_ID), new BatchId(batchId));
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        catch (final InvalidTenantIdException ex) {
+        } catch (final InvalidTenantIdException ex) {
             LOGGER.error("Invalid X-TENANT-ID ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
-        catch (final InvalidBatchIdException ex){
+        } catch (final InvalidBatchIdException ex) {
             LOGGER.error("Invalid batchId ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
-        catch (final BatchNotFoundException ex) {
+        } catch (final BatchNotFoundException ex) {
             LOGGER.error("Error in deleteBatch ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
 
-        }
-        catch(final StagingException ex){
+        } catch (final StagingException ex) {
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     public ResponseEntity<BatchList> getBatches(
-            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
-            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,
-            @Size(min=1,max=256)
-            @ApiParam(value = "Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.")
-            @Valid @RequestParam(value = "startsWith", required = false) String startsWith,
-            @Size(min=1,max=256) @ApiParam(value = "Specifies the identifier to fetch batches that follow it alphabetically.")
-            @Valid @RequestParam(value = "from", required = false) String from,
-            @Min(1) @ApiParam(value = "Specifies the number of results to return (defaults to 25 if not specified).", allowableValues = "")
-            @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+        @ApiParam(value = "Identifies the tenant making the request.", required = true)
+        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
+        @Size(min = 1, max = 256)
+        @ApiParam(value = "Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.")
+        @Valid @RequestParam(value = "startsWith", required = false) String startsWith,
+        @Size(min = 1, max = 256) @ApiParam(value = "Specifies the identifier to fetch batches that follow it alphabetically.")
+        @Valid @RequestParam(value = "from", required = false) String from,
+        @Min(1) @ApiParam(value = "Specifies the number of results to return (defaults to 25 if not specified).", allowableValues = "")
+        @Valid @RequestParam(value = "limit", required = false) Integer limit)
+    {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
         final BatchList batchList = new BatchList();
         try {
             final BatchId fromBatchId;
-            if(from == null)
-            {
+            if (from == null) {
                 fromBatchId = null;
-            }
-            else
-            {
+            } else {
                 fromBatchId = new BatchId(from);
             }
             final List<String> batchFiles = batchDao.getBatches(new TenantId(X_TENANT_ID), startsWith, fromBatchId, limit);
             batchList.entries(batchFiles);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(batchList);
-        }
-        catch (final InvalidTenantIdException ex) {
+        } catch (final InvalidTenantIdException ex) {
             LOGGER.error("Invalid X-TENANT-ID ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
-        catch (final InvalidBatchIdException ex) {
+        } catch (final InvalidBatchIdException ex) {
             LOGGER.error("Invalid batchId ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
-        catch (final StagingException ex) {
+        } catch (final StagingException ex) {
             LOGGER.error("Error in getBatches ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
@@ -180,25 +170,23 @@ public class StagingController implements StagingApi {
 
     @Override
     public ResponseEntity<StatusResponse> getStatus(
-            @ApiParam(value = "Identifies the tenant making the request." ,required=true)
-            @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID
-            ) {
+        @ApiParam(value = "Identifies the tenant making the request.", required = true)
+        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID
+    )
+    {
         final StatusResponse status = new StatusResponse();
 
         final Health health = diskSpaceHealthIndicatorWithTimeout.health();
 
-        if(health.getStatus() == Status.UP)
-        {
+        if (health.getStatus() == Status.UP) {
             status.setMessage("Service available");
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
-        }
-        else
-        {
+        } else {
             status.setMessage("Service unavailable due to unavailable batches directory or low disk space. "
                 + health.getDetails().toString());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(status);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(status);
         }
     }
 

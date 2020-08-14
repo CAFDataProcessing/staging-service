@@ -53,7 +53,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @EnableScheduling
-public class FileSystemDao implements BatchDao {
+public class FileSystemDao implements BatchDao
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemDao.class);
 
     private static final String DOCUMENT_JSON_CONTENT = "application/document+json";
@@ -70,7 +71,8 @@ public class FileSystemDao implements BatchDao {
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold,
-                         final long fileAgeThreshold, final boolean skipBatchFileCleanup) {
+                         final long fileAgeThreshold, final boolean skipBatchFileCleanup)
+    {
         batchPathProvider = new BatchPathProvider(basePath);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
@@ -82,48 +84,49 @@ public class FileSystemDao implements BatchDao {
 
     @Override
     public List<String> getBatches(
-            final TenantId tenantId,
-            final String startsWith,
-            final BatchId from,
-            final Integer limit) throws StagingException {
+        final TenantId tenantId,
+        final String startsWith,
+        final BatchId from,
+        final Integer limit) throws StagingException
+    {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
 
         final Path batchesPath = batchPathProvider.getPathForBatches(tenantId);
-        if(!batchesPath.toFile().exists()){
+        if (!batchesPath.toFile().exists()) {
             return new ArrayList<>();
         }
         //Retrieve the current list of batches in alphabetical order
-        try(final Stream<Path> pathStream =
-                    Files.walk(batchesPath, 1, FileVisitOption.FOLLOW_LINKS).skip(1)){
+        try (final Stream<Path> pathStream
+            = Files.walk(batchesPath, 1, FileVisitOption.FOLLOW_LINKS).skip(1)) {
 
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
-                    filter(File::isDirectory).map(File::getName);
+                filter(File::isDirectory).map(File::getName);
 
-            if(startsWith!=null){
+            if (startsWith != null) {
                 batchDirectoryNames = batchDirectoryNames.filter(f -> f.startsWith(startsWith));
             }
 
-            if(from!=null){
-                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from.getValue())>=0);
+            if (from != null) {
+                batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from.getValue()) >= 0);
             }
 
-            if(limit!=null){
+            if (limit != null) {
                 batchDirectoryNames = batchDirectoryNames.limit(limit);
             }
 
             return batchDirectoryNames.sorted().collect(Collectors.toList());
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             throw new StagingException(ex);
         }
     }
 
     @Override
     public void deleteBatch(final TenantId tenantId, final BatchId batchId)
-            throws BatchNotFoundException, StagingException {
+        throws BatchNotFoundException, StagingException
+    {
         final Path batchPath = batchPathProvider.getPathForBatch(tenantId, batchId);
-        if(!batchPath.toFile().exists()){
+        if (!batchPath.toFile().exists()) {
             throw new BatchNotFoundException(batchId.getValue());
         }
 
@@ -136,35 +139,35 @@ public class FileSystemDao implements BatchDao {
 
     @Override
     public List<String> saveFiles(final TenantId tenantId, BatchId batchId, FileItemIterator fileItemIterator)
-            throws StagingException, InvalidBatchException, IncompleteBatchException {
+        throws StagingException, InvalidBatchException, IncompleteBatchException
+    {
 
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
         final Map<String, String> binaryFilesUploaded = new HashMap<>();
-        try(final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)){
-            while(true){
+        try (final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)) {
+            while (true) {
 
                 final FileItemStream fileItemStream;
-                try{
+                try {
                     LOGGER.debug("Retrieving next part...");
-                    if (!fileItemIterator.hasNext()){
+                    if (!fileItemIterator.hasNext()) {
                         LOGGER.debug("No further parts.");
                         break;
                     }
                     fileItemStream = fileItemIterator.next();
-                }
-                catch (FileUploadException | IOException ex){
+                } catch (FileUploadException | IOException ex) {
                     throw new IncompleteBatchException(ex);
                 }
 
-                if(!fileItemStream.isFormField()){
+                if (!fileItemStream.isFormField()) {
                     LOGGER.error("A form field is required.");
                     throw new InvalidBatchException("A form field is required.");
                 }
 
                 final String filename = fileItemStream.getFieldName();
-                if(filename==null || filename.trim().length()==0){
+                if (filename == null || filename.trim().length() == 0) {
                     LOGGER.error("The form field name must be present and contain the filename.");
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
@@ -194,13 +197,11 @@ public class FileSystemDao implements BatchDao {
                     }
                 }
             }
-        }
-        catch (IncompleteBatchException | InvalidBatchException | StagingException ex){
+        } catch (IncompleteBatchException | InvalidBatchException | StagingException ex) {
             LOGGER.error(String.format("Error saving batch [%s].", ex.getMessage()));
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             LOGGER.error(String.format("Error saving batch [%s].", t.getMessage()));
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
@@ -209,10 +210,11 @@ public class FileSystemDao implements BatchDao {
         return fileNames;
     }
 
-    private void cleanupInProgressBatch(final File inProgressBatchFolderPath){
+    private void cleanupInProgressBatch(final File inProgressBatchFolderPath)
+    {
 
         try {
-            if(inProgressBatchFolderPath.exists()){
+            if (inProgressBatchFolderPath.exists()) {
                 LOGGER.error(String.format("Removing in progress batch [%s] after failure.", inProgressBatchFolderPath));
                 FileUtils.deleteDirectory(inProgressBatchFolderPath);
             }
@@ -222,11 +224,12 @@ public class FileSystemDao implements BatchDao {
     }
 
     private void completeInProgressBatch(final TenantId tenantId, final Path inProgressBatchFolderPath, final BatchId batchId)
-            throws StagingException {
+        throws StagingException
+    {
         LOGGER.info("Completing batch with id {} for {}...", batchId, tenantId);
 
         final Path batchFolder = batchPathProvider.getPathForBatch(tenantId, batchId);
-        if(batchFolder.toFile().exists()){
+        if (batchFolder.toFile().exists()) {
             LOGGER.warn("Batch {} has been previously uploaded.  Removing previously uploaded batch...", batchId);
             try {
                 FileUtils.deleteDirectory(batchFolder.toFile());
@@ -296,17 +299,18 @@ public class FileSystemDao implements BatchDao {
     }
 
     /**
-     * Obtain a path to the tenants in_progress folder, if the string provided is not a valid tenant id this method will return 
-     * an empty Optional
+     * Obtain a path to the tenants in_progress folder, if the string provided is not a valid tenant id this method will return an empty
+     * Optional
+     *
      * @param tenantIdFolderName The name of the tenant
      * @return An Optional of paths to the tenants in_progress folder
      */
     private Optional<Path> getTenantInprogressDirectorySafely(final String tenantIdFolderName)
     {
-        try{
+        try {
             final TenantId tenantId = new TenantId(tenantIdFolderName);
             return Optional.ofNullable(batchPathProvider.getTenantInprogressDirectory(tenantId));
-        } catch (final InvalidTenantIdException ex){
+        } catch (final InvalidTenantIdException ex) {
             LOGGER.debug("Ignoring folder {} as it does not represent a valid tenantId.", tenantIdFolderName);
             return Optional.empty();
         }
@@ -314,6 +318,7 @@ public class FileSystemDao implements BatchDao {
 
     /**
      * Returns a list of the path to all sub files in all folders provide
+     *
      * @param tenantFolders List of Path objects that represent all current tenant in_progress folders
      * @return return a Stream of paths to all subfiles under all folders provided
      */
@@ -327,7 +332,7 @@ public class FileSystemDao implements BatchDao {
         }
     }
 
-     /**
+    /**
      * Determines if the file was created longer ago than the file age threshold
      *
      * @param filename A filename to be used to obtain the file creation time

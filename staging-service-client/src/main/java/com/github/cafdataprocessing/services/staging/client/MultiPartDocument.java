@@ -23,7 +23,8 @@ import java.net.URL;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-public class MultiPartDocument implements MultiPart{
+public class MultiPartDocument implements MultiPart
+{
     private final String name;
     private final InputStreamSupplier streamSupplier;
 
@@ -46,21 +47,25 @@ public class MultiPartDocument implements MultiPart{
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     @Override
-    public String getContentType() {
+    public String getContentType()
+    {
         return "application/document+json";
     }
 
     @Override
-    public InputStream openInputStream() throws IOException {
+    public InputStream openInputStream() throws IOException
+    {
         return streamSupplier.get();
     }
 
-    private String generateName() {
+    private String generateName()
+    {
         return RandomStringUtils.randomAlphanumeric(10);
     }
 
