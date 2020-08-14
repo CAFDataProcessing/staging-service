@@ -2,427 +2,219 @@
     "document": {
         "reference": "12",
         "fields": {
-            "TENANT": [{
-                    "data": "acmeoverflow-com"
-                }],
-            "family_address_from": [{
-                    "data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"
-                }],
-            "FILE_SIZE": [{
-                    "data": "187904"
-                }],
-            "family_address_to": [{
-                    "data": "samson.khuveio@hp.com"
-                }],
-            "IS_ROOT_DOC": [{
-                    "data": "true"
-                }],
-            "PRIORITY": [{
-                    "data": "1"
-                }],
-            "FILE_NAME": [{
-                    "data": "test Mail with Multiple attachment...Ignore It EOM.msg"
-                }],
-            "DATE_POSTED": [{
-                    "data": "1353072712"
-                }],
-            "reference": [{
-                    "data": "12"
-                }],
-            "THREAD_INDEX": [{
-                    "data": "Ac3D/qq7yZSvI9j5SbylBxuWosohoQ=="
-                }],
-            "address_display_to": [{
-                    "data": "Khuveio, Samson"
-                }],
-            "POLICY_KV_METADATA_PRESENT": [{
-                    "data": "true"
-                }],
-            "family_address_display_to": [{
-                    "data": "Khuveio, Samson"
-                }],
-            "from": [{
-                    "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                }],
-            "REPOSITORY_SUB_TYPE": [{
-                    "data": "FILESYSTEMWIN"
-                }],
-            "ID": [{
-                    "data": "12"
-                }],
-            "FAMILY_TITLE": [{
-                    "data": "test Mail with Multiple attachment...Ignore It <EOM>"
-                }],
-            "TYPE": [{
-                    "data": "345"
-                }],
-            "DATE_MODIFIED": [{
-                    "data": "1517248636"
-                }],
-            "IS_HEAD_OF_FAMILY": [{
-                    "data": "true"
-                }],
-            "CUSTOMER_ID": [{
-                    "data": "307620341985838080"
-                }],
-            "PROCESSING_PolicyWorker_VERSION": [{
-                    "data": "1.4.0-174"
-                }],
-            "address_from": [{
-                    "data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"
-                }],
-            "HASH": [{
-                    "data": "1633910e39731b9cf9b6b93d0737274a405100a8"
-                }],
-            "family_address_display_from": [{
-                    "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                }],
-            "DREREFERENCE": [{
-                    "data": "12"
-                }],
-            "IS_OLE": [{
-                    "data": "false"
-                }],
-            "DATE_CREATED": [{
-                    "data": "1517249074"
-                }],
-            "address_to": [{
-                    "data": "samson.khuveio@hp.com"
-                }],
-            "source_reference": [{
-                    "data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"
-                }],
-            "THREAD_TOPIC": [{
-                    "data": "test Mail with Multiple attachment...Ignore It <EOM>"
-                }],
-            "collection_status": [{
-                    "data": "CONTENT"
-                }],
-            "address_display_from": [{
-                    "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                }],
-            "FAMILY_DATE_POSTED": [{
-                    "data": "1353072712"
-                }],
-            "REPOSITORY_TYPE": [{
-                    "data": "FILESYSTEM"
-                }],
-            "REPOSITORY_ID": [{
-                    "data": "2308"
-                }],
-            "ID_PATH": [{
-                    "data": "/12"
-                }],
-            "CONTENT_PRIMARY": [{
-                    "data": "IAo=",
-                    "encoding": "base64"
-                }],
-            "ROOT_ID": [{
-                    "data": "12"
-                }],
-            "FAMILY_ID": [{
-                    "data": "12"
-                }],
-            "FILE_EXT": [{
-                    "data": "msg"
-                }],
-            "DATE_PROCESSED": [{
-                    "data": "1517251568"
-                }],
-            "scan_reference": [{
-                    "data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"
-                }],
-            "job_run_id": [{
-                    "data": "2310"
-                }],
-            "job_id": [{
-                    "data": "2309"
-                }],
-            "extraction_type": [{
-                    "data": "Text"
-                }],
-            "FILEPATH": [{
-                    "data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"
-                }],
-            "mimetype": [{
-                    "data": "application/vnd.ms-outlook"
-                }],
-            "TITLE": [{
-                    "data": "test Mail with Multiple attachment...Ignore It <EOM>"
-                }],
-            "to": [{
-                    "data": "\"Khuveio, Samson\" <samson.khuveio@hp.com>"
-                }],
-            "HAS_ATTACHMENTS": [{
-                    "data": "true"
-                }
+            "TENANT": [{"data": "acmeoverflow-com"}],
+            "family_address_from": [{"data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"}],
+            "FILE_SIZE": [{"data": "187904"}],
+            "family_address_to": [{"data": "samson.khuveio@hp.com"}],
+            "IS_ROOT_DOC": [{"data": "true"}],
+            "PRIORITY": [{"data": "1"}],
+            "FILE_NAME": [{"data": "test Mail with Multiple attachment...Ignore It EOM.msg"}],
+            "DATE_POSTED": [{"data": "1353072712"}],
+            "reference": [ {"data": "12"} ],
+            "THREAD_INDEX": [ {"data": "Ac3D/qq7yZSvI9j5SbylBxuWosohoQ=="} ],
+            "address_display_to": [ {"data": "Khuveio, Samson"} ],
+            "POLICY_KV_METADATA_PRESENT": [ {"data": "true"} ],
+            "family_address_display_to": [ {"data": "Khuveio, Samson"} ],
+            "from": [ {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"} ],
+            "REPOSITORY_SUB_TYPE": [ {"data": "FILESYSTEMWIN"} ],
+            "ID": [ {"data": "12"} ],
+            "FAMILY_TITLE": [ {"data": "test Mail with Multiple attachment...Ignore It <EOM>"} ],
+            "TYPE": [ {"data": "345"} ],
+            "DATE_MODIFIED": [ {"data": "1517248636"} ],
+            "IS_HEAD_OF_FAMILY": [ {"data": "true"} ],
+            "CUSTOMER_ID": [ {"data": "307620341985838080"} ],
+            "PROCESSING_PolicyWorker_VERSION": [ {"data": "1.4.0-174"} ],
+            "address_from": [ {"data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"} ],
+            "HASH": [ {"data": "1633910e39731b9cf9b6b93d0737274a405100a8"} ],
+            "family_address_display_from": [ {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"} ],
+            "DREREFERENCE": [ {"data": "12"} ],
+            "IS_OLE": [ {"data": "false"} ],
+            "DATE_CREATED": [ {"data": "1517249074"} ],
+            "address_to": [ {"data": "samson.khuveio@hp.com"} ],
+            "source_reference": [ {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"} ],
+            "THREAD_TOPIC": [ {"data": "test Mail with Multiple attachment...Ignore It <EOM>"} ],
+            "collection_status": [ {"data": "CONTENT"} ],
+            "address_display_from": [ {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"} ],
+            "FAMILY_DATE_POSTED": [ {"data": "1353072712"} ],
+            "REPOSITORY_TYPE": [ {"data": "FILESYSTEM"} ],
+            "REPOSITORY_ID": [ {"data": "2308"} ],
+            "ID_PATH": [ {"data": "/12"} ],
+            "CONTENT_PRIMARY": [ {"data": "IAo=", "encoding": "base64"} ],
+            "ROOT_ID": [ {"data": "12"} ],
+            "FAMILY_ID": [ {"data": "12"} ],
+            "FILE_EXT": [ {"data": "msg"} ],
+            "DATE_PROCESSED": [ {"data": "1517251568"} ],
+            "scan_reference": [ {"data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"} ],
+            "job_run_id": [ {"data": "2310"} ],
+            "job_id": [ {"data": "2309"} ],
+            "extraction_type": [ {"data": "Text"} ],
+            "FILEPATH": [ {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"} ],
+            "mimetype": [ {"data": "application/vnd.ms-outlook"} ],
+            "TITLE": [ {"data": "test Mail with Multiple attachment...Ignore It <EOM>"} ],
+            "to": [ {"data": "\"Khuveio, Samson\" <samson.khuveio@hp.com>"} ],
+            "HAS_ATTACHMENTS": [ {"data": "true"}
             ]
         },
         "subdocuments": [
             {
                 "reference": "9",
                 "fields": {
-                    "TENANT": [{
-                            "data": "acmeoverflow-com"
-                        }
+                    "TENANT": [{"data": "acmeoverflow-com"}
                     ],
                     "family_address_from": [
-                        {
-                            "data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"
-                        }
+                        {"data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"}
                     ],
                     "FILE_SIZE": [
-                        {
-                            "data": "2482"
-                        }
+                        {"data": "2482"}
                     ],
                     "family_address_to": [
-                        {
-                            "data": "samson.khuveio@hp.com"
-                        }
+                        {"data": "samson.khuveio@hp.com"}
                     ],
                     "IS_ROOT_DOC": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "extraction_index": [
-                        {
-                            "data": "1"
-                        }
+                        {"data": "1"}
                     ],
                     "PRIORITY": [
-                        {
-                            "data": "1"
-                        }
+                        {"data": "1"}
                     ],
                     "FILE_NAME": [
-                        {
-                            "data": "Test Mai_kv0.mail"
-                        }
+                        {"data": "Test Mai_kv0.mail"}
                     ],
                     "DATE_POSTED": [
-                        {
-                            "data": "1353072712"
-                        }
+                        {"data": "1353072712"}
                     ],
                     "reference": [
-                        {
-                            "data": "9"
-                        }
+                        {"data": "9"}
                     ],
                     "THREAD_INDEX": [
-                        {
-                            "data": "Ac3D/nWVlcQfc+oBSpOSgZvZq7KWgg=="
-                        }
+                        {"data": "Ac3D/nWVlcQfc+oBSpOSgZvZq7KWgg=="}
                     ],
                     "address_display_to": [
-                        {
-                            "data": "Patra, Mana"
-                        }
+                        {"data": "Patra, Mana"}
                     ],
                     "POLICY_KV_METADATA_PRESENT": [
-                        {
-                            "data": "true"
-                        }
+                        {"data": "true"}
                     ],
                     "family_address_display_to": [
-                        {
-                            "data": "Khuveio, Samson"
-                        }
+                        {"data": "Khuveio, Samson"}
                     ],
                     "from": [
-                        {
-                            "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                        }
+                        {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"}
                     ],
                     "REPOSITORY_SUB_TYPE": [
-                        {
-                            "data": "FILESYSTEMWIN"
-                        }
+                        {"data": "FILESYSTEMWIN"}
                     ],
                     "ID": [
-                        {
-                            "data": "9"
-                        }
+                        {"data": "9"}
                     ],
                     "FAMILY_TITLE": [
-                        {
-                            "data": "test Mail with Multiple attachment...Ignore It <EOM>"
-                        }
+                        {"data": "test Mail with Multiple attachment...Ignore It <EOM>"}
                     ],
                     "TYPE": [
-                        {
-                            "data": "345"
-                        }
+                        {"data": "345"}
                     ],
                     "DATE_MODIFIED": [
-                        {
-                            "data": "1353072614"
-                        }
+                        {"data": "1353072614"}
                     ],
                     "IS_HEAD_OF_FAMILY": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "PROCESSING_PolicyWorker_VERSION": [
-                        {
-                            "data": "1.4.0-174"
-                        }
+                        {"data": "1.4.0-174"}
                     ],
                     "address_from": [
-                        {
-                            "data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"
-                        }
+                        {"data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"}
                     ],
                     "HASH": [
-                        {
-                            "data": "c7312142fd3de67b297d43c96e59abb3cf21f518"
-                        }
+                        {"data": "c7312142fd3de67b297d43c96e59abb3cf21f518"}
                     ],
                     "family_address_display_from": [
-                        {
-                            "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                        }
+                        {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"}
                     ],
                     "DREREFERENCE": [
-                        {
-                            "data": "9"
-                        }
+                        {"data": "9"}
                     ],
                     "IS_OLE": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "DATE_CREATED": [
-                        {
-                            "data": "1517251568"
-                        }
+                        {"data": "1517251568"}
                     ],
                     "address_to": [
-                        {
-                            "data": "mana.patra@hp.com"
-                        }
+                        {"data": "mana.patra@hp.com"}
                     ],
                     "source_reference": [
-                        {
-                            "data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"
-                        }
+                        {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"}
                     ],
                     "THREAD_TOPIC": [
-                        {
-                            "data": "Test Mail with Multiple Attachments"
-                        }
+                        {"data": "Test Mail with Multiple Attachments"}
                     ],
                     "collection_status": [
-                        {
-                            "data": "CONTENT"
-                        }
+                        {"data": "CONTENT"}
                     ],
                     "address_display_from": [
-                        {
-                            "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                        }
+                        {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"}
                     ],
                     "FAMILY_DATE_POSTED": [
-                        {
-                            "data": "1353072712"
-                        }
+                        {"data": "1353072712"}
                     ],
                     "PARENT_REFERENCE": [
-                        {
-                            "data": "c270fbd38cab4fe181746455c7f4f1dc"
-                        }
+                        {"data": "c270fbd38cab4fe181746455c7f4f1dc"}
                     ],
                     "REPOSITORY_TYPE": [
-                        {
-                            "data": "FILESYSTEM"
-                        }
+                        {"data": "FILESYSTEM"}
                     ],
                     "REPOSITORY_ID": [
-                        {
-                            "data": "2308"
-                        }
+                        {"data": "2308"}
                     ],
                     "ID_PATH": [
-                        {
-                            "data": "/12/9"
-                        }
+                        {"data": "/12/9"}
                     ],
                     "CONTENT_PRIMARY": [
-                        {
-                            "data": "VGVzdCBtYWlsIHdpdGggbXVsdGlwbGUgYXR0YWNobWVudOKApgo=",
-                            "encoding": "base64"
-                        }
+                        {"data": "VGVzdCBtYWlsIHdpdGggbXVsdGlwbGUgYXR0YWNobWVudOKApgo=",
+                            "encoding": "base64"}
                     ],
                     "ROOT_ID": [
-                        {
-                            "data": "12"
-                        }
+                        {"data": "12"}
                     ],
                     "FAMILY_ID": [
-                        {
-                            "data": "12"
-                        }
+                        {"data": "12"}
                     ],
                     "FILE_EXT": [
-                        {
-                            "data": "mail"
-                        }
+                        {"data": "mail"}
                     ],
                     "DATE_PROCESSED": [
-                        {
-                            "data": "1517251568"
-                        }
+                        {"data": "1517251568"}
                     ],
                     "scan_reference": [
-                        {
-                            "data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"
-                        }
+                        {"data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"}
                     ],
                     "job_run_id": [
-                        {
-                            "data": "2310"
-                        }
+                        {"data": "2310"}
                     ],
                     "job_id": [
-                        {
-                            "data": "2309"
-                        }
+                        {"data": "2309"}
                     ],
                     "extraction_type": [
-                        {
-                            "data": "Text"
-                        }
+                        {"data": "Text"}
                     ],
                     "FILEPATH": [
-                        {
-                            "data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"
-                        }
+                        {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test Mail with Multiple att…"}
                     ],
                     "mimetype": [
-                        {
-                            "data": "application/vnd.ms-outlook"
-                        }
+                        {"data": "application/vnd.ms-outlook"}
                     ],
                     "TITLE": [
-                        {
-                            "data": "Test Mail with Multiple Attachments"
-                        }
+                        {"data": "Test Mail with Multiple Attachments"}
                     ],
                     "to": [
-                        {
-                            "data": "\"Patra, Mana\" <mana.patra@hp.com>"
-                        }
+                        {"data": "\"Patra, Mana\" <mana.patra@hp.com>"}
                     ],
                     "HAS_ATTACHMENTS": [
-                        {
-                            "data": "true"
-                        }
-                    ]
-                },
+                        {"data": "true"}
+                    ]},
                 "subdocuments": [
                     {
                         "reference": "8",
@@ -691,8 +483,7 @@
                                 {
                                     "data": "true"
                                 }
-                            ]
-                        },
+                            ]},
                         "subdocuments": [
                             {
                                 "reference": "11",
@@ -1198,8 +989,7 @@
                                 {
                                     "data": "true"
                                 }
-                            ]
-                        },
+                            ]},
                         "subdocuments": [
                             {
                                 "reference": "10",
@@ -1428,222 +1218,135 @@
             {
                 "reference": "16",
                 "fields": {
-                    "TENANT": [{
-                            "data": "acmeoverflow-com"
-                        }
+                    "TENANT": [{"data": "acmeoverflow-com"}
                     ],
                     "family_address_from": [
-                        {
-                            "data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"
-                        }
+                        {"data": "chakraborty, shubhendu </o=compaq/ou=exchange administrative group …"}
                     ],
                     "DATE_CREATED": [
-                        {
-                            "data": "1517251568"
-                        }
+                        {"data": "1517251568"}
                     ],
                     "FILE_SIZE": [
-                        {
-                            "data": "12372"
-                        }
+                        {"data": "12372"}
                     ],
                     "family_address_to": [
-                        {
-                            "data": "samson.khuveio@hp.com"
-                        }
+                        {"data": "samson.khuveio@hp.com"}
                     ],
                     "IS_ROOT_DOC": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "extraction_index": [
-                        {
-                            "data": "3"
-                        }
+                        {"data": "3"}
                     ],
                     "FILE_NAME": [
-                        {
-                            "data": "Engg_QA_Shares.xlsx"
-                        }
+                        {"data": "Engg_QA_Shares.xlsx"}
                     ],
                     "DATE_POSTED": [
-                        {
-                            "data": "1352966416"
-                        }
+                        {"data": "1352966416"}
                     ],
                     "source_reference": [
-                        {
-                            "data": "\\\\rahul-agent01\\testdata\\newfamily\\test2 Mail with Multiple att…"
-                        }
+                        {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test2 Mail with Multiple att…"}
                     ],
                     "reference": [
-                        {
-                            "data": "16"
-                        }
+                        {"data": "16"}
                     ],
                     "collection_status": [
-                        {
-                            "data": "CONTENT"
-                        }
+                        {"data": "CONTENT"}
                     ],
                     "FAMILY_DATE_POSTED": [
-                        {
-                            "data": "1353072712"
-                        }
+                        {"data": "1353072712"}
                     ],
                     "PARENT_REFERENCE": [
-                        {
-                            "data": "c270fbd38cab4fe181746455c7f4f1dc:test Mai/Test Mai_kv0.mail:test Ma…"
-                        }
+                        {"data": "c270fbd38cab4fe181746455c7f4f1dc:test Mai/Test Mai_kv0.mail:test Ma…"}
                     ],
                     "REPOSITORY_TYPE": [
-                        {
-                            "data": "FILESYSTEM"
-                        }
+                        {"data": "FILESYSTEM"}
                     ],
                     "POLICY_KV_METADATA_PRESENT": [
-                        {
-                            "data": "true"
-                        }
+                        {"data": "true"}
                     ],
                     "REPOSITORY_ID": [
-                        {
-                            "data": "2308"
-                        }
+                        {"data": "2308"}
                     ],
                     "ID_PATH": [
-                        {
-                            "data": "/12/16"
-                        }
+                        {"data": "/12/16"}
                     ],
                     "CONTENT_PRIMARY": [
-                        {
-                            "data": "U2hhcmVzCVJlYXNvbgkKXFxTT1NEQlxNQ0IgQmFja3VwCQpcXFNPU0RCXE5FV19TT1N…",
-                            "encoding": "base64"
-                        }
+                        {"data": "U2hhcmVzCVJlYXNvbgkKXFxTT1NEQlxNQ0IgQmFja3VwCQpcXFNPU0RCXE5FV19TT1N…",
+                            "encoding": "base64"}
                     ],
                     "family_address_display_to": [
-                        {
-                            "data": "Khuveio, Samson"
-                        }
+                        {"data": "Khuveio, Samson"}
                     ],
                     "REPOSITORY_SUB_TYPE": [
-                        {
-                            "data": "FILESYSTEMWIN"
-                        }
+                        {"data": "FILESYSTEMWIN"}
                     ],
                     "ROOT_ID": [
-                        {
-                            "data": "12"
-                        }
+                        {"data": "12"}
                     ],
                     "FAMILY_ID": [
-                        {
-                            "data": "12"
-                        }
+                        {"data": "12"}
                     ],
                     "ID": [
-                        {
-                            "data": "16"
-                        }
+                        {"data": "16"}
                     ],
                     "FAMILY_TITLE": [
-                        {
-                            "data": "test Mail with Multiple attachment...Ignore It <EOM>"
-                        }
+                        {"data": "test Mail with Multiple attachment...Ignore It <EOM>"}
                     ],
                     "FILE_EXT": [
-                        {
-                            "data": "xlsx"
-                        }
+                        {"data": "xlsx"}
                     ],
                     "TYPE": [
-                        {
-                            "data": "361"
-                        }
+                        {"data": "361"}
                     ],
                     "DATE_MODIFIED": [
-                        {
-                            "data": "1352966416"
-                        }
+                        {"data": "1352966416"}
                     ],
                     "IS_HEAD_OF_FAMILY": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "DATE_PROCESSED": [
-                        {
-                            "data": "1517251568"
-                        }
+                        {"data": "1517251568"}
                     ],
                     "PROCESSING_PolicyWorker_VERSION": [
-                        {
-                            "data": "1.4.0-174"
-                        }
+                        {"data": "1.4.0-174"}
                     ],
                     "HASH": [
-                        {
-                            "data": "da938f2d9fd3c15e45d6725ea9512e13a8e675f8"
-                        }
+                        {"data": "da938f2d9fd3c15e45d6725ea9512e13a8e675f8"}
                     ],
                     "family_address_display_from": [
-                        {
-                            "data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"
-                        }
+                        {"data": "\"Chakraborty, Shubhendu\" </o=Compaq/ou=Exchange Administrative Gr…"}
                     ],
                     "scan_reference": [
-                        {
-                            "data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"
-                        }
+                        {"data": "5354808e1aad10508b494479d887caa3|1517248637|2234824ba08811f436ddf0b…"}
                     ],
                     "job_run_id": [
-                        {
-                            "data": "2310"
-                        }
+                        {"data": "2310"}
                     ],
                     "job_id": [
-                        {
-                            "data": "2309"
-                        }
+                        {"data": "2309"}
                     ],
                     "extraction_type": [
-                        {
-                            "data": "Text"
-                        }
+                        {"data": "Text"}
                     ],
                     "FILEPATH": [
-                        {
-                            "data": "\\\\rahul-agent01\\testdata\\newfamily\\test2 Mail with Multiple att…"
-                        }
+                        {"data": "\\\\rahul-agent01\\testdata\\newfamily\\test2 Mail with Multiple att…"}
                     ],
                     "mimetype": [
-                        {
-                            "data": "application/x-ms-excel07"
-                        }
+                        {"data": "application/x-ms-excel07"}
                     ],
                     "TITLE": [
-                        {
-                            "data": "Engg_QA_Shares.xlsx"
-                        }
+                        {"data": "Engg_QA_Shares.xlsx"}
                     ],
                     "DREREFERENCE": [
-                        {
-                            "data": "16"
-                        }
+                        {"data": "16"}
                     ],
                     "IS_OLE": [
-                        {
-                            "data": "false"
-                        }
+                        {"data": "false"}
                     ],
                     "HAS_ATTACHMENTS": [
-                        {
-                            "data": "false"
-                        }
-                    ]
-                }
+                        {"data": "false"}
+                    ]}
             }
         ]
     }

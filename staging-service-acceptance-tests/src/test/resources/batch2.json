@@ -1,19 +1,11 @@
 {
-    "document": {
-        "reference": "batch2.msg",
-        "fields": {
-            "FROM": [{
-                    "data": "Mark Roberts"
-                }],
-            "TO": [{
-                    "data": "Gene Simmons"
-                }],
-            "SUBJECT": [{
-                    "data": "Favourite book"
-                }],
-            "CONTENT": [{
-                    "data": "This is the book that popularised the use of the phrase \"Merry Christmas\"."
-                }]
-        }
+  "document": {
+    "reference": "batch2.msg",
+    "fields": {
+      "FROM": [{"data": "Mark Roberts"}],
+      "TO": [{"data": "Gene Simmons"}],
+      "SUBJECT": [{"data": "Favourite book"}],
+      "CONTENT": [{"data": "This is the book that popularised the use of the phrase \"Merry Christmas\"."}]
     }
+  }
 }
