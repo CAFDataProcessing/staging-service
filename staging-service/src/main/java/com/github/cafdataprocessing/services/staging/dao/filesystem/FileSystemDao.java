@@ -148,7 +148,7 @@ public class FileSystemDao implements BatchDao
     {
 
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
-        final Path storageRefFolderPath = batchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
+        final Path storageRefFolderPath = BatchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
         final Map<String, String> binaryFilesUploaded = new HashMap<>();
         try (final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)) {

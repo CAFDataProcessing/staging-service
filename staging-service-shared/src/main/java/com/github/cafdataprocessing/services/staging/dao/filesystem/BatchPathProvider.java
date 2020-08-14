@@ -33,7 +33,7 @@ public class BatchPathProvider
     private static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
-    private Path basePath;
+    private final Path basePath;
 
     public BatchPathProvider(final String basePath)
     {
@@ -116,8 +116,8 @@ public class BatchPathProvider
         return inProgressPath;
     }
 
-    public Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
-                                                final String contentFolder) throws StagingException
+    public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
+                                                       final String contentFolder) throws StagingException
     {
         final Path storePathFromStr = Paths.get(storePath);
         final Path tenantPath = storePathFromStr.resolve(tenantId.getValue());
