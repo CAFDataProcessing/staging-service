@@ -40,11 +40,11 @@ public class BatchPathProvider
         this.basePath = Paths.get(basePath);
     }
 
-    public Path getPathForTenant(final TenantId tenantId)
+    public Path getPathForTenant(final TenantId tenantId) throws InvalidTenantIdException
     {
-        final Path tenantPath = basePath.resolve(tenantId.getValue());
+        final Path tenantPath = Paths.get(basePath.toString()).resolve(tenantId.getValue());
         if (!tenantPath.normalize().startsWith(basePath)) {
-            throw new IllegalArgumentException("Invalid tenant id : " + tenantId);
+            throw new InvalidTenantIdException("Invalid tenant id : " + tenantId);
         }
         return tenantPath;
     }
@@ -109,7 +109,7 @@ public class BatchPathProvider
         return inProgressPath;
     }
 
-    public Path getTenantInprogressDirectory(final TenantId tenantId)
+    public Path getTenantInprogressDirectory(final TenantId tenantId) throws InvalidTenantIdException
     {
         final Path tenantPath = getPathForTenant(tenantId);
         final Path inProgressPath = tenantPath.resolve(INPROGRESS_FOLDER);
