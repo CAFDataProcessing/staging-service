@@ -35,6 +35,10 @@ public class BatchPathProvider
 
     public BatchPathProvider(final String basePath)
     {
+        if(basePath == null)
+        {
+            throw new UnexpectedInvalidBasePathException(basePath);
+        }
         this.basePath = Paths.get(basePath).normalize();
     }
 
@@ -111,6 +115,14 @@ public class BatchPathProvider
                                                        final String contentFolder)
     {
         return (new BatchPathProvider(storePath)).getPathForBatch(tenantId, batchId).resolve(contentFolder);
+    }
+
+    private static final class UnexpectedInvalidBasePathException extends RuntimeException
+    {
+        public UnexpectedInvalidBasePathException(final String basePath)
+        {
+            super("Invalid base path: " + basePath);
+        }
     }
 
     private static final class UnexpectedInvalidTenantIdException extends RuntimeException
