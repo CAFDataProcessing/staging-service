@@ -22,8 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
@@ -63,14 +61,7 @@ public class SubBatchWriter implements AutoCloseable
     {
         //Make a new subbatch file
         final String subBatchFileName = BatchNameProvider.getSubBatchName();
-        final Path inProgressPath = Paths.get(inProgressBatchFolder.toString());
-        final Path subBatchPath = inProgressPath.resolve(subBatchFileName);
-
-        if (!subBatchPath.normalize().startsWith(inProgressPath)) {
-            throw new StagingException("Sub batch path was not created. Invalid path : " + subBatchPath);
-        }
-
-        final File subBatch = subBatchPath.toFile();
+        final File subBatch = inProgressBatchFolder.toPath().resolve(subBatchFileName).toFile();
         LOGGER.debug("Created new subbatchFile : {} ", subBatch);
         //Open new stream to start writing to subbatch file
 
