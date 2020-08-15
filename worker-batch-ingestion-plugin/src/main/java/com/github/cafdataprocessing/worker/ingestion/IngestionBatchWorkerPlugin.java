@@ -95,9 +95,6 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 } catch (final InvalidBatchIdException ex) {
                     log.error("Invalid Batch Id Exception! " + ex.getMessage());
                     throw new BatchDefinitionException("Invalid Batch Id Exception! " + ex.getMessage());
-                } catch (final InvalidTenantIdException ex) {
-                    log.error("Invalid Tenant Id Exception! " + ex.getMessage());
-                    throw new BatchDefinitionException("Invalid Tenant Id Exception! " + ex.getMessage());
                 }
             } else {
                 log.error("Invalid format of the batch definition: " + batchDefinition);
@@ -161,7 +158,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
                                 final Map<String, String> taskMessageParams)
-        throws InvalidBatchIdException, InvalidTenantIdException, BatchWorkerTransientException, BatchDefinitionException
+        throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
     {
         final Subbatch subbatchObj = extractSubbatch(subbatch);
         final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(subbatchObj.getTenantId(), subbatchObj.getBatchId());
