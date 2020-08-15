@@ -290,6 +290,7 @@
                     <verbose>true</verbose>
                     <autoPull>on</autoPull>
                     <logDate>default</logDate>
+                    <containerNamePattern>%a-%t</containerNamePattern>
                     <images>
                         <!-- Run the WebDav image to simulate the RFS -->
                         <image>
