@@ -177,7 +177,7 @@ public class FileSystemDao implements BatchDao
                     subBatchWriter
                         .writeDocumentFile(fileItemStream::openStream,
                                            storageRefFolderPath.toString(),
-                                           Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES).toString(),
+                                           inProgressBatchFolderPath.resolve(CONTENT_FILES).toString(),
                                            fieldValueSizeThreshold, binaryFilesUploaded);
                     fileNames.add(filename);
                 } else {
@@ -185,7 +185,7 @@ public class FileSystemDao implements BatchDao
                     final String fileExtension = FilenameUtils.getExtension(filename);
                     final String targetFileName = fileExtension.isEmpty()
                         ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
-                    final File targetFile = Paths.get(inProgressBatchFolderPath.toString(), CONTENT_FILES, targetFileName).toFile();
+                    final File targetFile = inProgressBatchFolderPath.resolve(CONTENT_FILES).resolve(targetFileName).toFile();
                     LOGGER.debug("Reading loose file...");
                     try (final InputStream inStream = fileItemStream.openStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile);
