@@ -35,22 +35,35 @@ public class BatchPathProvider
 
     public BatchPathProvider(final String basePath)
     {
-        this.basePath = Paths.get(basePath);
+        if(basePath == null)
+        {
+            throw new UnexpectedInvalidBasePathException(basePath);
+        }
+        this.basePath = Paths.get(basePath).normalize();
     }
 
     public Path getPathForTenant(final TenantId tenantId)
     {
-        return Paths.get(basePath.toString(), tenantId.getValue());
+        final Path tenantPath = basePath.resolve(tenantId.getValue()).normalize();
+        if (!tenantPath.startsWith(basePath)) {
+            throw new UnexpectedInvalidTenantIdException(tenantId);
+        }
+        return tenantPath;
     }
 
     public Path getPathForBatches(final TenantId tenantId)
     {
-        return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER);
+        return getPathForTenant(tenantId).resolve(COMPLETED_FOLDER);
     }
 
     public Path getPathForBatch(final TenantId tenantId, final BatchId batchId)
     {
-        return Paths.get(basePath.toString(), tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue());
+        final Path pathForBatches = getPathForBatches(tenantId);
+        final Path batchPath = pathForBatches.resolve(batchId.getValue()).normalize();
+        if (!batchPath.startsWith(pathForBatches)) {
+            throw new UnexpectedInvalidBatchIdException(batchId);
+        }
+        return batchPath;
     }
 
     public Path getInProgressPathForBatch(final TenantId tenantId, final BatchId batchId) throws StagingException
@@ -69,9 +82,15 @@ public class BatchPathProvider
         If the batch folder existed under the staging root, it will be deleted before copying the new data
          */
         //Make a temporary folder with name like, timestamp+threadid+serviceid+batchID in a separate "in_progress" folder
+        final Path tenantPath = getPathForTenant(tenantId);
+
         final String inProgressBatchFolderName = BatchNameProvider.getBatchDirectoryName(batchId);
 
-        final Path inProgressPath = Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER, inProgressBatchFolderName);
+        final Path inProgressPath = tenantPath.resolve(INPROGRESS_FOLDER).resolve(inProgressBatchFolderName).normalize();
+        if (!inProgressPath.startsWith(tenantPath)) {
+            throw new UnexpectedInvalidBatchIdException(batchId);
+        }
+
         final File inProgressFile = inProgressPath.toFile();
 
         if (!inProgressFile.exists()) {
@@ -89,12 +108,36 @@ public class BatchPathProvider
 
     public Path getTenantInprogressDirectory(final TenantId tenantId)
     {
-        return Paths.get(basePath.toString(), tenantId.getValue(), INPROGRESS_FOLDER);
+        return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
     public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
                                                        final String contentFolder)
     {
-        return Paths.get(storePath, tenantId.getValue(), COMPLETED_FOLDER, batchId.getValue(), contentFolder);
+        return (new BatchPathProvider(storePath)).getPathForBatch(tenantId, batchId).resolve(contentFolder);
+    }
+
+    private static final class UnexpectedInvalidBasePathException extends RuntimeException
+    {
+        public UnexpectedInvalidBasePathException(final String basePath)
+        {
+            super("Invalid base path: " + basePath);
+        }
+    }
+
+    private static final class UnexpectedInvalidTenantIdException extends RuntimeException
+    {
+        public UnexpectedInvalidTenantIdException(final TenantId tenantId)
+        {
+            super("Invalid tenant id: " + tenantId);
+        }
+    }
+
+    private static final class UnexpectedInvalidBatchIdException extends RuntimeException
+    {
+        public UnexpectedInvalidBatchIdException(final BatchId batchId)
+        {
+            super("Invalid batch id: " + batchId);
+        }
     }
 }
