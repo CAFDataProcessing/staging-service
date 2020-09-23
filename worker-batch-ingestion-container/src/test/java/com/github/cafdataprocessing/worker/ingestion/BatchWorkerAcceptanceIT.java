@@ -25,12 +25,12 @@ import com.hpe.caf.services.job.client.model.Job;
 import com.hpe.caf.services.job.client.model.NewJob;
 import com.hpe.caf.services.job.client.model.WorkerAction;
 import com.hpe.caf.worker.batch.BatchWorkerTask;
+import com.hpe.caf.worker.batch.QueueConsumer;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -43,7 +43,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -109,12 +108,12 @@ public class BatchWorkerAcceptanceIT
 
         //ensure that an explicit ack is sent from worker before removing from the queue
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (true) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery(60000L);
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery(60000L);
             if (delivery == null) {
                 break;
             }
@@ -144,12 +143,12 @@ public class BatchWorkerAcceptanceIT
         final int messageCount = setupQueue(workflow_queue);
         //ensure that an explicit ack is sent from worker before removing from the queue
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (true) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery(60000L);
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery(60000L);
             if (delivery == null) {
                 break;
             }
@@ -179,12 +178,12 @@ public class BatchWorkerAcceptanceIT
         final int messageCount = setupQueue(workflow_queue);
         //ensure that an explicit ack is sent from worker before removing from the queue
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (true) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery(60000L);
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery(60000L);
             if (delivery == null) {
                 break;
             }
@@ -213,12 +212,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(workflow_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (true) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery(60000L);
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery(60000L);
             if (delivery == null) {
                 break;
             }
@@ -248,12 +247,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(workflow_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 35) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
 
@@ -294,12 +293,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(workflow_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 35) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
 
@@ -338,12 +337,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(workflow_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(workflow_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 35) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -392,12 +391,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -438,12 +437,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -484,12 +483,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -531,12 +530,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -578,12 +577,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -626,12 +625,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -674,12 +673,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -723,12 +722,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
@@ -770,12 +769,12 @@ public class BatchWorkerAcceptanceIT
 
         final int messageCount = setupQueue(output_queue);
         final boolean autoAck = false;
-        final QueueingConsumer consumer = new QueueingConsumer(channel);
+        final QueueConsumer consumer = new QueueConsumer(channel);
         final String consumerTag = channel.basicConsume(output_queue, autoAck, consumer);
 
         int count = 0;
         while (count < 1) {
-            final QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            final QueueConsumer.Delivery delivery = consumer.nextDelivery();
 
             final String message = new String(delivery.getBody());
             final TaskMessage returnedTaskData = mapper.readValue(message, TaskMessage.class);
