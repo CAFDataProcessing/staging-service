@@ -302,7 +302,7 @@
                             <alias>webdav</alias>
                             <name>${project.artifactId}-test-webdav:${project.version}</name>
                             <build>
-                                <from>cloudesire/webdav</from>
+                                <from>${dockerHubPublic}/cloudesire/webdav</from>
                                 <assembly>
                                     <basedir>/</basedir>
                                     <inline>
@@ -346,7 +346,7 @@
                         <!-- Run the RabbitMQ image. -->
                         <image>
                             <alias>rabbitmq</alias>
-                            <name>rabbitmq:3-management</name>
+                            <name>${dockerHubPublic}/library/rabbitmq:3-management</name>
                             <run>
                                 <ports>
                                     <port>${rabbitmq.ctrl.port}:15672</port>
@@ -368,7 +368,7 @@
                         <!-- Job Service and DB -->
                         <image>
                             <alias>postgres</alias>
-                            <name>postgres:11.7</name>
+                            <name>${dockerHubPublic}/library/postgres:11.7</name>
                             <run>
                                 <env>
                                     <POSTGRES_DB>${jobServiceDatabaseName}</POSTGRES_DB>
@@ -390,7 +390,7 @@
                         </image>
                         <image>
                             <alias>job-service</alias>
-                            <name>jobservice/job-service:2</name>
+                            <name>${dockerHubPublic}/jobservice/job-service:2</name>
                             <run>
                                 <ports>
                                     <port>${job-service.adminport}:8080</port>
@@ -427,7 +427,7 @@
                             <alias>worker-ingestion</alias>
                             <name>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}worker-ingestion${dockerProjectVersion}</name>
                             <build>
-                                <from>cafinternal/prereleases:opensuse-jre11-3.1.0-SNAPSHOT</from>
+                                <from>${dockerHubPrivate}/cafinternal/prereleases:opensuse-jre11-3.1.0-SNAPSHOT</from>
                                 <labels>
                                     <caf.worker-framework.version>${caf.worker-batch-framework.version}</caf.worker-framework.version>
                                     <Build.Number>${project.version}</Build.Number>
