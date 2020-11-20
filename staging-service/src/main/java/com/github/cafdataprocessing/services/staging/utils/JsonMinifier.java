@@ -103,7 +103,7 @@ public final class JsonMinifier
                                           final int fieldValueSizeThreshold,
                                           final Map<String, String> binaryFilesUploaded) throws IOException, InvalidBatchException
     {
-        String dataBuffer = "";
+        String dataBuffer = null;
         String encodingBuffer = null;
         JsonToken token;
         boolean pauseWriting = false;
@@ -156,7 +156,7 @@ public final class JsonMinifier
                     // values and write them out
                     if (pauseWriting) {
                         // check size of data field value
-                        if (dataBuffer.getBytes().length > fieldValueSizeThreshold) {
+                        if (dataBuffer!=null && dataBuffer.getBytes().length > fieldValueSizeThreshold) {
                             // write it out to a loose file
                             final String fileName = RandomStringUtils.randomAlphanumeric(10);
                             final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);
