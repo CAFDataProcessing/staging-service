@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2020 Micro Focus or one of its affiliates.
+    Copyright 2019-2021 Micro Focus or one of its affiliates.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@
     <inceptionYear>2019</inceptionYear>
 
     <properties>
-        <copyrightYear>2020</copyrightYear>
+        <copyrightYear>2021</copyrightYear>
         <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
