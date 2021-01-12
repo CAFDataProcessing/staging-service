@@ -24,7 +24,7 @@
     <groupId>com.github.cafdataprocessing</groupId>
     <artifactId>staging-service-aggregator</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1-512</version>
     <modules>
         <module>staging-service-contract</module>
         <module>staging-service-shared</module>
@@ -109,17 +109,17 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>staging-service</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.1.1-512</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>staging-service-client</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.1.1-512</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>staging-service-shared</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>1.1.1-512</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
