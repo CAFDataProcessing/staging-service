@@ -36,6 +36,7 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.util.UrlPathHelper;
 
+import com.github.cafapi.http.interceptors.CorrelationIdInterceptor;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
@@ -132,6 +133,7 @@ public class StagingApplication implements WebMvcConfigurer
     {
         registry.addInterceptor(new LoggingMDCInterceptor());
         registry.addInterceptor(new HealthcheckInterceptor(adminPort));
+        registry.addInterceptor(new CorrelationIdInterceptor());
     }
 
 }
