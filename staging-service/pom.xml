@@ -40,6 +40,10 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.cafapi.correlation</groupId>
+            <artifactId>caf-correlation-spring</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>staging-service-shared</artifactId>
         </dependency>
