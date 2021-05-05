@@ -32,6 +32,7 @@ import com.hpe.caf.worker.document.DocumentWorkerScript;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final BatchId batchIdExtracted = extractBatchIds(batchId).get(0);
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
 
-            if (!Files.exists(pathOfSubBatches)) {
+            if (!doesFileExist(pathOfSubBatches)) {
                 log.error("Exception while reading the batch: " + batchId + " was not found");
                 throw new BatchDefinitionException("Exception while reading the batch: " + batchId
                     + " was not found");
@@ -155,7 +156,28 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
         }
     }
-
+    
+    private boolean doesFileExist(final Path path)
+    {
+        try
+        {
+            path.getFileSystem().provider().checkAccess(path);
+        }
+        catch(final IOException ex)
+        {
+            if(ex instanceof NoSuchFileException)
+            {
+                log.error("file does not exist", ex);
+            }
+            else
+            {
+                log.error("File existence check failed ", ex);
+            }
+            return false;
+        }
+        return true;
+    }
+    
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
                                 final Map<String, String> taskMessageParams)
         throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
@@ -166,7 +188,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         log.debug("I am going to read each line of: " + subbatchFileName);
         final List<String> lines = new ArrayList<>();
         try {
-            if (!Files.exists(subbatchFileName)) {
+            if (!doesFileExist(subbatchFileName)) {
                 log.error("Exception while reading subbatch: " + subbatch + ", it does not exist");
                 throw new BatchDefinitionException("Exception while reading subbatch: " + subbatch + ", it does not exist");
             }
