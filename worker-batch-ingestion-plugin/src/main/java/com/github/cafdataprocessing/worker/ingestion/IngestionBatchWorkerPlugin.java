@@ -153,10 +153,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         }
     }
     
-    private boolean throwIOExceptionIfFileDoesNotExist(final Path path) throws IOException
+    private void throwIOExceptionIfFileDoesNotExist(final Path path) throws IOException
     {
         path.getFileSystem().provider().checkAccess(path);
-        return true;
     }
     
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
