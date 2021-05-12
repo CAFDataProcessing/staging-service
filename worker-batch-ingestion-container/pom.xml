@@ -104,7 +104,6 @@
         <dependency>
             <groupId>com.github.workerframework</groupId>
             <artifactId>worker-store-fs</artifactId>
-            <version>5.0.0-SCMOD-13301-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
