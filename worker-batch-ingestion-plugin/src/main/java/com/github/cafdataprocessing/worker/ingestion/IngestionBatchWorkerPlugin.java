@@ -131,12 +131,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             final BatchId batchIdExtracted = extractBatchIds(batchId).get(0);
             final Path pathOfSubBatches = fileSystemProvider.getPathForBatch(tenantId, batchIdExtracted);
 
-            if (!Files.exists(pathOfSubBatches)) {
-                log.error("Exception while reading the batch: " + batchId + " was not found");
-                throw new BatchDefinitionException("Exception while reading the batch: " + batchId
-                    + " was not found");
-            }
-
+            throwIOExceptionIfFileIsNotAccessible(pathOfSubBatches);
             final String[] extensions = {"batch"};
             final Collection<File> subbatchesFiles = FileUtils.listFiles(pathOfSubBatches.toFile(), extensions, false);
 
@@ -153,9 +148,17 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
+        } catch(final IOException ex) {
+            log.error("Exception while reading the batch: " + batchId + " was not found", ex);
+            throw new BatchDefinitionException("Exception while reading the batch: " + batchId + " was not found", ex);
         }
     }
-
+    
+    private static void throwIOExceptionIfFileIsNotAccessible(final Path path) throws IOException
+    {
+        path.getFileSystem().provider().checkAccess(path);
+    }
+    
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
                                 final Map<String, String> taskMessageParams)
         throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
@@ -166,10 +169,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         log.debug("I am going to read each line of: " + subbatchFileName);
         final List<String> lines = new ArrayList<>();
         try {
-            if (!Files.exists(subbatchFileName)) {
-                log.error("Exception while reading subbatch: " + subbatch + ", it does not exist");
-                throw new BatchDefinitionException("Exception while reading subbatch: " + subbatch + ", it does not exist");
-            }
+            throwBatchExceptionIfFileIsNotAccessible(subbatch, subbatchFileName);
             lines.addAll(Files.readAllLines(subbatchFileName));
         } catch (final IOException ex) {
             log.error("Transient exception while reading subbatch: " + subbatchFileName + ", message: " + ex.getMessage());
@@ -192,7 +192,18 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             batchWorkerServices.registerItemSubtask(DocumentWorkerConstants.DOCUMENT_TASK_NAME, 1, document);
         }
     }
-
+    
+    private static void throwBatchExceptionIfFileIsNotAccessible(final String subbatch, final Path subbatchFileName)
+            throws BatchDefinitionException
+    {
+        try {
+            throwIOExceptionIfFileIsNotAccessible(subbatchFileName);
+        } catch(final IOException ex) {
+            log.error("Exception while reading subbatch: " + subbatch + ", it does not exist", ex);
+            throw new BatchDefinitionException("Exception while reading subbatch: " + subbatch + ", it does not exist", ex);
+        }
+    }
+    
     private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
         throws IOException, BatchDefinitionException
     {
