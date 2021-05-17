@@ -193,7 +193,8 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         }
     }
     
-    private static void throwBatchExceptionIfFileIsNotAccessible(final String subbatch, final Path subbatchFileName) throws BatchDefinitionException
+    private static void throwBatchExceptionIfFileIsNotAccessible(final String subbatch, final Path subbatchFileName)
+            throws BatchDefinitionException
     {
         try {
             throwIOExceptionIfFileIsNotAccessible(subbatchFileName);
