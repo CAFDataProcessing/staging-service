@@ -514,6 +514,7 @@
             <properties>
                 <rabbitmq.ctrl.port>15672</rabbitmq.ctrl.port>
                 <rabbitmq.node.port>5672</rabbitmq.node.port>
+                <webdav.apache.port>8080</webdav.apache.port>
                 <worker.adminport>8081</worker.adminport>
                 <job-service.adminport>28003</job-service.adminport>
                 <postgres.port>25432</postgres.port>
