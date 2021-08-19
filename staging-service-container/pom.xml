@@ -57,18 +57,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>use-default-fixed-ports</id>
-            <properties>
-                <db.port>25081</db.port>
-                <staging.ports.api.http>25082</staging.ports.api.http>
-                <!--<staging.ports.api.https>25083</staging.ports.api.https>-->
-                <!--<staging.ports.api.admin>25084</staging.ports.api.admin>-->
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
