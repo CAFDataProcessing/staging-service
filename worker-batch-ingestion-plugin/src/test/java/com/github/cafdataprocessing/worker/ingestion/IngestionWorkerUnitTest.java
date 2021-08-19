@@ -502,7 +502,7 @@ public final class IngestionWorkerUnitTest
     }
 
     @SafeVarargs
-    private static final Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
+    private static Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
     {
         final Map<String, String> testTaskMessageParams = new HashMap<>();
         for (final Map.Entry<String, String> entry : entries) {
