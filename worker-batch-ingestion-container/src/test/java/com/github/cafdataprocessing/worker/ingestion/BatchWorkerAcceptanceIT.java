@@ -278,7 +278,7 @@ public class BatchWorkerAcceptanceIT
     void checkScriptMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("scripts:resetDocumentOnError.js",
+        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("graaljs:resetDocumentOnError.js",
                                                                                                      "function onError(document, error) "
                                                                                                      + "{ document.getField('ERROR')"
                                                                                                      + ".add(error); }"));
@@ -309,6 +309,7 @@ public class BatchWorkerAcceptanceIT
 
             assertThat(taskDecoded.scripts.size(), is(equalTo(1)));
             assertThat(taskDecoded.scripts.get(0).name, is(equalTo("resetDocumentOnError.js")));
+            assertThat(taskDecoded.scripts.get(0).engine, is(equalTo("GRAAL_JS")));
             assertThat(taskDecoded.scripts.get(0).script,
                        is(equalTo("function onError(document, error) { document.getField('ERROR').add(error); }")));
 

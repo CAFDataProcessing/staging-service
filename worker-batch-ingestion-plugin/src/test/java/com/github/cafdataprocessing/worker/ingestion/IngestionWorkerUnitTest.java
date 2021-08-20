@@ -262,6 +262,7 @@ public final class IngestionWorkerUnitTest
             final int numberOfScripts = returnedTaskData.scripts.size();
 
             assertThat(numberOfScripts, is(equalTo(1)));
+            assertThat(returnedTaskData.scripts.get(0).engine, is(equalTo("GRAAL_JS")));
 
             if (returnedTaskData.scripts.get(0).name.equals("workflow.js")) {
                 assertThat(returnedTaskData.scripts.get(0).script, is(equalTo("/Scripts/WorkflowScript.js")));
@@ -458,12 +459,12 @@ public final class IngestionWorkerUnitTest
     private static Stream<Arguments> scriptProvider()
     {
         return Stream.of(arguments(createTaskMessageParams(
-            new AbstractMap.SimpleEntry<>("scripts:resetDocumentOnError.js",
+            new AbstractMap.SimpleEntry<>("graaljs:resetDocumentOnError.js",
                                           "function onError(document, error) { document.getField('ERROR').add(error); }"))),
                          arguments(createTaskMessageParams(
-                             new AbstractMap.SimpleEntry<>("scripts:workflow.js", "/Scripts/WorkflowScript.js"))),
+                             new AbstractMap.SimpleEntry<>("graaljs:workflow.js", "/Scripts/WorkflowScript.js"))),
                          arguments(createTaskMessageParams(
-                             new AbstractMap.SimpleEntry<>("scripts:trackDocuments.js", "http://scriptserver/trackDocuments.js"))));
+                             new AbstractMap.SimpleEntry<>("graaljs:trackDocuments.js", "http://scriptserver/trackDocuments.js"))));
     }
 
     private BatchWorkerServices createTestBatchWorkerServices(final List<TaskMessage> constructedMessages,

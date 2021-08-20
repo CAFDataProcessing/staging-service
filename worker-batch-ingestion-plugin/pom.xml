@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>4.1.0-292</version>
+                <version>5.0.0-924</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

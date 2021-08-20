@@ -276,11 +276,11 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 if (!taskParam.getKey().contains(":")) {
                     log.error("Unable to act on task param as it contains an unrecognized field. Task param key was %s,"
                         + " task param value was %s. Field names should be prefixed with one of the following, field, cd, "
-                        + "customdata or script. Key: " + taskParam.getKey() + ", Value: " + taskParam.getValue());
+                        + "customdata or graaljs. Key: " + taskParam.getKey() + ", Value: " + taskParam.getValue());
                     throw new BatchDefinitionException(String.format(
                         "Unable to act on task param as it contains an unrecognized field. Task param key was %s,"
                         + " task param value was %s. Field names should be prefixed with one of the following, field, cd, "
-                        + "customdata or script.", taskParam.getKey(), taskParam.getValue()));
+                        + "customdata or graaljs.", taskParam.getKey(), taskParam.getValue()));
                 }
                 final String paramType = taskParam.getKey().substring(0, taskParam.getKey().indexOf(":"));
                 if (paramType.equals("customdata")) {
@@ -304,16 +304,22 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 if (!taskParam.getKey().contains(":")) {
                     log.error("Unable to act on task param as it contains an unrecognized field. Task param key was %s,"
                         + " task param value was %s. Field names should be prefixed with one of the following, field, cd, "
-                        + "customdata or script. Key: " + taskParam.getKey() + ", Value: " + taskParam.getValue());
+                        + "customdata or graaljs. Key: " + taskParam.getKey() + ", Value: " + taskParam.getValue());
                     throw new BatchDefinitionException(String.format(
                         "Unable to act on task param as it contains an unrecognized field. Task param key was %s,"
                         + " task param value was %s. Field names should be prefixed with one of the following, field, cd, "
-                        + "customdata or script.", taskParam.getKey(), taskParam.getValue()));
+                        + "customdata or graaljs.", taskParam.getKey(), taskParam.getValue()));
                 }
                 final String paramType = taskParam.getKey().substring(0, taskParam.getKey().indexOf(":"));
                 if (paramType.equals("scripts")) {
                     final DocumentWorkerScript script = new DocumentWorkerScript();
                     script.name = createKey(taskParam.getKey());
+                    script.script = taskParam.getValue();
+                    list.add(script);
+                } else if (paramType.equals("graaljs")) {
+                    final DocumentWorkerScript script = new DocumentWorkerScript();
+                    script.name = createKey(taskParam.getKey());
+                    script.engine = "GRAAL_JS";
                     script.script = taskParam.getValue();
                     list.add(script);
                 }
