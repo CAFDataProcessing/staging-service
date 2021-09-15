@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
-import org.springframework.util.unit.DataSize;
 
 final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
 {
@@ -37,7 +36,7 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
     private final ExecutorService healthcheckExecutor;
 
     public DiskSpaceHealthIndicatorWithTimeout(
-        final File path, final DataSize threshold, final int healthcheckTimeoutSeconds)
+        final File path, final long threshold, final int healthcheckTimeoutSeconds)
     {
         super(path, threshold);
         this.path = path;
