@@ -37,7 +37,6 @@
     <properties>
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <fabric8.docker.maven.version>0.28.0</fabric8.docker.maven.version>
         <maven.failsafe.version>2.22.1</maven.failsafe.version>
         <test.data>${project.basedir}/test-data/input</test.data>
 
@@ -58,7 +57,6 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>5.0.0-924</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -256,7 +254,6 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>${fabric8.docker.maven.version}</version>
                 <executions>
                     <execution>
                         <id>build-docker-container</id>
