@@ -387,7 +387,7 @@
                         </image>
                         <image>
                             <alias>job-service</alias>
-                            <name>${dockerHubPublic}/jobservice/job-service:2</name>
+                            <name>${dockerHubPublic}/jobservice/job-service:4</name>
                             <run>
                                 <ports>
                                     <port>${job-service.adminport}:8080</port>
