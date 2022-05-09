@@ -149,7 +149,7 @@ public class FileSystemDao implements BatchDao
 
         try {
             LOGGER.warn("About to run df -h command to help debug US453042");
-            Process process = Runtime.getRuntime().exec("sh -c 'df -h'");
+            Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
             final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
             Executors.newSingleThreadExecutor().submit(streamGobbler);
             int exitCode;
@@ -161,7 +161,7 @@ public class FileSystemDao implements BatchDao
 
         try {
             LOGGER.warn("About to run df -i command to help debug US453042");
-            Process process = Runtime.getRuntime().exec("sh -c 'df -i'");
+            Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
             final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
             Executors.newSingleThreadExecutor().submit(streamGobbler);
             int exitCode;
@@ -230,7 +230,7 @@ public class FileSystemDao implements BatchDao
 
             try {
                 LOGGER.warn("About to run df -h command to help debug US453042");
-                Process process = Runtime.getRuntime().exec("sh -c 'df -h'");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
                 final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
                 Executors.newSingleThreadExecutor().submit(streamGobbler);
                 int exitCode;
@@ -242,7 +242,7 @@ public class FileSystemDao implements BatchDao
 
             try {
                 LOGGER.warn("About to run df -i command to help debug US453042");
-                Process process = Runtime.getRuntime().exec("sh -c 'df -i'");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
                 final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
                 Executors.newSingleThreadExecutor().submit(streamGobbler);
                 int exitCode;
