@@ -35,12 +35,17 @@ import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchE
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -141,7 +146,6 @@ public class FileSystemDao implements BatchDao
     public List<String> saveFiles(final TenantId tenantId, BatchId batchId, FileItemIterator fileItemIterator)
         throws StagingException, InvalidBatchException, IncompleteBatchException
     {
-
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = BatchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
@@ -198,11 +202,64 @@ public class FileSystemDao implements BatchDao
                 }
             }
         } catch (IncompleteBatchException | InvalidBatchException | StagingException ex) {
+
             LOGGER.error("Error saving batch", ex);
+            
+            try {
+                LOGGER.warn("About to run df -h command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable t) {
+                LOGGER.error("Couldn't run df -h command to help debug US453042", t);
+            }
+
+            try {
+                LOGGER.warn("About to run df -i command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable t) {
+                LOGGER.error("Couldn't run df -i command to help debug US453042", t);
+            }
+
+            
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
         } catch (Throwable t) {
+            
             LOGGER.error("Error (throwable) saving batch", t);
+            
+            try {
+                LOGGER.warn("About to run df -h command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable x) {
+                LOGGER.error("Couldn't run df -h command to help debug US453042", x);
+            }
+
+            try {
+                LOGGER.warn("About to run df -i command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable x) {
+                LOGGER.error("Couldn't run df -i command to help debug US453042", x);
+            }
+                  
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }
