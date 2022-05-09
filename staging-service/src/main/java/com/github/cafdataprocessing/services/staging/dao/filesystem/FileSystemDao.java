@@ -146,31 +146,6 @@ public class FileSystemDao implements BatchDao
     public List<String> saveFiles(final TenantId tenantId, BatchId batchId, FileItemIterator fileItemIterator)
         throws StagingException, InvalidBatchException, IncompleteBatchException
     {
-
-        try {
-            LOGGER.warn("About to run df -h command to help debug US453042");
-            Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
-            final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
-            Executors.newSingleThreadExecutor().submit(streamGobbler);
-            int exitCode;
-            exitCode = process.waitFor();
-            assert exitCode == 0;
-        } catch (final Throwable t) {
-            LOGGER.error("Couldn't run df -h command to help debug US453042", t);
-        }
-
-        try {
-            LOGGER.warn("About to run df -i command to help debug US453042");
-            Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
-            final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
-            Executors.newSingleThreadExecutor().submit(streamGobbler);
-            int exitCode;
-            exitCode = process.waitFor();
-            assert exitCode == 0;
-        } catch (final Throwable t) {
-            LOGGER.error("Couldn't run df -i command to help debug US453042", t);
-        }
-
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = BatchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
@@ -228,6 +203,8 @@ public class FileSystemDao implements BatchDao
             }
         } catch (IncompleteBatchException | InvalidBatchException | StagingException ex) {
 
+            LOGGER.error("Error saving batch", ex);
+            
             try {
                 LOGGER.warn("About to run df -h command to help debug US453042");
                 Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
@@ -252,10 +229,13 @@ public class FileSystemDao implements BatchDao
                 LOGGER.error("Couldn't run df -i command to help debug US453042", t);
             }
 
-            LOGGER.error("Error saving batch", ex);
+            
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
         } catch (Throwable t) {
+            
+            LOGGER.error("Error (throwable) saving batch", t);
+            
             try {
                 LOGGER.warn("About to run df -h command to help debug US453042");
                 Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
@@ -279,8 +259,7 @@ public class FileSystemDao implements BatchDao
             } catch (final Throwable x) {
                 LOGGER.error("Couldn't run df -i command to help debug US453042", x);
             }
-            
-            LOGGER.error("Error (throwable) saving batch", t);
+                  
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
         }
