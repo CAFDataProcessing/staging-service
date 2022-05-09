@@ -256,6 +256,30 @@ public class FileSystemDao implements BatchDao
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
         } catch (Throwable t) {
+            try {
+                LOGGER.warn("About to run df -h command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -h",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable x) {
+                LOGGER.error("Couldn't run df -h command to help debug US453042", x);
+            }
+
+            try {
+                LOGGER.warn("About to run df -i command to help debug US453042");
+                Process process = Runtime.getRuntime().exec((new String[]{"sh", "-c", "df -i",}));
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable x) {
+                LOGGER.error("Couldn't run df -i command to help debug US453042", x);
+            }
+            
             LOGGER.error("Error (throwable) saving batch", t);
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw new StagingException(t);
