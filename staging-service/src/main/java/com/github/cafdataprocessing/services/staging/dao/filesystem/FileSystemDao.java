@@ -35,12 +35,17 @@ import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchE
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -142,6 +147,30 @@ public class FileSystemDao implements BatchDao
         throws StagingException, InvalidBatchException, IncompleteBatchException
     {
 
+        try {
+            LOGGER.warn("About to run df -h command to help debug US453042");
+            Process process = Runtime.getRuntime().exec("sh -c 'df -h'");
+            final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+            Executors.newSingleThreadExecutor().submit(streamGobbler);
+            int exitCode;
+            exitCode = process.waitFor();
+            assert exitCode == 0;
+        } catch (final Throwable t) {
+            LOGGER.error("Couldn't run df -h command to help debug US453042", t);
+        }
+
+        try {
+            LOGGER.warn("About to run df -i command to help debug US453042");
+            Process process = Runtime.getRuntime().exec("sh -c 'df -i'");
+            final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+            Executors.newSingleThreadExecutor().submit(streamGobbler);
+            int exitCode;
+            exitCode = process.waitFor();
+            assert exitCode == 0;
+        } catch (final Throwable t) {
+            LOGGER.error("Couldn't run df -i command to help debug US453042", t);
+        }
+
         final Path inProgressBatchFolderPath = batchPathProvider.getInProgressPathForBatch(tenantId, batchId);
         final Path storageRefFolderPath = BatchPathProvider.getStorageRefFolderPathForBatch(tenantId, batchId, this.storagePath, CONTENT_FILES);
         final List<String> fileNames = new ArrayList<>();
@@ -198,6 +227,31 @@ public class FileSystemDao implements BatchDao
                 }
             }
         } catch (IncompleteBatchException | InvalidBatchException | StagingException ex) {
+
+            try {
+                LOGGER.warn("About to run df -h command to help debug US453042");
+                Process process = Runtime.getRuntime().exec("sh -c 'df -h'");
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable t) {
+                LOGGER.error("Couldn't run df -h command to help debug US453042", t);
+            }
+
+            try {
+                LOGGER.warn("About to run df -i command to help debug US453042");
+                Process process = Runtime.getRuntime().exec("sh -c 'df -i'");
+                final StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+                Executors.newSingleThreadExecutor().submit(streamGobbler);
+                int exitCode;
+                exitCode = process.waitFor();
+                assert exitCode == 0;
+            } catch (final Throwable t) {
+                LOGGER.error("Couldn't run df -i command to help debug US453042", t);
+            }
+
             LOGGER.error("Error saving batch", ex);
             cleanupInProgressBatch(inProgressBatchFolderPath.toFile());
             throw ex;
