@@ -43,10 +43,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
+import io.swagger.annotations.ApiOperation;
 //import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -77,12 +83,20 @@ public class StagingController implements StagingApi
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 
+    @ApiOperation(value = "Upload documents. The batch will be automatically created if it doesn't already exist.", nickname = "createOrReplaceBatch", notes = "", tags = {})
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully uploaded batch of documents."),
+        @ApiResponse(code = 400, message = "The request could not be processed because one or more arguments are invalid."),
+        @ApiResponse(code = 500, message = "The request failed due to an unexpected server error.")})
+    @RequestMapping(value = "/batches/{batchId}",
+                    consumes = {"multipart/mixed"},
+                    method = RequestMethod.PUT)
     public ResponseEntity<Void> createOrReplaceBatch(
         @ApiParam(value = "Identifies the tenant making the request.", required = true)
         @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
         @Size(min = 1) @ApiParam(value = "Identifies the batch.", required = true)
         @PathVariable("batchId") String batchId,
-        Object body)
+        @Valid @RequestBody Object body)
     {
 
         final ServletFileUpload fileUpload = new ServletFileUpload();

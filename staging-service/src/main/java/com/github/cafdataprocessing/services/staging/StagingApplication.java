@@ -41,6 +41,7 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 @SpringBootApplication
@@ -135,5 +136,13 @@ public class StagingApplication implements WebMvcConfigurer
         registry.addInterceptor(new HealthcheckInterceptor(adminPort));
         registry.addInterceptor(new CorrelationIdInterceptor());
     }
+
+//    @Bean(name = "multipartResolver")
+//    public CommonsMultipartResolver multipartResolver()
+//    {
+//        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+//        multipartResolver.setMaxUploadSize(100000);
+//        return multipartResolver;
+//    }
 
 }

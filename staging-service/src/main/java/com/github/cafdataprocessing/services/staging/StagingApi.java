@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @Api(value = "Staging", description = "the Staging API")
 public interface StagingApi {
 
+    // TODO https://stackoverflow.com/a/25700288/12177456 
     @ApiOperation(value = "Upload documents. The batch will be automatically created if it doesn't already exist.", nickname = "createOrReplaceBatch", notes = "", tags={  })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully uploaded batch of documents."),
@@ -51,7 +52,6 @@ public interface StagingApi {
         @ApiResponse(code = 500, message = "The request failed due to an unexpected server error.") })
     @RequestMapping(value = "/batches/{batchId}",
         consumes = { "multipart/mixed" },
-//        accept = MediaType.MULTIPART_FORM_DATA_VALUE,
         method = RequestMethod.PUT)
     ResponseEntity<Void> createOrReplaceBatch(@ApiParam(value = "Identifies the tenant making the request." ,required=true) @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,@Size(min=1) @ApiParam(value = "Identifies the batch.",required=true) @PathVariable("batchId") String batchId,@ApiParam(value = ""  ) @Valid @RequestBody Object body);
 

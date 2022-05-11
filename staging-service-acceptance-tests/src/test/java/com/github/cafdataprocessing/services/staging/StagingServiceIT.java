@@ -39,7 +39,8 @@ public class StagingServiceIT
 {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
-//        private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+//        private static final String STAGING_SERVICE_URI = "http://localhost:25082";
+//    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT()
@@ -54,7 +55,7 @@ public class StagingServiceIT
         stagingApi.setApiClient(apiClient);
     }
 
-    //@Test
+    @Test
     public void uploadDocumentsToBatchTest() throws Exception
     {
         final String tenantId = "tenant-test-batch1";
@@ -66,7 +67,7 @@ public class StagingServiceIT
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
     }
 
-    @Test
+   // @Test
     public void uploadJsonsBeforeFilesTest() throws Exception
     {
         final String tenantId = "tenant-test-batch1";
