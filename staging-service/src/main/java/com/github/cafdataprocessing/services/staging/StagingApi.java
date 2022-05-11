@@ -51,8 +51,9 @@ public interface StagingApi {
         @ApiResponse(code = 500, message = "The request failed due to an unexpected server error.") })
     @RequestMapping(value = "/batches/{batchId}",
         consumes = { "multipart/mixed" },
+//        accept = MediaType.MULTIPART_FORM_DATA_VALUE,
         method = RequestMethod.PUT)
-    ResponseEntity<Void> createOrReplaceBatch(@ApiParam(value = "Identifies the tenant making the request." ,required=true) @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,@Size(min=1) @ApiParam(value = "Identifies the batch.",required=true) @PathVariable("batchId") String batchId,@ApiParam(value = ""  ) @Valid @ModelAttribute Object body);
+    ResponseEntity<Void> createOrReplaceBatch(@ApiParam(value = "Identifies the tenant making the request." ,required=true) @RequestHeader(value="X-TENANT-ID", required=true) String X_TENANT_ID,@Size(min=1) @ApiParam(value = "Identifies the batch.",required=true) @PathVariable("batchId") String batchId,@ApiParam(value = ""  ) @Valid @RequestBody Object body);
 
 
     @ApiOperation(value = "Delete specified batch.", nickname = "deleteBatch", notes = "", tags={  })

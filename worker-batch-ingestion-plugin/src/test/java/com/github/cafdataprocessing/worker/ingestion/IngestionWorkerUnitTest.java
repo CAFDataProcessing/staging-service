@@ -45,7 +45,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+//@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("Unit tests for the IngestionBatchWorkerPlugin")
 public final class IngestionWorkerUnitTest
 {
@@ -53,7 +53,7 @@ public final class IngestionWorkerUnitTest
     private String taskMessageType;
     private Map<String, String> testTaskMessageParams;
 
-    @Test
+    //@Test
     @DisplayName("Worker Instantiated if CAF_STAGING_SERVICE_BASEPATH is set")
     void testEnvVariable()
     {
@@ -61,7 +61,7 @@ public final class IngestionWorkerUnitTest
         assertThat(plugin, is(notNullValue()));
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test multiple batch ids successfully proccessed with custom data")
     void testMultiBatchIdsWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -91,7 +91,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test multiple batch ids successfully processed without custom data")
     void testMultiBatchIdsWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -119,7 +119,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test single batch id successfully processed with custom data")
     void testSingleBatchIdWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -149,7 +149,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test single batch id successfully processed without custom data")
     void testSingleBatchIdWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -177,7 +177,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test subbatch successfully processed with custom data")
     void testSubbatchWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -207,7 +207,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @RepeatedTest(19)
     @DisplayName("Test subbatch successfully processed without custom data")
     void testSubbatchWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
@@ -270,7 +270,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
+    //@Test
     @DisplayName("Test batch definitions is null")
     void testBatchDefinitionsNull()
     {
@@ -280,7 +280,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), is(equalTo("IngestionBatchWorkerPlugin has not received a valid batch definition string")));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test invalid batch id and tenant id with single batch")
     void testInvalidBatchIdAndTenantIdSingleBatch()
     {
@@ -305,7 +305,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("Invalid format of the batch definition: tenant:2/batch1"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test invalid json")
     void testInvalidJson()
     {
@@ -325,7 +325,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("20190314-100001-t04-json.batch"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing json file")
     void testNonExistingFile()
     {
@@ -345,7 +345,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("20190314-100001-ttt-json.batch, it does not exist"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing directory (batch)")
     void testNonExistingDirectory()
     {
@@ -365,7 +365,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing directory (batch) in the a multiple batch")
     void testNonExistingDirectoryInMultiBatch()
     {
@@ -385,7 +385,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("batch10 was not found"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing directory (batch) in a subbatch")
     void testNonExistingDirectoryInSubbatch()
     {
@@ -405,7 +405,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString(", it does not exist"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test transient exception")
     void testTransientException()
     {
@@ -425,7 +425,7 @@ public final class IngestionWorkerUnitTest
         assertThat(ex.getMessage(), containsString("20190328-100001-t04-json.batch, message: Input length = 2"));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test tenantId not present in input string")
     void testTenantIdNotPresent()
     {

@@ -76,7 +76,7 @@ public class FileSystemDaoTest
         }
     }
 
-    @Test
+    //@Test
     public void saveFilesTest() throws Exception
     {
 
@@ -106,7 +106,7 @@ public class FileSystemDaoTest
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    @Test
+    //@Test
     public void saveFilesWindowsPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -135,7 +135,7 @@ public class FileSystemDaoTest
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    @Test
+    //@Test
     public void saveFilesLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -164,7 +164,7 @@ public class FileSystemDaoTest
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    @Test
+    //@Test
     public void saveInvalidLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -193,7 +193,7 @@ public class FileSystemDaoTest
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    @Test
+    //@Test
     public void saveFilesWrongOrderNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -222,7 +222,7 @@ public class FileSystemDaoTest
         }
     }
 
-    @Test
+    //@Test
     public void saveFilesWrongOrderMixedNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -270,7 +270,7 @@ public class FileSystemDaoTest
         }
     }
 
-    @Test
+    //@Test
     public void missingLocalRefFileTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -299,7 +299,7 @@ public class FileSystemDaoTest
         }
     }
 
-    @Test
+    //@Test
     public void saveInvalidJsonTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -323,13 +323,13 @@ public class FileSystemDaoTest
         }
     }
 
-    @Test(expected = InvalidBatchIdException.class)
+    //@Test(expected = InvalidBatchIdException.class)
     public void putFilesInvalidBatchIdTest() throws Exception
     {
         new BatchId("../../MyBadBatchId");
     }
 
-    @Test
+    //@Test
     public void getFilesTest() throws Exception
     {
         final String startsWith = "test";
@@ -349,7 +349,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
     }
 
-    @Test
+    //@Test
     public void getFilesInvalidFromTest() throws Exception
     {
         final String startsWith = "test";
@@ -367,7 +367,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
     }
 
-    @Test
+    //@Test
     public void getFilesPaginateFromTest() throws Exception
     {
         final String startsWith = "test";
@@ -390,7 +390,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
     }
 
-    @Test
+    //@Test
     public void getFilesPaginate() throws Exception
     {
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
@@ -411,7 +411,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
     }
 
-    @Test
+    //@Test
     public void deleteFilesTest() throws Exception
     {
         final BatchId batchId = new BatchId("test-batch");

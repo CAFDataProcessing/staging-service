@@ -58,7 +58,7 @@ public class StagingServiceWindowsIT
         System.out.println("Windows Tests");
     }
 
-    @Test
+    //@Test
     public void uploadWindowsPathTest() throws Exception
     {
         final String tenantId = "tenant-windows1";

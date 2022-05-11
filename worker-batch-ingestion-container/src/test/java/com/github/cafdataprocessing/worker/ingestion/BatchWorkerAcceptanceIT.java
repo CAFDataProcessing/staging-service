@@ -47,7 +47,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+//@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("IT for IngestionBatchWorkerPlugin")
 @Slf4j
 public class BatchWorkerAcceptanceIT
@@ -75,7 +75,7 @@ public class BatchWorkerAcceptanceIT
         jobsApi = new JobsApi(client);
     }
 
-    @Test
+    //@Test
     @DisplayName("Check environmental variables for tests have been set")
     void checkEnvVariablesTest() throws ApiException
     {
@@ -88,7 +88,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(System.getenv("CAF_BATCH_WORKER_ERROR_QUEUE"), is(notNullValue()));
     }
 
-    @Test
+    //@Test
     @DisplayName("Check number of messages for single Subbatch")
     void countMessagesSingleSubbatchTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -126,7 +126,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Check number of messages for single Batch")
     void countMessagesSingleBatchTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -161,7 +161,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(10)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Check number of messages for multiple Batches")
     void countMessagesMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -196,7 +196,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Check number of messages for 937 subbatches")
     void countMessagesManySubbatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -230,7 +230,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(937)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Multple batches check custom data managed")
     void checkCustomDataMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -273,7 +273,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Multple batches check script managed")
     void checkScriptMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -321,7 +321,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test data put in the TaskMessage and DocumentWorkerDocumentTask")
     void checkDataTest() throws ApiException, IOException, TimeoutException, InterruptedException
     {
@@ -375,7 +375,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test batch definitions is null")
     void batchDefinitionNullTest() throws ApiException, InterruptedException, IOException
     {
@@ -421,7 +421,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test invalid tenantId")
     void invalidTenantIdTest() throws ApiException, InterruptedException, IOException
     {
@@ -467,7 +467,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test invalid batchId")
     void invalidBatchIdTest() throws ApiException, InterruptedException, IOException
     {
@@ -513,7 +513,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test invalid json")
     void invalidJsonTest() throws ApiException, InterruptedException, IOException
     {
@@ -560,7 +560,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing batch file")
     void nonExistingFileTest() throws ApiException, InterruptedException, IOException
     {
@@ -608,7 +608,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing batch directory")
     void nonExistingDirectoryTest() throws ApiException, InterruptedException, IOException
     {
@@ -656,7 +656,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing batch directory in multibatch")
     void nonExistingDirectoryInMultiBatchTest() throws ApiException, InterruptedException, IOException
     {
@@ -705,7 +705,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test non existing directory in subbatch")
     void nonExistingDirectoryInSubbatchTest() throws ApiException, InterruptedException, IOException
     {
@@ -753,7 +753,7 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
+    //@Test
     @DisplayName("Test tenantId not present")
     void tenantIdNotPresentTest() throws ApiException, InterruptedException, IOException
     {
