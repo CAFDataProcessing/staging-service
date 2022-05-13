@@ -24,9 +24,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 import com.github.cafdataprocessing.services.staging.exceptions.*;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +41,17 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import io.swagger.annotations.ApiOperation;
-//import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
-
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Collection;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
 import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @DependsOn({"basePathCreator"})
@@ -96,19 +94,17 @@ public class StagingController implements StagingApi
         @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
         @Size(min = 1) @ApiParam(value = "Identifies the batch.", required = true)
         @PathVariable("batchId") String batchId,
-        @Valid @RequestBody Object body)
+        MultipartHttpServletRequest request)
     {
-
-        final ServletFileUpload fileUpload = new ServletFileUpload();
-        final FileItemIterator fileItemIterator;
+        final Collection<Part> parts;
         try {
-            fileItemIterator = fileUpload.getItemIterator(request);
-        } catch (final FileUploadException | IOException ex) {
-            LOGGER.error("Error getting FileItemIterator", ex);
+            parts = this.request.getParts();
+        } catch (final ServletException | IOException ex) {
+            LOGGER.error("Error getting paets from MultipartHttpServletRequest", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
         try {
-            batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
+            batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), parts);
             LOGGER.debug("Staged batch: {}", batchId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex) {

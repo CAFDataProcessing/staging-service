@@ -130,9 +130,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.failsafe.version}</version>
 
-<!--                <configuration>
+                <configuration>
                     <skip>true</skip>
-                </configuration>-->
+                </configuration>
                 <executions>
                     <execution>
                         <id>staging-service</id>
@@ -211,7 +211,7 @@
                                     <port>${staging.ports.api.http}:8080</port>
                                     <port>${staging.ports.api.https}:8443</port>
                                     <port>${staging.ports.api.admin}:8081</port>
-                                    <port>6005:6005</port>
+                                    <!--<port>6005:6005</port>-->
                                 </ports>
                                 <env>
                                     <SSL_CERT_ALIAS>staging</SSL_CERT_ALIAS>
@@ -220,7 +220,7 @@
                                     <SSL_KEYSTORE_PATH>/test-keystore</SSL_KEYSTORE_PATH>
                                     <CAF_LOG_LEVEL>DEBUG</CAF_LOG_LEVEL>
                                     <CAF_STAGING_SERVICE_SUBBATCH_SIZE>4</CAF_STAGING_SERVICE_SUBBATCH_SIZE>
-                                    <CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:6005</CAF_SERVICE_JAVA_OPTS>
+                                    <!--<CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:6005</CAF_SERVICE_JAVA_OPTS>-->
                                 </env>
                                 <volumes>
                                     <from>
@@ -234,7 +234,7 @@
                                     <http>
                                         <url>http://${docker.host.address}:${staging.ports.api.admin}/healthcheck</url>
                                     </http>
-                                    <time>1200000000</time>
+                                    <time>120000</time>
                                     <shutdown>500</shutdown>
                                 </wait>
                             </run>

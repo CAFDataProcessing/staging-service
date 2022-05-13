@@ -60,7 +60,7 @@ public class StagingServiceLinuxIT
         System.out.println("Linux Tests");
     }
 
-    //@Test
+    @Test
     public void uploadLinuxPathTest() throws Exception
     {
         final String tenantId = "tenant-linux1";
@@ -115,7 +115,7 @@ public class StagingServiceLinuxIT
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
     }
 
-    //@Test
+    @Test
     public void uploadLinuxDangerousPathsTest() throws Exception
     {
         final String tenantId = "tenant-linux2";

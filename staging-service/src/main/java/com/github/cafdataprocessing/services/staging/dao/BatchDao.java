@@ -27,13 +27,12 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-
-import org.apache.commons.fileupload.FileItemIterator;
+import java.util.Collection;
+import javax.servlet.http.Part;
 
 public interface BatchDao
 {
-
-    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
+    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, Collection<Part> parts)
         throws IncompleteBatchException, InvalidBatchException, StagingException;
 
     List<String> getBatches(TenantId tenantId, @Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,

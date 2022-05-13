@@ -17,10 +17,6 @@
 debug: false
 server:
   port: 8080
-#  servlet:
-#    encoding:
-#      enabled: false
-#      force: false
 https:
   port: 8443
 management:
@@ -50,11 +46,6 @@ spring:
   servlet:
     multipart:
       enabled: true
-#  http:
-#    encoding:
-#      enabled: false
-#      force: false
-#      force-request: false
 staging:
     basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
     subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}

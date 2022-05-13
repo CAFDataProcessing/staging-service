@@ -33,8 +33,6 @@ import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +43,9 @@ import org.slf4j.LoggerFactory;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.servlet.http.Part;
 import org.apache.commons.io.FilenameUtils;
 
 public class FileSystemDaoTest
@@ -76,145 +77,139 @@ public class FileSystemDaoTest
         }
     }
 
-    //@Test
+    @Test
     public void saveFilesTest() throws Exception
     {
-
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("hello.txt");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
+        when(part1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f2, f1);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("hello.txt");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part2);
+        parts.add(part1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, parts);
         assertEquals(2, files.size());
-        assertTrue(files.contains(f1.getFieldName()));
-        files.remove(f1.getFieldName());
+        assertTrue(files.contains(part1.getName()));
+        files.remove(part1.getName());
         assertTrue(files.size() == 1);
         assertTrue(FilenameUtils.getExtension(files.get(0)).equals("txt"));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    //@Test
+    @Test
     public void saveFilesWindowsPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("C:\\test\\hello.pdf");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
+        when(part1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f2, f1);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("C:\\test\\hello.pdf");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part2);
+        parts.add(part1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, parts);
         assertEquals(2, files.size());
-        assertTrue(files.contains(f1.getFieldName()));
-        files.remove(f1.getFieldName());
+        assertTrue(files.contains(part1.getName()));
+        files.remove(part1.getName());
         assertTrue(files.size() == 1);
         assertTrue(FilenameUtils.getExtension(files.get(0)).equals("pdf"));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    //@Test
+    @Test
     public void saveFilesLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("/mnt/c/test/hello");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
+        when(part1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f2, f1);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("/mnt/c/test/hello");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part2);
+        parts.add(part1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, parts);
         assertEquals(2, files.size());
-        assertTrue(files.contains(f1.getFieldName()));
-        files.remove(f1.getFieldName());
+        assertTrue(files.contains(part1.getName()));
+        files.remove(part1.getName());
         assertTrue(files.size() == 1);
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    //@Test
+    @Test
     public void saveInvalidLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("../../mnt/c/test/hello");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
+        when(part1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f2, f1);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("../../mnt/c/test/hello");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part2);
+        parts.add(part1);
+
+        final List<String> files = fileSystemDao.saveFiles(tenantId, batchId, parts);
         assertEquals(2, files.size());
-        assertTrue(files.contains(f1.getFieldName()));
-        files.remove(f1.getFieldName());
+        assertTrue(files.contains(part1.getName()));
+        files.remove(part1.getName());
         assertTrue(files.size() == 1);
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
-    //@Test
+    @Test
     public void saveFilesWrongOrderNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
+        when(part1.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f1, f2);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("A_Christmas_Carol1.txt");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part1);
+        parts.add(part2);
 
         try {
-            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fileSystemDao.saveFiles(tenantId, batchId, parts);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
             assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the JSON "
@@ -222,47 +217,46 @@ public class FileSystemDaoTest
         }
     }
 
-    //@Test
+    @Test
     public void saveFilesWrongOrderMixedNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream jsonDocOk = mock(FileItemStream.class);
+
+        Part jsonDocOk = mock(Part.class);
         when(jsonDocOk.getContentType()).thenReturn("application/document+json");
-        when(jsonDocOk.getFieldName()).thenReturn("jsonDocument.json");
-        when(jsonDocOk.isFormField()).thenReturn(true);
-        when(jsonDocOk.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
+        when(jsonDocOk.getName()).thenReturn("jsonDocument.json");
+        when(jsonDocOk.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemStream localRefOneOk = mock(FileItemStream.class);
+        Part localRefOneOk = mock(Part.class);
         when(localRefOneOk.getContentType()).thenReturn("application/text");
-        when(localRefOneOk.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
-        when(localRefOneOk.isFormField()).thenReturn(true);
-        when(localRefOneOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(localRefOneOk.getName()).thenReturn("A_Christmas_Carol1.txt");
+        when(localRefOneOk.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemStream localRefTwoOk = mock(FileItemStream.class);
+        Part localRefTwoOk = mock(Part.class);
         when(localRefTwoOk.getContentType()).thenReturn("application/text");
-        when(localRefTwoOk.getFieldName()).thenReturn("A_Christmas_Carol2.txt");
-        when(localRefTwoOk.isFormField()).thenReturn(true);
-        when(localRefTwoOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(localRefTwoOk.getName()).thenReturn("A_Christmas_Carol2.txt");
+        when(localRefTwoOk.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemStream jsonDocNotOk = mock(FileItemStream.class);
+        Part jsonDocNotOk = mock(Part.class);
         when(jsonDocNotOk.getContentType()).thenReturn("application/document+json");
-        when(jsonDocNotOk.getFieldName()).thenReturn("jsonDocument.json");
-        when(jsonDocNotOk.isFormField()).thenReturn(true);
-        when(jsonDocNotOk.openStream()).thenReturn(new FileInputStream(
+        when(jsonDocNotOk.getName()).thenReturn("jsonDocument.json");
+        when(jsonDocNotOk.getInputStream()).thenReturn(new FileInputStream(
             Paths.get("src", "test", "resources", "batch1MissingLocalRef.json").toFile()));
 
-        FileItemStream localRefThreeTooLate = mock(FileItemStream.class);
+        Part localRefThreeTooLate = mock(Part.class);
         when(localRefThreeTooLate.getContentType()).thenReturn("application/text");
-        when(localRefThreeTooLate.getFieldName()).thenReturn("hello-hello.txt");
-        when(localRefThreeTooLate.isFormField()).thenReturn(true);
-        when(localRefThreeTooLate.openStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
+        when(localRefThreeTooLate.getName()).thenReturn("hello-hello.txt");
+        when(localRefThreeTooLate.getInputStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, true, true, true, false);
-        when(fileItemIterator.next()).thenReturn(localRefOneOk, localRefTwoOk, jsonDocOk, jsonDocNotOk, localRefThreeTooLate);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(localRefOneOk);
+        parts.add(localRefTwoOk);
+        parts.add(jsonDocOk);
+        parts.add(jsonDocNotOk);
+        parts.add(localRefThreeTooLate);
 
         try {
-            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fileSystemDao.saveFiles(tenantId, batchId, parts);
             fail("An exception should have been thrown");
         } catch (InvalidBatchException ex) {
             assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the "
@@ -270,28 +264,27 @@ public class FileSystemDaoTest
         }
     }
 
-    //@Test
+    @Test
     public void missingLocalRefFileTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("batch1.json");
-        when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toString()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
-        when(f2.getContentType()).thenReturn("application/text");
-        when(f2.getFieldName()).thenReturn("hello.txt");
-        when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("batch1.json");
+        when(part1.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toString()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, true, false);
-        when(fileItemIterator.next()).thenReturn(f1, f2);
+        Part part2 = mock(Part.class);
+        when(part2.getContentType()).thenReturn("application/text");
+        when(part2.getName()).thenReturn("hello.txt");
+        when(part2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part1);
+        parts.add(part2);
 
         try {
-            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fileSystemDao.saveFiles(tenantId, batchId, parts);
             fail("The exception has not been thrown!");
         } catch (InvalidBatchException ex) {
             assertTrue(ex.getMessage().contains("Binary files referenced in the JSON documents must be uploaded before the JSON "
@@ -299,37 +292,35 @@ public class FileSystemDaoTest
         }
     }
 
-    //@Test
+    @Test
     public void saveInvalidJsonTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
-        FileItemStream f1 = mock(FileItemStream.class);
-        when(f1.getContentType()).thenReturn("application/document+json");
-        when(f1.getFieldName()).thenReturn("jsonDocument.json");
-        when(f1.isFormField()).thenReturn(true);
+        Part part1 = mock(Part.class);
+        when(part1.getContentType()).thenReturn("application/document+json");
+        when(part1.getName()).thenReturn("jsonDocument.json");
         // Invalid json
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{\"abc\": \"lll\",}".getBytes()));
+        when(part1.getInputStream()).thenReturn(new ByteArrayInputStream("{\"abc\": \"lll\",}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
-        when(fileItemIterator.hasNext()).thenReturn(true, false);
-        when(fileItemIterator.next()).thenReturn(f1);
+        final Collection<Part> parts = new ArrayList<>();
+        parts.add(part1);
 
         try {
-            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
+            fileSystemDao.saveFiles(tenantId, batchId, parts);
             fail("Incorrectly uploaded invalid batch");
         } catch (final InvalidBatchException e) {
             assertTrue("Expected InvalidBatchException thrown", true);
         }
     }
 
-    //@Test(expected = InvalidBatchIdException.class)
+    @Test(expected = InvalidBatchIdException.class)
     public void putFilesInvalidBatchIdTest() throws Exception
     {
         new BatchId("../../MyBadBatchId");
     }
 
-    //@Test
+    @Test
     public void getFilesTest() throws Exception
     {
         final String startsWith = "test";
@@ -349,7 +340,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
     }
 
-    //@Test
+    @Test
     public void getFilesInvalidFromTest() throws Exception
     {
         final String startsWith = "test";
@@ -367,7 +358,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
     }
 
-    //@Test
+    @Test
     public void getFilesPaginateFromTest() throws Exception
     {
         final String startsWith = "test";
@@ -390,7 +381,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
     }
 
-    //@Test
+    @Test
     public void getFilesPaginate() throws Exception
     {
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
@@ -411,7 +402,7 @@ public class FileSystemDaoTest
         assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
     }
 
-    //@Test
+    @Test
     public void deleteFilesTest() throws Exception
     {
         final BatchId batchId = new BatchId("test-batch");
