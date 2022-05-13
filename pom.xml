@@ -182,13 +182,11 @@
                 <artifactId>swagger-annotations</artifactId>
                 <version>2.0.6</version>
             </dependency>
-            
             <dependency>
                 <groupId>jakarta.validation</groupId>
                 <artifactId>jakarta.validation-api</artifactId>
                 <version>2.0.2</version>
             </dependency>
-            
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
