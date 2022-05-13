@@ -130,9 +130,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.failsafe.version}</version>
 
-                <configuration>
+<!--                <configuration>
                     <skip>true</skip>
-                </configuration>
+                </configuration>-->
                 <executions>
                     <execution>
                         <id>staging-service</id>
@@ -188,13 +188,13 @@
                             <goal>start</goal>
                         </goals>
                     </execution>
-                    <execution>
+<!--                    <execution>
                         <id>stop</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
                         </goals>
-                    </execution>
+                    </execution>-->
                 </executions>
                 <configuration>
                     <verbose>true</verbose>
