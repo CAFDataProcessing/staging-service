@@ -151,6 +151,11 @@ public class FileSystemDao implements BatchDao
 
             for (final Part part : parts) {
 
+                if (part.getSubmittedFileName() != null) {
+                    LOGGER.error("A form field is required.");
+                    throw new InvalidBatchException("A form field is required.");
+                }
+
                 final String filename = part.getName();
                 if (filename == null || filename.trim().length() == 0) {
                     LOGGER.error("The form field name must be present and contain the filename.");
