@@ -46,9 +46,6 @@ public class StagingServiceIT
     {
         final ApiClient apiClient = new ApiClient();
         apiClient.setBasePath(STAGING_SERVICE_URI);
-        apiClient.setConnectTimeout(0);
-        apiClient.setReadTimeout(0);
-        apiClient.setWriteTimeout(0);
         stagingApi = new StagingApi();
 
         stagingApi.setApiClient(apiClient);

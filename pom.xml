@@ -50,13 +50,9 @@
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
-<!--        <springVersion>5.2.4.RELEASE</springVersion>
-        <springBootVersion>2.2.6.RELEASE</springBootVersion>-->
-        
         <springVersion>5.3.19</springVersion>
         <springBootVersion>2.6.7</springBootVersion>
-        
-        <okhttp-version>2.7.5</okhttp-version> <!-- TODO -->
+        <okhttp-version>2.7.5</okhttp-version>
         <enforceBannedDependencies>true</enforceBannedDependencies>
         <enforceCorrectDependencies>true</enforceCorrectDependencies>
         <fasterxmlVersion>2.12.5</fasterxmlVersion>
