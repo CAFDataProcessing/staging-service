@@ -39,7 +39,7 @@ public class StagingServiceIT
 {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
-//    private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+//        private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT()
@@ -47,7 +47,6 @@ public class StagingServiceIT
         final ApiClient apiClient = new ApiClient();
         apiClient.setBasePath(STAGING_SERVICE_URI);
         stagingApi = new StagingApi();
-
         stagingApi.setApiClient(apiClient);
     }
 
