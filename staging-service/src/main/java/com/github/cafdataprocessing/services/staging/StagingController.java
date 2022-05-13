@@ -17,8 +17,11 @@ package com.github.cafdataprocessing.services.staging;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+import javax.servlet.ServletException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -41,9 +44,7 @@ import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import io.swagger.annotations.ApiParam;
-import java.util.Collection;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
+
 import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;

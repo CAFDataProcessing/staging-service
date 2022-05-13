@@ -16,7 +16,9 @@
 package com.github.cafdataprocessing.services.staging.dao;
 
 import java.util.List;
+import java.util.Collection;
 
+import javax.servlet.http.Part;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -27,8 +29,6 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-import java.util.Collection;
-import javax.servlet.http.Part;
 
 public interface BatchDao
 {
