@@ -48,6 +48,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
 
 @RestController
 @DependsOn({"basePathCreator"})

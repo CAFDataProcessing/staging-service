@@ -210,6 +210,55 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>modify-swagger</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>targetDir</name>
+                                    <value>${project.build.directory}</value>
+                                </property>
+                            </properties>
+                            <scripts>
+                                <!--
+                                    From Spring 5.1, we must use `MultipartHttpServletRequest` instead of `@Valid @RequestBody Object`
+                                    to process a multipart HTTP PUT request, since from 5.1 Spring MVC now reads the body, making it
+                                    unavailable to commons-fileupload.
+
+                                    See: https://github.com/spring-projects/spring-boot/issues/30971
+                                -->
+                                <script><![CDATA[
+                                    def fileToModify = new File(targetDir +
+                                        "/swagger-codegen/src/main/java/com/github/cafdataprocessing/services/staging/swagger/api/StagingApi.java")
+
+                                    def fileToModifyText = fileToModify.text
+                                    if (fileToModifyText == null) {
+                                        throw Exception();
+                                    }
+
+                                    def fileToModifyTextFirstUpdate = fileToModifyText.replaceAll(
+                                        'import org.springframework.web.bind.annotation.RequestBody',
+                                        'import org.springframework.web.multipart.MultipartHttpServletRequest')
+
+                                    def fileToModifyTextSecondUpdate = fileToModifyTextFirstUpdate.replaceAll(
+                                        '@Valid @RequestBody Object body',
+                                        'MultipartHttpServletRequest request')
+
+                                    fileToModify.write(fileToModifyTextSecondUpdate)
+                                ]]></script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>

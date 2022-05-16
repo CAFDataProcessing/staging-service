@@ -4,12 +4,6 @@
 #SettingsApiController copied and modified with implementation
 **/SettingsApiController.java
 
-# StagingApi.java copied and modified with implementation
-# Changes made:
-# '@Valid @RequestBody Object body' parameter changed to 'MultipartHttpServletRequest request'
-# See: https://github.com/spring-projects/spring-boot/issues/30971
-**/StagingApi.java
-
 #Annotations from Swagger2SpringBoot added to StagingService
 **/Swagger2SpringBoot.java
 
