@@ -101,12 +101,16 @@
             <artifactId>tomcat-embed-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -205,6 +209,59 @@
                                 <interfaceOnly>true</interfaceOnly>
                                 <useTags>true</useTags>
                             </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>modify-swagger</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>targetDir</name>
+                                    <value>${project.build.directory}</value>
+                                </property>
+                            </properties>
+                            <scripts>
+                                <!--
+                                     Spring does not support streaming multipart request bodies, so we must use commons-fileupload
+                                     instead. To prevent Spring from reading the request body we do two things:
+
+                                    1) Set `spring.servlet.multipart.enabled=false` in the application.yaml
+                                    2) Modify the generated swagger sources to change the `@Valid @RequestBody Object` param to
+                                      `HttpServletRequest`
+
+                                    See: https://stackoverflow.com/questions/32782026/springboot-large-streaming-file-upload-using-apache-commons-fileupload
+                                         https://stackoverflow.com/questions/37870989/spring-how-to-stream-large-multipart-file-uploads-to-database-without-storing
+                                -->
+                                <script><![CDATA[
+                                    def fileToModify = new File(targetDir +
+                                        "/swagger-codegen/src/main/java/com/github/cafdataprocessing/services/staging/swagger/api/StagingApi.java")
+
+                                    def fileToModifyText = fileToModify.text
+                                    if (fileToModifyText == null) {
+                                        throw Exception();
+                                    }
+
+                                    def fileToModifyTextFirstUpdate = fileToModifyText.replaceAll(
+                                        'import org.springframework.web.bind.annotation.RequestBody',
+                                        'import javax.servlet.http.HttpServletRequest')
+
+                                    def fileToModifyTextSecondUpdate = fileToModifyTextFirstUpdate.replaceAll(
+                                        '@Valid @RequestBody Object body',
+                                        'HttpServletRequest request')
+
+                                    fileToModify.write(fileToModifyTextSecondUpdate)
+                                ]]></script>
+                            </scripts>
                         </configuration>
                     </execution>
                 </executions>

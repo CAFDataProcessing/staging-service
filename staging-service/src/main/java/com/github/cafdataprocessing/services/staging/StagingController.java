@@ -82,7 +82,7 @@ public class StagingController implements StagingApi
         @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
         @Size(min = 1) @ApiParam(value = "Identifies the batch.", required = true)
         @PathVariable("batchId") String batchId,
-        Object body)
+        HttpServletRequest request)
     {
 
         final ServletFileUpload fileUpload = new ServletFileUpload();
