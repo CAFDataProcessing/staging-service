@@ -79,6 +79,7 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
         //If an error occures on creation this statement wont be reached
         //However if creation succeeds, test passes, therefore file needs deleted
         if (created) {
+            LOGGER.debug("File created successfully");
             file.delete();
         }
     }
