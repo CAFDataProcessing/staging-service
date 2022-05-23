@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.services.staging;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,6 +55,7 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
         });
         try {
             healthcheckFuture.get(healthcheckTimeoutSeconds, TimeUnit.SECONDS);
+            testWrite(path);
         } catch (final TimeoutException e) {
             healthcheckFuture.cancel(true);
             builder.down().withDetail(
@@ -61,12 +63,23 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
                 String.format("Timeout after %s seconds trying to access batches directory: %s",
                               healthcheckTimeoutSeconds,
                               path.toString()));
-        } catch (final InterruptedException | ExecutionException e) {
+        } catch (final InterruptedException | ExecutionException | IOException e) {
             healthcheckFuture.cancel(true);
             builder.down().withDetail(
                 "errorMessage",
                 String.format("Exception thrown trying to access batches directory: %s", path.toString()));
             LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", path.toString(), e);
+        }
+    }
+    
+    private void testWrite(final File file) throws IOException
+    {
+        final boolean created = file.createNewFile();
+
+        //If an error occures on creation this statement wont be reached
+        //However if creation succeeds, test passes, therefore file needs deleted
+        if (created) {
+            file.delete();
         }
     }
 }
