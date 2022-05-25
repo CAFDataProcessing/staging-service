@@ -78,13 +78,6 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
                 "errorMessage",
                 String.format("Exception thrown trying to access batches directory: %s", path.toString()));
             LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", path.toString(), e);
-        } catch (final IOException  e) {
-            throw e;
-//            healthcheckFuture.cancel(true);
-//            builder.down().withDetail(
-//                "errorMessage",
-//                String.format("Exception thrown trying to access batches directory: %s", path.toString()));
-//            LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", path.toString(), e);
         }
     }
 
@@ -92,7 +85,7 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
     {
         try {
             Files.deleteIfExists(healthcheckFile.toPath());
-            boolean created = healthcheckFile.createNewFile();
+            final boolean created = healthcheckFile.createNewFile();
             if (!created) {
                 throw new IOException("Cannot create new file at directory: " + path.getAbsolutePath());
             }
