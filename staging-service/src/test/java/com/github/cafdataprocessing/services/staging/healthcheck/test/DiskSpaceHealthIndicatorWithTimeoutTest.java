@@ -24,6 +24,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,34 +38,35 @@ import org.springframework.util.unit.DataSize;
  *
  * @author TBroadbent
  */
-public class DiskSpaceHealthIndicatorWithTimeoutTest
+public final class DiskSpaceHealthIndicatorWithTimeoutTest
 {
     private StagingController controller;
 
-    BatchDao fileSystemDao;
-    HttpServletRequest request;
-    StagingProperties stagingProperties;
-    File file;
+    private BatchDao fileSystemDao;
+    private HttpServletRequest request;
+    private StagingProperties stagingProperties;
+    private DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties;
 
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Before
-    public void setup() throws IOException
+    public void setup()
     {
         fileSystemDao = Mockito.mock(BatchDao.class);
         request = Mockito.mock(HttpServletRequest.class);
-    }
 
-    @Test
-    public void healthCheckTest() throws IOException
-    {
-        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties
-            = new DiskSpaceHealthIndicatorProperties();
+        diskSpaceHealthIndicatorProperties = new DiskSpaceHealthIndicatorProperties();
+        diskSpaceHealthIndicatorProperties.setPath(folder.getRoot());
+        diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
 
         stagingProperties = new StagingProperties();
         stagingProperties.setHealthcheckTimeoutSeconds(60);
+    }
 
+    @Test
+    public void healthCheckTest()
+    {
         diskSpaceHealthIndicatorProperties.setPath(folder.getRoot());
         diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
         controller = new StagingController(fileSystemDao,
@@ -76,17 +78,9 @@ public class DiskSpaceHealthIndicatorWithTimeoutTest
     }
 
     @Test
-    public void healthCheckTestReadOnly() throws IOException
+    public void healthCheckTestReadOnly()
     {
-        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties
-            = new DiskSpaceHealthIndicatorProperties();
-
-        stagingProperties = new StagingProperties();
-        stagingProperties.setHealthcheckTimeoutSeconds(60);
-
         final File file = new File(folder.getRoot().getAbsolutePath() + "/test");
-        file.setReadOnly();
-        file.setWritable(false);
 
         diskSpaceHealthIndicatorProperties.setPath(file);
         diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));

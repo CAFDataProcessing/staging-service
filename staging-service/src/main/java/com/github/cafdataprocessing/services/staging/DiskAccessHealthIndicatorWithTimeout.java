@@ -16,6 +16,8 @@
 package com.github.cafdataprocessing.services.staging;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,16 +30,20 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
 import org.springframework.util.unit.DataSize;
 
-final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
+/**
+ *
+ * @author TBroadbent
+ */
+public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DiskSpaceHealthIndicatorWithTimeout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiskAccessHealthIndicatorWithTimeout.class);
 
     private final File path;
     private final File healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
 
-    public DiskSpaceHealthIndicatorWithTimeout(
+    public DiskAccessHealthIndicatorWithTimeout(
         final File path, final DataSize threshold, final int healthcheckTimeoutSeconds)
     {
         super(path, threshold);
@@ -50,26 +56,52 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception
     {
-        final Future<Void> healthcheckFuture = healthcheckExecutor.submit(() -> {
-            DiskSpaceHealthIndicatorWithTimeout.super.doHealthCheck(builder);
+        final Future<Void> healthCheckDiscAccessFuture = healthcheckExecutor.submit(() -> {
+            testWrite(path, builder);
             return null;
         });
 
         try {
-            healthcheckFuture.get(healthcheckTimeoutSeconds, TimeUnit.SECONDS);
+            healthCheckDiscAccessFuture.get(healthcheckTimeoutSeconds, TimeUnit.SECONDS);
         } catch (final TimeoutException e) {
-            healthcheckFuture.cancel(true);
+            healthCheckDiscAccessFuture.cancel(true);
             builder.down().withDetail(
                 "errorMessage",
                 String.format("Timeout after %s seconds trying to access batches directory: %s",
                               healthcheckTimeoutSeconds,
                               path.toString()));
         } catch (final InterruptedException | ExecutionException e) {
-            healthcheckFuture.cancel(true);
+            healthCheckDiscAccessFuture.cancel(true);
             builder.down().withDetail(
                 "errorMessage",
                 String.format("Exception thrown trying to access batches directory: %s", path.toString()));
             LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", path.toString(), e);
+        }
+    }
+
+    private void testWrite(final File path, final Health.Builder builder) throws IOException
+    {
+        try {
+            final boolean created = healthcheckFile.createNewFile();
+            if (!created) {
+                builder.down().withDetail(
+                    "errorMessage",
+                    String.format("Exception thrown trying to write healthcheck file to directory %s",
+                                  path.toString()));
+                LOGGER.warn("Error trying to write health check file to directory {} during healthcheck",
+                            path.toString());
+            } else {
+                builder.up();
+            }
+        } catch (final IOException e) {
+            builder.down().withDetail(
+                "errorMessage",
+                String.format("Exception thrown trying to write healthcheck file to directory %s",
+                              path.toString()));
+            LOGGER.warn("Exception thrown trying to write healthcheck file to directory {} during healthcheck",
+                        path.toString(), e);
+        } finally {
+            Files.deleteIfExists(healthcheckFile.toPath());
         }
     }
 }
