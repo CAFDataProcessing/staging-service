@@ -15,9 +15,9 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,23 +29,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 
-/**
- *
- * @author TBroadbent
- */
 final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskAccessHealthIndicatorWithTimeout.class);
 
-    private final File healthcheckFile;
+    private final Path healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
 
     public DiskAccessHealthIndicatorWithTimeout(
-        final File path, final int healthcheckTimeoutSeconds)
+        final Path path, final int healthcheckTimeoutSeconds)
     {
         super();
-        this.healthcheckFile = new File(path.getPath() + File.separator + "healthcheck-file.txt");
+        this.healthcheckFile = path.getFileName();
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
     }
@@ -78,9 +74,10 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
 
     private void testWrite(final Health.Builder builder) throws IOException
     {
+        Path created = null;
         try {
-            final boolean created = healthcheckFile.createNewFile();
-            if (!created) {
+            created = Files.createFile(healthcheckFile);
+            if (created !=null) {
                 builder.down().withDetail(
                     "errorMessage",
                     String.format("Exception thrown trying to write healthcheck file to directory %s",
@@ -98,7 +95,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
             LOGGER.warn("Exception thrown trying to write healthcheck file to directory {} during healthcheck",
                         healthcheckFile.toString(), e);
         } finally {
-            Files.deleteIfExists(healthcheckFile.toPath());
+            Files.deleteIfExists(created);
         }
     }
 }

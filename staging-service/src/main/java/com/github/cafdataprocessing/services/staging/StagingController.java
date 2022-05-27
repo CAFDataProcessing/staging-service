@@ -78,7 +78,7 @@ public class StagingController implements StagingApi
             diskSpaceHealthIndicatorProperties.getThreshold(),
             stagingProperties.getHealthcheckTimeoutSeconds());
         this.diskAccessHealthIndicatorWithTimeout = new DiskAccessHealthIndicatorWithTimeout(
-            diskSpaceHealthIndicatorProperties.getPath(),
+            diskSpaceHealthIndicatorProperties.getPath().toPath(),
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 

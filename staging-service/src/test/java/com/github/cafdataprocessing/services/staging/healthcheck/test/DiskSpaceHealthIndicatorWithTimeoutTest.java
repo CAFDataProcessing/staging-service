@@ -19,7 +19,7 @@ import com.github.cafdataprocessing.services.staging.StagingController;
 import com.github.cafdataprocessing.services.staging.StagingProperties;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
-import java.io.File;
+import java.nio.file.Path;
 import javax.servlet.http.HttpServletRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,10 +32,6 @@ import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndi
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.unit.DataSize;
 
-/**
- *
- * @author TBroadbent
- */
 public final class DiskSpaceHealthIndicatorWithTimeoutTest
 {
     private StagingController controller;
@@ -78,9 +74,9 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     @Test
     public void healthCheckTestReadOnly()
     {
-        final File file = new File(folder.getRoot().getAbsolutePath() + "/test");
+        final Path file = folder.getRoot().toPath().resolve("/test");
 
-        diskSpaceHealthIndicatorProperties.setPath(file);
+        diskSpaceHealthIndicatorProperties.setPath(file.toFile());
         diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
         controller = new StagingController(fileSystemDao,
                                            request,
