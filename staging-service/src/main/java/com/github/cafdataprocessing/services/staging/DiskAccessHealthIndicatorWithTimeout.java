@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.services.staging;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +42,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
         final Path path, final int healthcheckTimeoutSeconds)
     {
         super();
-        this.healthcheckFile = path.getFileName();
+        this.healthcheckFile = path.resolve("healthcheck-file.txt");
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
     }
@@ -77,7 +78,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
         Path created = null;
         try {
             created = Files.createFile(healthcheckFile);
-            if (created !=null) {
+            if (created == null) {
                 builder.down().withDetail(
                     "errorMessage",
                     String.format("Exception thrown trying to write healthcheck file to directory %s",

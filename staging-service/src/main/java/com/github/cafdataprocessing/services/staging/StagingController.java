@@ -189,7 +189,8 @@ public class StagingController implements StagingApi
             status.setMessage("Service available");
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
         } else {
-            status.setMessage(String.format("Service unavailable due to [access details Status:%s , %s disk space details Status:%s, %s]", diskAccessHealth.getStatus(), diskAccessHealth.getDetails(),
+            status.setMessage(String.format("Service unavailable due to [access details Status:%s , %s disk space details Status:%s, %s]",
+                                            diskAccessHealth.getStatus(), diskAccessHealth.getDetails(),
                                             diskSpaceHealth.getStatus(),
                                             diskSpaceHealth.getDetails()));
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
