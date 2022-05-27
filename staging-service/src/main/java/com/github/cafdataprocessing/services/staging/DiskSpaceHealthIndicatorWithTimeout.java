@@ -33,7 +33,6 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskSpaceHealthIndicatorWithTimeout.class);
 
     private final File path;
-    private final File healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
 
@@ -42,7 +41,6 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
     {
         super(path, threshold);
         this.path = path;
-        this.healthcheckFile = new File(path.getPath() + File.separator + "healthcheck-file.txt");
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
     }
