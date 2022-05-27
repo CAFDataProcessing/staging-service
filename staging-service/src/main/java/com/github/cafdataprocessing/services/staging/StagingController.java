@@ -79,7 +79,6 @@ public class StagingController implements StagingApi
             stagingProperties.getHealthcheckTimeoutSeconds());
         this.diskAccessHealthIndicatorWithTimeout = new DiskAccessHealthIndicatorWithTimeout(
             diskSpaceHealthIndicatorProperties.getPath(),
-            diskSpaceHealthIndicatorProperties.getThreshold(),
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 
@@ -190,8 +189,9 @@ public class StagingController implements StagingApi
             status.setMessage("Service available");
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
         } else {
-            status.setMessage("Service unavailable due to unavailable batches directory or low disk space. "
-                + diskSpaceHealth.getDetails().toString());
+            status.setMessage(String.format("Service unavailable due to [access details Status:%s , %s disk space details Status:%s, %s]", diskAccessHealth.getStatus(), diskAccessHealth.getDetails(),
+                                            diskSpaceHealth.getStatus(),
+                                            diskSpaceHealth.getDetails()));
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(status);

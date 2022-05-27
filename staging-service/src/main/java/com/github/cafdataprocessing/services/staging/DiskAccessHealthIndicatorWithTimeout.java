@@ -26,28 +26,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
-import org.springframework.util.unit.DataSize;
 
 /**
  *
  * @author TBroadbent
  */
-public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
+final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskAccessHealthIndicatorWithTimeout.class);
 
-    private final File path;
     private final File healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
 
     public DiskAccessHealthIndicatorWithTimeout(
-        final File path, final DataSize threshold, final int healthcheckTimeoutSeconds)
+        final File path, final int healthcheckTimeoutSeconds)
     {
-        super(path, threshold);
-        this.path = path;
+        super();
         this.healthcheckFile = new File(path.getPath() + File.separator + "healthcheck-file.txt");
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
@@ -57,7 +54,7 @@ public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicat
     protected void doHealthCheck(Health.Builder builder) throws Exception
     {
         final Future<Void> healthCheckDiscAccessFuture = healthcheckExecutor.submit(() -> {
-            testWrite(path, builder);
+            testWrite(builder);
             return null;
         });
 
@@ -69,17 +66,17 @@ public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicat
                 "errorMessage",
                 String.format("Timeout after %s seconds trying to access batches directory: %s",
                               healthcheckTimeoutSeconds,
-                              path.toString()));
+                              healthcheckFile.toString()));
         } catch (final InterruptedException | ExecutionException e) {
             healthCheckDiscAccessFuture.cancel(true);
             builder.down().withDetail(
                 "errorMessage",
-                String.format("Exception thrown trying to access batches directory: %s", path.toString()));
-            LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", path.toString(), e);
+                String.format("Exception thrown trying to access batches directory: %s", healthcheckFile));
+            LOGGER.warn("Exception thrown trying to access batches directory {} during healthcheck", healthcheckFile.toString(), e);
         }
     }
 
-    private void testWrite(final File path, final Health.Builder builder) throws IOException
+    private void testWrite(final Health.Builder builder) throws IOException
     {
         try {
             final boolean created = healthcheckFile.createNewFile();
@@ -87,9 +84,9 @@ public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicat
                 builder.down().withDetail(
                     "errorMessage",
                     String.format("Exception thrown trying to write healthcheck file to directory %s",
-                                  path.toString()));
+                                  healthcheckFile.toString()));
                 LOGGER.warn("Error trying to write health check file to directory {} during healthcheck",
-                            path.toString());
+                            healthcheckFile.toString());
             } else {
                 builder.up();
             }
@@ -97,9 +94,9 @@ public class DiskAccessHealthIndicatorWithTimeout extends DiskSpaceHealthIndicat
             builder.down().withDetail(
                 "errorMessage",
                 String.format("Exception thrown trying to write healthcheck file to directory %s",
-                              path.toString()));
+                              healthcheckFile.toString()));
             LOGGER.warn("Exception thrown trying to write healthcheck file to directory {} during healthcheck",
-                        path.toString(), e);
+                        healthcheckFile.toString(), e);
         } finally {
             Files.deleteIfExists(healthcheckFile.toPath());
         }
