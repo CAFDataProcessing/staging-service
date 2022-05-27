@@ -52,7 +52,6 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
             DiskSpaceHealthIndicatorWithTimeout.super.doHealthCheck(builder);
             return null;
         });
-
         try {
             healthcheckFuture.get(healthcheckTimeoutSeconds, TimeUnit.SECONDS);
         } catch (final TimeoutException e) {
