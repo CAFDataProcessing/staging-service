@@ -61,6 +61,8 @@ public class StagingController implements StagingApi
     private final HttpServletRequest request;
 
     private final DiskSpaceHealthIndicatorWithTimeout diskSpaceHealthIndicatorWithTimeout;
+    
+    private final DiskAccessHealthIndicatorWithTimeout diskAccessHealthIndicatorWithTimeout;
 
     @Autowired
     public StagingController(
@@ -74,6 +76,9 @@ public class StagingController implements StagingApi
         this.diskSpaceHealthIndicatorWithTimeout = new DiskSpaceHealthIndicatorWithTimeout(
             diskSpaceHealthIndicatorProperties.getPath(),
             diskSpaceHealthIndicatorProperties.getThreshold(),
+            stagingProperties.getHealthcheckTimeoutSeconds());
+        this.diskAccessHealthIndicatorWithTimeout = new DiskAccessHealthIndicatorWithTimeout(
+            diskSpaceHealthIndicatorProperties.getPath().toPath(),
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 
@@ -176,14 +181,18 @@ public class StagingController implements StagingApi
     {
         final StatusResponse status = new StatusResponse();
 
-        final Health health = diskSpaceHealthIndicatorWithTimeout.health();
+        final Health diskSpaceHealth = diskSpaceHealthIndicatorWithTimeout.health();
+        
+        final Health diskAccessHealth = diskAccessHealthIndicatorWithTimeout.health();
 
-        if (health.getStatus() == Status.UP) {
+        if ((diskSpaceHealth.getStatus() == Status.UP) && (diskAccessHealth.getStatus() == Status.UP)) {
             status.setMessage("Service available");
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
         } else {
-            status.setMessage("Service unavailable due to unavailable batches directory or low disk space. "
-                + health.getDetails().toString());
+            status.setMessage(String.format("Service unavailable due to [access details Status:%s , %s disk space details Status:%s, %s]",
+                                            diskAccessHealth.getStatus(), diskAccessHealth.getDetails(),
+                                            diskSpaceHealth.getStatus(),
+                                            diskSpaceHealth.getDetails()));
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(status);
