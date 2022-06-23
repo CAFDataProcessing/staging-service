@@ -41,7 +41,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
         final Path path, final int healthcheckTimeoutSeconds)
     {
         super();
-        this.healthcheckFile = path.resolve("healthcheck-file.txt");
+        this.healthcheckFile = path.resolve("healthcheck-file_"  + Thread.currentThread().getId()+ ".txt");
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
     }
