@@ -76,6 +76,10 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     {
         Path created = null;
         try {
+            //Check to see if file exists from previous healtcheck run
+            Files.deleteIfExists(healthcheckFile);
+            
+            //Create new healthcheck file for current healtcheck run
             created = Files.createFile(healthcheckFile);
             if (created == null) {
                 builder.down().withDetail(
