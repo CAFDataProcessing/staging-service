@@ -36,7 +36,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     private final Path healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
-
+    
     public DiskAccessHealthIndicatorWithTimeout(
         final Path path, final int healthcheckTimeoutSeconds)
     {
@@ -50,7 +50,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     protected void doHealthCheck(Health.Builder builder) throws Exception
     {
         final Future<Void> healthCheckDiscAccessFuture = healthcheckExecutor.submit(() -> {
-            testWrite(builder);
+            doWriteCheck(builder);
             return null;
         });
 
@@ -72,10 +72,18 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
         }
     }
 
-    private void testWrite(final Health.Builder builder) throws IOException
+    private synchronized void doWriteCheck(final Health.Builder builder) throws IOException
     {
         Path created = null;
+
         try {
+            Files.deleteIfExists(healthcheckFile);
+        } catch (final IOException e) {
+            //Ignoring exception here due to wanting the healthcheck to only fail on the write check
+        }
+
+        try {
+            //Create new healthcheck file for current healtcheck run
             created = Files.createFile(healthcheckFile);
             if (created == null) {
                 builder.down().withDetail(
