@@ -18,6 +18,7 @@ package com.github.cafdataprocessing.services.staging;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,12 +37,12 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     private final Path healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
-
+    
     public DiskAccessHealthIndicatorWithTimeout(
         final Path path, final int healthcheckTimeoutSeconds)
     {
         super();
-        this.healthcheckFile = path.resolve("healthcheck-file_"  + Thread.currentThread().getId()+ ".txt");
+        this.healthcheckFile = path.resolve("healthcheck-file.txt");
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
         this.healthcheckExecutor = Executors.newSingleThreadExecutor();
     }
@@ -50,7 +51,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     protected void doHealthCheck(Health.Builder builder) throws Exception
     {
         final Future<Void> healthCheckDiscAccessFuture = healthcheckExecutor.submit(() -> {
-            testWrite(builder);
+            doWriteCheck(builder);
             return null;
         });
 
@@ -72,13 +73,17 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
         }
     }
 
-    private void testWrite(final Health.Builder builder) throws IOException
+    private synchronized void doWriteCheck(final Health.Builder builder) throws IOException
     {
         Path created = null;
+
         try {
-            //Check to see if file exists from previous healtcheck run
             Files.deleteIfExists(healthcheckFile);
-            
+        } catch (final IOException e) {
+            //Ignoring exception here due to wanting the healthcheck to only fail on the write check
+        }
+
+        try {
             //Create new healthcheck file for current healtcheck run
             created = Files.createFile(healthcheckFile);
             if (created == null) {
