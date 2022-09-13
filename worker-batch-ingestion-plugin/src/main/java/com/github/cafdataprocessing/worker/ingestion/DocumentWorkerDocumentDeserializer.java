@@ -28,6 +28,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,27 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                                               final DeserializationContext deserializationContext)
             throws IOException, JsonProcessingException {
 
-        return deserializeDocumentWorkerDocument(jsonParser, deserializationContext, jsonParser.currentToken(), new MutableInt());
+        final MutableInt totalSubdocuments = new MutableInt();
+
+        final DocumentWorkerDocument documentWorkerDocument = 
+                deserializeDocumentWorkerDocument(
+                        jsonParser, deserializationContext, jsonParser.currentToken(), totalSubdocuments);
+        
+        if(totalSubdocuments.intValue() > this.totalSubdocumentLimit){
+            if(documentWorkerDocument.failures == null) {
+                documentWorkerDocument.failures = new ArrayList<>();
+            }
+            final DocumentWorkerFailure subdocumentsTruncatedFailure = new DocumentWorkerFailure();
+
+            subdocumentsTruncatedFailure.failureId = "TODO";
+            subdocumentsTruncatedFailure.failureMessage =
+                    String.format("Subdocuments were truncated to %s", totalSubdocuments.intValue());
+            subdocumentsTruncatedFailure.failureStack = Arrays.toString(Thread.currentThread().getStackTrace());
+
+            documentWorkerDocument.failures.add(subdocumentsTruncatedFailure);
+        }
+        
+        return documentWorkerDocument;
 
     }
     private DocumentWorkerDocument deserializeDocumentWorkerDocument(
@@ -123,6 +144,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
 
             if(totalSubdocuments.intValue() >= totalSubdocumentLimit) {
                 jsonParser.skipChildren();
+                totalSubdocuments.increment();
                 break;
             }
 
