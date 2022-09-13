@@ -18,6 +18,7 @@ package com.github.cafdataprocessing.worker.ingestion;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
@@ -27,18 +28,20 @@ import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DocumentWorkerDocumentDeserializer extends StdDeserializer<DocumentWorkerDocument> {
 
-    public DocumentWorkerDocumentDeserializer() {
-        this(null);
+    private final int totalSubdocumentLimit;
+    
+    public DocumentWorkerDocumentDeserializer(final int totalSubdocumentLimit) {
+        this(null, totalSubdocumentLimit);
     }
 
-    public DocumentWorkerDocumentDeserializer(Class<?> vc) {
+    public DocumentWorkerDocumentDeserializer(final Class<?> vc, final int totalSubdocumentLimit) {
         super(vc);
+        this.totalSubdocumentLimit = totalSubdocumentLimit;
     }
 
     @Override
@@ -46,11 +49,12 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                                               final DeserializationContext deserializationContext)
             throws IOException, JsonProcessingException {
 
-        return deserializeDocumentWorkerDocument(jsonParser, jsonParser.currentToken(), new MutableInt());
+        return deserializeDocumentWorkerDocument(jsonParser, deserializationContext, jsonParser.currentToken(), new MutableInt());
 
     }
     private DocumentWorkerDocument deserializeDocumentWorkerDocument(
             final JsonParser jsonParser,
+            final DeserializationContext deserializationContext,
             final JsonToken currentJsonToken,
             final MutableInt totalSubdocuments) throws IOException {
 
@@ -59,71 +63,50 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
         }
 
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
-
-        JsonToken currentDocumentJsonToken = jsonParser.nextToken();
-
-        while(currentDocumentJsonToken != JsonToken.END_OBJECT) {
-            if(currentDocumentJsonToken == JsonToken.FIELD_NAME){
+        
+        while(jsonParser.currentToken() != JsonToken.END_OBJECT) {
+            if(jsonParser.currentToken() == JsonToken.FIELD_NAME){
                 final String field = jsonParser.getCurrentName();
+                jsonParser.nextToken();
                 switch(field){
                     case "reference": {
                         documentWorkerDocument.reference = jsonParser.getValueAsString();
                         break;
                     }
                     case "fields": {
-                        documentWorkerDocument.fields = deserializeFields(jsonParser, jsonParser.nextToken());
+                        documentWorkerDocument.fields = deserializationContext.readValue(jsonParser,
+                                deserializationContext.getTypeFactory()
+                                        .constructType(
+                                                new TypeReference<Map<String, List<DocumentWorkerFieldValue>>>() {}));
                         break;
                     }
                     case "failures": {
-                        documentWorkerDocument.failures = deserializeFailures(jsonParser, jsonParser.nextToken());
+                        documentWorkerDocument.failures = deserializationContext.readValue(jsonParser,
+                                deserializationContext.getTypeFactory()
+                                        .constructType(new TypeReference<List<DocumentWorkerFailure>>() {}));
                         break;
                     }
                     case "subdocuments": {
                         documentWorkerDocument.subdocuments =
-                                deserializeSubdocuments(jsonParser, jsonParser.nextToken(), totalSubdocuments);
+                                deserializeSubdocuments(jsonParser, deserializationContext, jsonParser.currentToken(),
+                                        totalSubdocuments);
                         break;
                     }
-                } 
+                    default: {
+                        throw new IllegalStateException("TODO");
+                    }
+                }
+                
             }
-            currentDocumentJsonToken = jsonParser.nextToken();
+            jsonParser.nextToken();
         }
 
         return documentWorkerDocument;
 
     }
     
-    private Map<String, List<DocumentWorkerFieldValue>> deserializeFields(final JsonParser jsonParser, 
-                                                                          final JsonToken currentJsonToken) 
-            throws IOException 
-    {
-
-        if(currentJsonToken != JsonToken.START_ARRAY){
-            throw new IllegalStateException("TODO");
-        }
-
-        final Map<String, List<DocumentWorkerFieldValue>> fields = new HashMap<>();
-
-        JsonToken currentFieldArrayJsonToken = jsonParser.nextToken();
-
-        while(currentFieldArrayJsonToken != JsonToken.END_ARRAY) {
-            fi
-
-        }
-        
-        return fields;
-    }
-
-    private List<DocumentWorkerFailure> deserializeFailures(final JsonParser jsonParser,
-                                                            final JsonToken currentJsonToken) throws IOException {
-
-        final List<DocumentWorkerFailure> documentWorkerFailures = new ArrayList<>();
-
-        jsonParser.skipChildren();
-
-        return documentWorkerFailures;
-    }
-
     private List<DocumentWorkerDocument> deserializeSubdocuments(final JsonParser jsonParser,
+                                                                 final DeserializationContext deserializationContext,
                                                                  final JsonToken currentJsonToken,
                                                                  final MutableInt totalSubdocuments) throws IOException 
     {
@@ -138,16 +121,17 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
 
         while(currentSubdocumentArrayJsonToken != JsonToken.END_ARRAY) {
 
-            if(totalSubdocuments.intValue() >= 100) {
+            if(totalSubdocuments.intValue() >= totalSubdocumentLimit) {
                 jsonParser.skipChildren();
                 break;
             }
 
-            documentWorkerSubdocumentList.add(deserializeDocumentWorkerDocument(jsonParser, 
+            documentWorkerSubdocumentList.add(deserializeDocumentWorkerDocument(jsonParser, deserializationContext,
                     currentSubdocumentArrayJsonToken, 
                     totalSubdocuments));
             
             totalSubdocuments.increment();
+            
             currentSubdocumentArrayJsonToken = jsonParser.nextToken();
 
         }
