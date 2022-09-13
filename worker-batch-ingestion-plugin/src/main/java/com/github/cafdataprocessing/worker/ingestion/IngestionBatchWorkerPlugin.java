@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.worker.ingestion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
@@ -27,6 +28,7 @@ import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
 import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
+import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
 import java.io.File;
@@ -69,6 +71,10 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         }
         fileSystemProvider = new BatchPathProvider(env);
         mapper = new ObjectMapper();
+        final SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(DocumentWorkerDocument.class, new DocumentWorkerDocumentDeserializer(100));
+        mapper.registerModule(simpleModule);
+
     }
 
     @Override
