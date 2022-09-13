@@ -64,7 +64,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
 
             subdocumentsTruncatedFailure.failureId = "TODO";
             subdocumentsTruncatedFailure.failureMessage =
-                    String.format("Subdocuments were truncated to %s", totalSubdocuments.intValue());
+                    String.format("Subdocuments were truncated to %s", totalSubdocumentLimit);
             subdocumentsTruncatedFailure.failureStack = Arrays.toString(Thread.currentThread().getStackTrace());
 
             documentWorkerDocument.failures.add(subdocumentsTruncatedFailure);
