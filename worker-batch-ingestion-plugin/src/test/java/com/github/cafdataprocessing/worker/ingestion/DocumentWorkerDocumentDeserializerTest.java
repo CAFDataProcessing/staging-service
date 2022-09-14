@@ -23,6 +23,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -95,14 +96,14 @@ class DocumentWorkerDocumentDeserializerTest {
     void deserializeInvalidDocumentTest() throws JsonProcessingException {
 
         final String json = "[]";
-        try {
-            final DocumentWorkerDocument documentWorkerDocument =
-                    objectMapper.readValue(json, DocumentWorkerDocument.class);
-        }
-        catch(final IllegalStateException ex) {
-            assertEquals("Expected '{' at [Source: (String)\"[]\"; line: 1, column: 2]", ex.getMessage());
-        }
-        
+
+        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
+            objectMapper.readValue(json, DocumentWorkerDocument.class);
+        });
+        Assertions.assertEquals(
+                "Expected '{' at [Source: (String)\"[]\"; line: 1, column: 2]",
+                thrown.getMessage());
+
     }
 
     @Test
@@ -110,13 +111,12 @@ class DocumentWorkerDocumentDeserializerTest {
 
         final String json = "{\"subdocuments\":{}}";
 
-        try {
-            final DocumentWorkerDocument documentWorkerDocument =
-                    objectMapper.readValue(json, DocumentWorkerDocument.class);
-        }
-        catch(final IllegalStateException ex) {
-            assertEquals("Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]", ex.getMessage());
-        }
+        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
+            objectMapper.readValue(json, DocumentWorkerDocument.class);
+        });
+        Assertions.assertEquals(
+                "Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]",
+                thrown.getMessage());
 
     }
 
