@@ -79,9 +79,12 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
             final JsonToken currentJsonToken,
             final MutableInt totalSubdocuments) throws IOException {
 
-        if(currentJsonToken != JsonToken.START_OBJECT){
-            throw new IllegalStateException("TODO");
+        if(currentJsonToken != JsonToken.START_OBJECT) {
+            throw new IllegalStateException(String.format("Expected '{' at %s", 
+                    jsonParser.getCurrentLocation().toString()));
         }
+        
+        jsonParser.nextToken();
 
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
         
@@ -114,7 +117,9 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                         break;
                     }
                     default: {
-                        throw new IllegalStateException("TODO");
+                        throw new IllegalStateException(String.format("Unexpected field '%s' at %s",
+                                field,
+                                jsonParser.getCurrentLocation().toString()));
                     }
                 }
                 
@@ -133,7 +138,8 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
     {
 
         if(currentJsonToken != JsonToken.START_ARRAY){
-            throw new IllegalStateException("TODO");
+            throw new IllegalStateException(String.format("Expected '[' at %s",
+                    jsonParser.getCurrentLocation().toString()));
         }
 
         final List<DocumentWorkerDocument> documentWorkerSubdocumentList = new ArrayList<>();

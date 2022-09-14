@@ -23,23 +23,30 @@ import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DocumentWorkerDocumentDeserializerTest {
 
-    @Test
-    void deserialize() throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
+    
+    @BeforeEach
+    public void before() {
+        objectMapper = new ObjectMapper();
         final SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(DocumentWorkerDocument.class, new DocumentWorkerDocumentDeserializer(100));
         objectMapper.registerModule(simpleModule);
+    }
+    
+    @Test
+    public void deserializeAndLimitTest() throws JsonProcessingException {
 
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
         documentWorkerDocument.fields = new HashMap<>();
@@ -71,6 +78,46 @@ class DocumentWorkerDocumentDeserializerTest {
                 objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
         
         assertEquals(100, deserialisedDocumentWorkerDocumentTask.document.subdocuments.size());
+        assertEquals(2, deserialisedDocumentWorkerDocumentTask.document.failures.size());
+        
+        final List<DocumentWorkerFailure> actualFailures = 
+                deserialisedDocumentWorkerDocumentTask.document.failures.stream()
+                .filter(f -> f.failureId.equals("IBWP-SUBDOCUMENTS_TRUNCATED-WARNING")).collect(Collectors.toList());
+        
+        assertEquals(1, actualFailures.size());
+        final DocumentWorkerFailure truncationFailure = actualFailures.get(0);
+        assertEquals("Subdocuments were truncated at 100", truncationFailure.failureMessage);
+        assertNotNull(truncationFailure.failureStack);
+        
+    }
+
+    @Test
+    void deserializeInvalidDocumentTest() throws JsonProcessingException {
+
+        final String json = "[]";
+        try {
+            final DocumentWorkerDocument documentWorkerDocument =
+                    objectMapper.readValue(json, DocumentWorkerDocument.class);
+        }
+        catch(final IllegalStateException ex) {
+            assertEquals("Expected '{' at [Source: (String)\"[]\"; line: 1, column: 2]", ex.getMessage());
+        }
+        
+    }
+
+    @Test
+    void deserializeInvalidSubdocumentsTest() throws JsonProcessingException {
+
+        final String json = "{\"subdocuments\":{}}";
+
+        try {
+            final DocumentWorkerDocument documentWorkerDocument =
+                    objectMapper.readValue(json, DocumentWorkerDocument.class);
+        }
+        catch(final IllegalStateException ex) {
+            assertEquals("Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]", ex.getMessage());
+        }
+
     }
 
     private static List<DocumentWorkerFieldValue> getDocumentWorkerFieldValues() {
