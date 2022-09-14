@@ -23,6 +23,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,9 @@ class DocumentWorkerDocumentDeserializerTest {
     public void deserializeAndLimitTest() throws JsonProcessingException {
 
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
+
+        documentWorkerDocument.reference = "root";
+
         documentWorkerDocument.fields = new HashMap<>();
         documentWorkerDocument.fields.put("field", getDocumentWorkerFieldValues());
 
@@ -57,17 +61,26 @@ class DocumentWorkerDocumentDeserializerTest {
         documentWorkerDocument.failures.add(getDocumentWorkerFailure());
 
         documentWorkerDocument.subdocuments = new ArrayList<>();
-        for(int i = 0; i <1000; i ++){
-            documentWorkerDocument.reference = String.format("r%s", i);
+
+        for(int subdocumentIndex = 0; subdocumentIndex < 100; subdocumentIndex ++) {
             final DocumentWorkerDocument subdocument = new DocumentWorkerDocument();
-            subdocument.reference = "subdocument " + i;
+            subdocument.reference = documentWorkerDocument.reference + "/subdocument_" + subdocumentIndex;
+            
             subdocument.fields = new HashMap<>();
             subdocument.fields.put("myfield", getDocumentWorkerFieldValues());
 
             subdocument.failures = new ArrayList<>();
             subdocument.failures.add(getDocumentWorkerFailure());
-            
+
+            subdocument.subdocuments = new ArrayList<>();
+
             documentWorkerDocument.subdocuments.add(subdocument);
+
+            for(int subsubdocumentIndex = 0; subsubdocumentIndex < 100; subsubdocumentIndex ++) {
+                final DocumentWorkerDocument subsubdocument = new DocumentWorkerDocument();
+                subsubdocument.reference = subdocument.reference + "/subdocument_" + subsubdocumentIndex;
+                subdocument.subdocuments.add(subsubdocument);
+            }
         }
 
         final DocumentWorkerDocumentTask documentWorkerDocumentTask = new DocumentWorkerDocumentTask();
@@ -78,8 +91,11 @@ class DocumentWorkerDocumentDeserializerTest {
         final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask = 
                 objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
         
-        assertEquals(100, deserialisedDocumentWorkerDocumentTask.document.subdocuments.size());
-        assertEquals(2, deserialisedDocumentWorkerDocumentTask.document.failures.size());
+        final MutableInt count = new MutableInt();
+        countAllSubdocuments(count, deserialisedDocumentWorkerDocumentTask.document);
+        assertEquals(100, count.intValue(), "Sub document count wrong");
+        assertEquals(2, deserialisedDocumentWorkerDocumentTask.document.failures.size(), 
+                "Failures count incorrect");
         
         final List<DocumentWorkerFailure> actualFailures = 
                 deserialisedDocumentWorkerDocumentTask.document.failures.stream()
@@ -135,5 +151,15 @@ class DocumentWorkerDocumentDeserializerTest {
         documentWorkerFailure.failureMessage = "message";
         documentWorkerFailure.failureStack = "stack";
         return documentWorkerFailure;
+    }
+    
+    private void countAllSubdocuments(final MutableInt count, final DocumentWorkerDocument documentWorkerDocument) {
+        if (documentWorkerDocument.subdocuments == null) {
+            return;
+        }
+        for (final DocumentWorkerDocument subdocument: documentWorkerDocument.subdocuments) {
+            count.increment();
+            countAllSubdocuments(count, subdocument);
+        }
     }
 }
