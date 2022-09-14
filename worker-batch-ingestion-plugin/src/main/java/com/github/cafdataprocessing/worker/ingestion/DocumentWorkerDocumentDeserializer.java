@@ -24,13 +24,12 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
-import org.apache.commons.lang3.mutable.MutableInt;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public class DocumentWorkerDocumentDeserializer extends StdDeserializer<DocumentWorkerDocument>
 {

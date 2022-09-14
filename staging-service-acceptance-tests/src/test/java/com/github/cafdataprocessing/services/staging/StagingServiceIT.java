@@ -15,16 +15,6 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
-
 import com.github.cafdataprocessing.services.staging.client.ApiClient;
 import com.github.cafdataprocessing.services.staging.client.ApiException;
 import com.github.cafdataprocessing.services.staging.client.MultiPart;
@@ -32,8 +22,15 @@ import com.github.cafdataprocessing.services.staging.client.MultiPartContent;
 import com.github.cafdataprocessing.services.staging.client.MultiPartDocument;
 import com.github.cafdataprocessing.services.staging.client.StagingApi;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchList;
-
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.io.FileUtils;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class StagingServiceIT
 {

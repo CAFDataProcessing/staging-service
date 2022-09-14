@@ -15,19 +15,16 @@
  */
 package com.github.cafdataprocessing.services.staging.utils;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-
-import org.junit.Test;
-
-import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public final class JsonMinifierTest
 {

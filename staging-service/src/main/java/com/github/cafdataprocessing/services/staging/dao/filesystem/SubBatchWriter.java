@@ -15,6 +15,13 @@
  */
 package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
+import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
+import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,18 +29,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.cafdataprocessing.services.staging.dao.InputStreamSupplier;
-import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
-import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
-import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.cafdataprocessing.services.staging.utils.JsonMinifier;
-import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
-import java.util.Map;
 
 /*
  * This class handles the sub-batching and storing of documents.

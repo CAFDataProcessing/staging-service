@@ -15,37 +15,34 @@
  */
 package com.github.cafdataprocessing.services.staging.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.TenantId;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-
-import com.github.cafdataprocessing.services.staging.BatchId;
-import com.github.cafdataprocessing.services.staging.TenantId;
-import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
-import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
-import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
-import java.io.FileInputStream;
-import org.apache.commons.io.FilenameUtils;
 
 public class FileSystemDaoTest
 {

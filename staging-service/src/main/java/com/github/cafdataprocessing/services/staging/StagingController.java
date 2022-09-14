@@ -15,21 +15,25 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.exceptions.*;
+import com.github.cafdataprocessing.services.staging.models.BatchList;
+import com.github.cafdataprocessing.services.staging.models.StatusResponse;
+import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
+import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-
-import com.github.cafdataprocessing.services.staging.exceptions.*;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.context.annotation.DependsOn;
@@ -39,14 +43,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.github.cafdataprocessing.services.staging.dao.BatchDao;
-import com.github.cafdataprocessing.services.staging.models.BatchList;
-import com.github.cafdataprocessing.services.staging.models.StatusResponse;
-import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
-
-import io.swagger.annotations.ApiParam;
-import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
