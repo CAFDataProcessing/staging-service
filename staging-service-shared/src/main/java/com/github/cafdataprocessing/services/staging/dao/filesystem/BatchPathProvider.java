@@ -35,8 +35,7 @@ public class BatchPathProvider
 
     public BatchPathProvider(final String basePath)
     {
-        if(basePath == null)
-        {
+        if (basePath == null) {
             throw new UnexpectedInvalidBasePathException(basePath);
         }
         this.basePath = Paths.get(basePath).normalize();

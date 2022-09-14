@@ -72,24 +72,23 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         if (StringUtils.isEmpty(env)) {
             throw new RuntimeException("CAF_STAGING_SERVICE_BASEPATH environment variable not set");
         }
-        
+
         final Optional<Integer> totalSubdocumentLimit = Stream.of(
-                System.getenv("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT"), 
-                        "1000"
-                )
-                .filter(StringUtils::isNotBlank).map(Integer::parseInt).findFirst();
-        if(!totalSubdocumentLimit.isPresent()) {
-            throw new RuntimeException
-                    ("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT was not supplied and the default logic failed.");
+            System.getenv("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT"),
+            "1000"
+        ).filter(StringUtils::isNotBlank).map(Integer::parseInt).findFirst();
+
+        if (!totalSubdocumentLimit.isPresent()) {
+            throw new RuntimeException("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT was not supplied and the default logic failed.");
         }
-        
+
         fileSystemProvider = new BatchPathProvider(env);
         mapper = new ObjectMapper();
-        final SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addDeserializer(DocumentWorkerDocument.class, 
-                new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
-        mapper.registerModule(simpleModule);
 
+        final SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(DocumentWorkerDocument.class,
+                                     new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
+        mapper.registerModule(simpleModule);
     }
 
     @Override
@@ -169,17 +168,17 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         } catch (final InvalidBatchIdException | InvalidTenantIdException ex) {
             log.error("Exception while handling single batch id: " + ex.getMessage());
             throw new BatchDefinitionException("Exception while handling a single batch id: " + ex.getMessage());
-        } catch(final IOException ex) {
+        } catch (final IOException ex) {
             log.error("Exception while reading the batch: " + batchId + " was not found", ex);
             throw new BatchDefinitionException("Exception while reading the batch: " + batchId + " was not found", ex);
         }
     }
-    
+
     private static void throwIOExceptionIfFileIsNotAccessible(final Path path) throws IOException
     {
         path.getFileSystem().provider().checkAccess(path);
     }
-    
+
     private void handleSubbatch(final String subbatch, final BatchWorkerServices batchWorkerServices,
                                 final Map<String, String> taskMessageParams)
         throws InvalidBatchIdException, BatchWorkerTransientException, BatchDefinitionException
@@ -213,18 +212,18 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
             batchWorkerServices.registerItemSubtask(DocumentWorkerConstants.DOCUMENT_TASK_NAME, 1, document);
         }
     }
-    
+
     private static void throwBatchExceptionIfFileIsNotAccessible(final String subbatch, final Path subbatchFileName)
-            throws BatchDefinitionException
+        throws BatchDefinitionException
     {
         try {
             throwIOExceptionIfFileIsNotAccessible(subbatchFileName);
-        } catch(final IOException ex) {
+        } catch (final IOException ex) {
             log.error("Exception while reading subbatch: " + subbatch + ", it does not exist", ex);
             throw new BatchDefinitionException("Exception while reading subbatch: " + subbatch + ", it does not exist", ex);
         }
     }
-    
+
     private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
         throws IOException, BatchDefinitionException
     {
@@ -365,5 +364,4 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     {
         return key.substring(key.indexOf(":") + 1, key.length());
     }
-
 }

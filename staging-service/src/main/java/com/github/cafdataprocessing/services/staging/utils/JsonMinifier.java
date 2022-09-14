@@ -156,7 +156,7 @@ public final class JsonMinifier
                     // values and write them out
                     if (pauseWriting) {
                         // check size of data field value
-                        if (dataBuffer!=null && dataBuffer.getBytes().length > fieldValueSizeThreshold) {
+                        if (dataBuffer != null && dataBuffer.getBytes().length > fieldValueSizeThreshold) {
                             // write it out to a loose file
                             final String fileName = RandomStringUtils.randomAlphanumeric(10);
                             final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);

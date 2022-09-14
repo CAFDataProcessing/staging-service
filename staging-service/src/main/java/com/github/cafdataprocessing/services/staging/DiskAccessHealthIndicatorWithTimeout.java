@@ -36,7 +36,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     private final Path healthcheckFile;
     private final int healthcheckTimeoutSeconds;
     private final ExecutorService healthcheckExecutor;
-    
+
     public DiskAccessHealthIndicatorWithTimeout(
         final Path path, final int healthcheckTimeoutSeconds)
     {

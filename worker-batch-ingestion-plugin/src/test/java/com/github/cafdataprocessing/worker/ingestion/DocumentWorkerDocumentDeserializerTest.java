@@ -35,20 +35,22 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DocumentWorkerDocumentDeserializerTest {
-
+class DocumentWorkerDocumentDeserializerTest
+{
     private ObjectMapper objectMapper;
-    
+
     @BeforeEach
-    public void before() {
+    public void before()
+    {
         objectMapper = new ObjectMapper();
         final SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(DocumentWorkerDocument.class, new DocumentWorkerDocumentDeserializer(100));
         objectMapper.registerModule(simpleModule);
     }
-    
+
     @Test
-    public void deserializeAndLimitTest() throws JsonProcessingException {
+    public void deserializeAndLimitTest() throws JsonProcessingException
+    {
 
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
 
@@ -62,10 +64,10 @@ class DocumentWorkerDocumentDeserializerTest {
 
         documentWorkerDocument.subdocuments = new ArrayList<>();
 
-        for(int subdocumentIndex = 0; subdocumentIndex < 100; subdocumentIndex ++) {
+        for (int subdocumentIndex = 0; subdocumentIndex < 100; subdocumentIndex++) {
             final DocumentWorkerDocument subdocument = new DocumentWorkerDocument();
             subdocument.reference = documentWorkerDocument.reference + "/subdocument_" + subdocumentIndex;
-            
+
             subdocument.fields = new HashMap<>();
             subdocument.fields.put("myfield", getDocumentWorkerFieldValues());
 
@@ -76,7 +78,7 @@ class DocumentWorkerDocumentDeserializerTest {
 
             documentWorkerDocument.subdocuments.add(subdocument);
 
-            for(int subsubdocumentIndex = 0; subsubdocumentIndex < 100; subsubdocumentIndex ++) {
+            for (int subsubdocumentIndex = 0; subsubdocumentIndex < 100; subsubdocumentIndex++) {
                 final DocumentWorkerDocument subsubdocument = new DocumentWorkerDocument();
                 subsubdocument.reference = subdocument.reference + "/subdocument_" + subsubdocumentIndex;
                 subdocument.subdocuments.add(subsubdocument);
@@ -87,56 +89,58 @@ class DocumentWorkerDocumentDeserializerTest {
         documentWorkerDocumentTask.document = documentWorkerDocument;
 
         final String json = objectMapper.writeValueAsString(documentWorkerDocumentTask);
-        
-        final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask = 
-                objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
-        
+
+        final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask
+            = objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
+
         final MutableInt count = new MutableInt();
         countAllSubdocuments(count, deserialisedDocumentWorkerDocumentTask.document);
         assertEquals(100, count.intValue(), "Sub document count wrong");
-        assertEquals(2, deserialisedDocumentWorkerDocumentTask.document.failures.size(), 
-                "Failures count incorrect");
-        
-        final List<DocumentWorkerFailure> actualFailures = 
-                deserialisedDocumentWorkerDocumentTask.document.failures.stream()
+        assertEquals(2, deserialisedDocumentWorkerDocumentTask.document.failures.size(),
+                     "Failures count incorrect");
+
+        final List<DocumentWorkerFailure> actualFailures
+            = deserialisedDocumentWorkerDocumentTask.document.failures.stream()
                 .filter(f -> f.failureId.equals("IBWP-SUBDOCUMENTS_TRUNCATED-WARNING")).collect(Collectors.toList());
-        
+
         assertEquals(1, actualFailures.size());
         final DocumentWorkerFailure truncationFailure = actualFailures.get(0);
         assertEquals("Subdocuments were truncated at 100", truncationFailure.failureMessage);
         assertNotNull(truncationFailure.failureStack);
-        
     }
 
     @Test
-    void deserializeInvalidDocumentTest() throws JsonProcessingException {
-
+    void deserializeInvalidDocumentTest() throws JsonProcessingException
+    {
         final String json = "[]";
 
-        final IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
-            objectMapper.readValue(json, DocumentWorkerDocument.class);
-        });
-        Assertions.assertEquals(
-                "Expected '{' at [Source: (String)\"[]\"; line: 1, column: 2]",
-                thrown.getMessage());
+        final IllegalStateException thrown = Assertions.assertThrows(
+            IllegalStateException.class, () -> {
+                objectMapper.readValue(json, DocumentWorkerDocument.class);
+            });
 
+        Assertions.assertEquals(
+            "Expected '{' at [Source: (String)\"[]\"; line: 1, column: 2]",
+            thrown.getMessage());
     }
 
     @Test
-    void deserializeInvalidSubdocumentsTest() throws JsonProcessingException {
-
+    void deserializeInvalidSubdocumentsTest() throws JsonProcessingException
+    {
         final String json = "{\"subdocuments\":{}}";
 
-        final IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
-            objectMapper.readValue(json, DocumentWorkerDocument.class);
-        });
-        Assertions.assertEquals(
-                "Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]",
-                thrown.getMessage());
+        final IllegalStateException thrown = Assertions.assertThrows(
+            IllegalStateException.class, () -> {
+                objectMapper.readValue(json, DocumentWorkerDocument.class);
+            });
 
+        Assertions.assertEquals(
+            "Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]",
+            thrown.getMessage());
     }
 
-    private static List<DocumentWorkerFieldValue> getDocumentWorkerFieldValues() {
+    private static List<DocumentWorkerFieldValue> getDocumentWorkerFieldValues()
+    {
         final List<DocumentWorkerFieldValue> documentWorkerFieldValueList = new ArrayList<>();
         final DocumentWorkerFieldValue documentWorkerFieldValue = new DocumentWorkerFieldValue();
         documentWorkerFieldValue.data = "Data";
@@ -145,19 +149,22 @@ class DocumentWorkerDocumentDeserializerTest {
         return documentWorkerFieldValueList;
     }
 
-    private static DocumentWorkerFailure getDocumentWorkerFailure() {
+    private static DocumentWorkerFailure getDocumentWorkerFailure()
+    {
         final DocumentWorkerFailure documentWorkerFailure = new DocumentWorkerFailure();
         documentWorkerFailure.failureId = "id";
         documentWorkerFailure.failureMessage = "message";
         documentWorkerFailure.failureStack = "stack";
         return documentWorkerFailure;
     }
-    
-    private void countAllSubdocuments(final MutableInt count, final DocumentWorkerDocument documentWorkerDocument) {
+
+    private void countAllSubdocuments(final MutableInt count, final DocumentWorkerDocument documentWorkerDocument)
+    {
         if (documentWorkerDocument.subdocuments == null) {
             return;
         }
-        for (final DocumentWorkerDocument subdocument: documentWorkerDocument.subdocuments) {
+
+        for (final DocumentWorkerDocument subdocument : documentWorkerDocument.subdocuments) {
             count.increment();
             countAllSubdocuments(count, subdocument);
         }

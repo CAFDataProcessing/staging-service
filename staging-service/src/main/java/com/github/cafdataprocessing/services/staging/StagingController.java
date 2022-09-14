@@ -53,7 +53,6 @@ import org.springframework.web.bind.annotation.RestController;
 @DependsOn({"basePathCreator"})
 public class StagingController implements StagingApi
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingController.class);
 
     private final BatchDao batchDao;
@@ -61,7 +60,7 @@ public class StagingController implements StagingApi
     private final HttpServletRequest request;
 
     private final DiskSpaceHealthIndicatorWithTimeout diskSpaceHealthIndicatorWithTimeout;
-    
+
     private final DiskAccessHealthIndicatorWithTimeout diskAccessHealthIndicatorWithTimeout;
 
     @Autowired
@@ -182,7 +181,7 @@ public class StagingController implements StagingApi
         final StatusResponse status = new StatusResponse();
 
         final Health diskSpaceHealth = diskSpaceHealthIndicatorWithTimeout.health();
-        
+
         final Health diskAccessHealth = diskAccessHealthIndicatorWithTimeout.health();
 
         if ((diskSpaceHealth.getStatus() == Status.UP) && (diskAccessHealth.getStatus() == Status.UP)) {
@@ -198,5 +197,4 @@ public class StagingController implements StagingApi
                 .body(status);
         }
     }
-
 }
