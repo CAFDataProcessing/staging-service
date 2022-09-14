@@ -97,7 +97,7 @@ class DocumentWorkerDocumentDeserializerTest {
 
         final String json = "[]";
 
-        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
+        final IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
             objectMapper.readValue(json, DocumentWorkerDocument.class);
         });
         Assertions.assertEquals(
@@ -111,7 +111,7 @@ class DocumentWorkerDocumentDeserializerTest {
 
         final String json = "{\"subdocuments\":{}}";
 
-        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
+        final IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> {
             objectMapper.readValue(json, DocumentWorkerDocument.class);
         });
         Assertions.assertEquals(
