@@ -78,7 +78,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                         "1000"
                 )
                 .filter(StringUtils::isNotBlank).map(Integer::parseInt).findFirst();
-        if(totalSubdocumentLimit.isEmpty()) {
+        if(totalSubdocumentLimit.isPresent()) {
             throw new RuntimeException
                     ("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT was not supplied and the default logic failed.");
         }
