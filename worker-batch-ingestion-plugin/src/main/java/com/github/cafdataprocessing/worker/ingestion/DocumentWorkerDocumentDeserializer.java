@@ -148,20 +148,22 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
 
         while(currentSubdocumentArrayJsonToken != JsonToken.END_ARRAY) {
 
-            if(totalSubdocuments.intValue() >= totalSubdocumentLimit) {
+            final int currentCount = totalSubdocuments.incrementAndGet();
+            
+            if(currentCount <= totalSubdocumentLimit){
+                documentWorkerSubdocumentList.add(deserializeDocumentWorkerDocument(jsonParser, deserializationContext,
+                        currentSubdocumentArrayJsonToken,
+                        totalSubdocuments));
+            }
+            
+            currentSubdocumentArrayJsonToken = jsonParser.nextToken();
+
+            if(currentCount > totalSubdocumentLimit) {
                 jsonParser.skipChildren();
                 totalSubdocuments.increment();
                 break;
             }
-
-            documentWorkerSubdocumentList.add(deserializeDocumentWorkerDocument(jsonParser, deserializationContext,
-                    currentSubdocumentArrayJsonToken, 
-                    totalSubdocuments));
             
-            totalSubdocuments.increment();
-            
-            currentSubdocumentArrayJsonToken = jsonParser.nextToken();
-
         }
 
         return documentWorkerSubdocumentList;
