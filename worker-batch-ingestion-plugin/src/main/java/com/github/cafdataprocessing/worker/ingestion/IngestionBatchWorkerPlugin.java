@@ -43,6 +43,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import jdk.internal.joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,10 +73,22 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         if (StringUtils.isEmpty(env)) {
             throw new RuntimeException("CAF_STAGING_SERVICE_BASEPATH environment variable not set");
         }
+        
+        final Optional<Integer> totalSubdocumentLimit = Stream.of(
+                System.getenv("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT"), 
+                        "1000"
+                )
+                .filter(StringUtils::isNotBlank).map(Integer::parseInt).findFirst();
+        if(totalSubdocumentLimit.isEmpty()) {
+            throw new RuntimeException
+                    ("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT was not supplied and the default logic failed.");
+        }
+        
         fileSystemProvider = new BatchPathProvider(env);
         mapper = new ObjectMapper();
         final SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addDeserializer(DocumentWorkerDocument.class, new DocumentWorkerDocumentDeserializer(100));
+        simpleModule.addDeserializer(DocumentWorkerDocument.class, 
+                new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
 
     }
