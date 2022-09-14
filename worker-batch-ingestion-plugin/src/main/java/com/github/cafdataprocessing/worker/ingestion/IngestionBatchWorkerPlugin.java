@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.worker.ingestion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
@@ -27,6 +28,7 @@ import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
 import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
+import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
 import java.io.File;
@@ -41,6 +43,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,8 +72,24 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         if (StringUtils.isEmpty(env)) {
             throw new RuntimeException("CAF_STAGING_SERVICE_BASEPATH environment variable not set");
         }
+        
+        final Optional<Integer> totalSubdocumentLimit = Stream.of(
+                System.getenv("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT"), 
+                        "1000"
+                )
+                .filter(StringUtils::isNotBlank).map(Integer::parseInt).findFirst();
+        if(!totalSubdocumentLimit.isPresent()) {
+            throw new RuntimeException
+                    ("CAF_INGESTION_BATCH_WORKER_SUBDOCUMENT_LIMIT was not supplied and the default logic failed.");
+        }
+        
         fileSystemProvider = new BatchPathProvider(env);
         mapper = new ObjectMapper();
+        final SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(DocumentWorkerDocument.class, 
+                new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
+        mapper.registerModule(simpleModule);
+
     }
 
     @Override
