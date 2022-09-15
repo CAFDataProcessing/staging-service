@@ -62,7 +62,7 @@ class DocumentWorkerDocumentDeserializerTest
 
         documentWorkerDocument.subdocuments = new ArrayList<>();
 
-        for (int subdocumentIndex = 0; subdocumentIndex < 100; subdocumentIndex++) {
+        for (int subdocumentIndex = 0; subdocumentIndex < 5; subdocumentIndex++) {
             final DocumentWorkerDocument subdocument = new DocumentWorkerDocument();
             subdocument.reference = documentWorkerDocument.reference + "/subdocument_" + subdocumentIndex;
 
@@ -76,9 +76,18 @@ class DocumentWorkerDocumentDeserializerTest
 
             documentWorkerDocument.subdocuments.add(subdocument);
 
-            for (int subsubdocumentIndex = 0; subsubdocumentIndex < 100; subsubdocumentIndex++) {
+            for (int subsubdocumentIndex = 0; subsubdocumentIndex < 5; subsubdocumentIndex++) {
                 final DocumentWorkerDocument subsubdocument = new DocumentWorkerDocument();
                 subsubdocument.reference = subdocument.reference + "/subdocument_" + subsubdocumentIndex;
+                subsubdocument.subdocuments = new ArrayList<>();
+
+                for (int subsubsubdocumentIndex = 0; subsubsubdocumentIndex < 5; subsubsubdocumentIndex++) {
+                    final DocumentWorkerDocument subsubsubdocument = new DocumentWorkerDocument();
+                    subsubsubdocument.reference = subsubdocument.reference + "/subdocument_" + subsubsubdocumentIndex;
+                    subsubsubdocument.subdocuments = new ArrayList<>();
+                    subsubdocument.subdocuments.add(subsubsubdocument);
+                }
+                
                 subdocument.subdocuments.add(subsubdocument);
             }
         }

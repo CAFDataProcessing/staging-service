@@ -55,8 +55,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
         final MutableInt totalSubdocuments = new MutableInt();
 
         final DocumentWorkerDocument documentWorkerDocument
-            = deserializeDocumentWorkerDocument(
-                jsonParser, deserializationContext, jsonParser.currentToken(), totalSubdocuments);
+            = deserializeDocumentWorkerDocument(jsonParser, deserializationContext, totalSubdocuments);
 
         if (totalSubdocuments.intValue() > this.totalSubdocumentLimit) {
             if (documentWorkerDocument.failures == null) {
@@ -78,60 +77,61 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
     private DocumentWorkerDocument deserializeDocumentWorkerDocument(
         final JsonParser jsonParser,
         final DeserializationContext deserializationContext,
-        final JsonToken currentJsonToken,
         final MutableInt totalSubdocuments
     ) throws IOException
     {
-        if (currentJsonToken != JsonToken.START_OBJECT) {
+        if (jsonParser.currentToken() != JsonToken.START_OBJECT) {
             throw new IllegalStateException(
                 String.format("Expected '{' at %s", jsonParser.getCurrentLocation().toString()));
         }
-
-        jsonParser.nextToken();
-
+        
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
 
+        jsonParser.nextToken();
+        
         while (jsonParser.currentToken() != JsonToken.END_OBJECT) {
-            if (jsonParser.currentToken() == JsonToken.FIELD_NAME) {
-                final String field = jsonParser.getCurrentName();
-                jsonParser.nextToken();
-                switch (field) {
-                    case "reference": {
-                        documentWorkerDocument.reference = jsonParser.getValueAsString();
-                        break;
-                    }
-                    case "fields": {
-                        documentWorkerDocument.fields = deserializationContext.readValue(
+            if (jsonParser.currentToken() != JsonToken.FIELD_NAME) {
+                throw new IllegalStateException(
+                        String.format("Expected 'Field' at %s", jsonParser.getCurrentLocation().toString()));
+            }
+            final String field = jsonParser.getCurrentName();
+            jsonParser.nextToken();
+            switch (field) {
+                case "reference": {
+                    documentWorkerDocument.reference = jsonParser.getValueAsString();
+                    break;
+                }
+                case "fields": {
+                    documentWorkerDocument.fields = deserializationContext.readValue(
                             jsonParser,
                             deserializationContext.getTypeFactory()
-                                .constructType(
-                                    new TypeReference<Map<String, List<DocumentWorkerFieldValue>>>()
-                                {
-                                }));
-                        break;
-                    }
-                    case "failures": {
-                        documentWorkerDocument.failures = deserializationContext.readValue(
+                                    .constructType(
+                                            new TypeReference<Map<String, List<DocumentWorkerFieldValue>>>()
+                                            {
+                                            }));
+                    break;
+                }
+                case "failures": {
+                    documentWorkerDocument.failures = deserializationContext.readValue(
                             jsonParser,
                             deserializationContext.getTypeFactory()
-                                .constructType(new TypeReference<List<DocumentWorkerFailure>>()
-                                {
-                                }));
-                        break;
-                    }
-                    case "subdocuments": {
-                        documentWorkerDocument.subdocuments
-                            = deserializeSubdocuments(jsonParser, deserializationContext, jsonParser.currentToken(),
-                                                      totalSubdocuments);
-                        break;
-                    }
-                    default: {
-                        throw new IllegalStateException(
+                                    .constructType(new TypeReference<List<DocumentWorkerFailure>>()
+                                    {
+                                    }));
+                    break;
+                }
+                case "subdocuments": {
+                    documentWorkerDocument.subdocuments =
+                            deserializeSubdocuments(jsonParser, deserializationContext, totalSubdocuments);
+                    break;
+                }
+                default: {
+                    throw new IllegalStateException(
                             String.format("Unexpected field '%s' at %s", field, jsonParser.getCurrentLocation().toString()));
-                    }
                 }
             }
             jsonParser.nextToken();
+
         }
 
         return documentWorkerDocument;
@@ -140,39 +140,33 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
     private List<DocumentWorkerDocument> deserializeSubdocuments(
         final JsonParser jsonParser,
         final DeserializationContext deserializationContext,
-        final JsonToken currentJsonToken,
         final MutableInt totalSubdocuments
     ) throws IOException
     {
-        if (currentJsonToken != JsonToken.START_ARRAY) {
+        if (jsonParser.currentToken() != JsonToken.START_ARRAY) {
             throw new IllegalStateException(String.format("Expected '[' at %s",
                                                           jsonParser.getCurrentLocation().toString()));
         }
 
+        jsonParser.nextToken();
+        
         final List<DocumentWorkerDocument> documentWorkerSubdocumentList = new ArrayList<>();
+        
+        while (jsonParser.currentToken() != JsonToken.END_ARRAY) {
 
-        JsonToken currentSubdocumentArrayJsonToken = jsonParser.nextToken();
-
-        while (currentSubdocumentArrayJsonToken != JsonToken.END_ARRAY) {
-
-            final int currentCount = totalSubdocuments.incrementAndGet();
-
-            if (currentCount <= totalSubdocumentLimit) {
+            totalSubdocuments.increment();
+            
+            if (totalSubdocuments.intValue() <= totalSubdocumentLimit) {
                 documentWorkerSubdocumentList.add(
                     deserializeDocumentWorkerDocument(jsonParser, deserializationContext,
-                                                      currentSubdocumentArrayJsonToken,
                                                       totalSubdocuments));
             }
-
-            currentSubdocumentArrayJsonToken = jsonParser.nextToken();
-
-            if (currentCount > totalSubdocumentLimit) {
-                jsonParser.skipChildren();
-                totalSubdocuments.increment();
-                break;
+            else {
+                jsonParser.skipChildren(); //Skip this document objects children
             }
+            jsonParser.nextToken();
         }
-
+        
         return documentWorkerSubdocumentList;
     }
 }
