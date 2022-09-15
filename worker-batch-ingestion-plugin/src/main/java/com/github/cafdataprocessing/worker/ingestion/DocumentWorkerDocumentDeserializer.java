@@ -161,7 +161,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                                                       totalSubdocuments));
             }
             else {
-                jsonParser.skipChildren(); //Skip this document objects children
+                jsonParser.skipChildren(); //Skip this document and it's children
             }
             jsonParser.nextToken();
         }
