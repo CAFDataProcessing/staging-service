@@ -105,10 +105,10 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                     documentWorkerDocument.fields = deserializationContext.readValue(
                             jsonParser,
                             deserializationContext.getTypeFactory()
-                                    .constructType(
-                                            new TypeReference<Map<String, List<DocumentWorkerFieldValue>>>()
-                                            {
-                                            }));
+                                .constructType(
+                                    new TypeReference<Map<String, List<DocumentWorkerFieldValue>>>()
+                                {
+                                }));
                     break;
                 }
                 case "failures": {
@@ -166,7 +166,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
             }
             jsonParser.nextToken();
         }
-        
+
         return documentWorkerSubdocumentList;
     }
 }
