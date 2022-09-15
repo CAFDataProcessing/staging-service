@@ -131,7 +131,6 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
                 }
             }
             jsonParser.nextToken();
-
         }
 
         return documentWorkerDocument;
