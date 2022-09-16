@@ -87,7 +87,7 @@ class DocumentWorkerDocumentDeserializerTest
                     subsubsubdocument.subdocuments = new ArrayList<>();
                     subsubdocument.subdocuments.add(subsubsubdocument);
                 }
-                
+
                 subdocument.subdocuments.add(subsubdocument);
             }
         }
@@ -117,6 +117,135 @@ class DocumentWorkerDocumentDeserializerTest
     }
 
     @Test
+    public void deserializeAndUnderLimitTest() throws JsonProcessingException
+    {
+
+        final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
+
+        documentWorkerDocument.reference = "root";
+
+        documentWorkerDocument.fields = new HashMap<>();
+        documentWorkerDocument.fields.put("field", getDocumentWorkerFieldValues());
+
+        documentWorkerDocument.failures = new ArrayList<>();
+        documentWorkerDocument.failures.add(getDocumentWorkerFailure());
+
+        documentWorkerDocument.subdocuments = new ArrayList<>();
+
+        for (int subdocumentIndex = 0; subdocumentIndex < 5; subdocumentIndex++) {
+            final DocumentWorkerDocument subdocument = new DocumentWorkerDocument();
+            subdocument.reference = documentWorkerDocument.reference + "/subdocument_" + subdocumentIndex;
+
+            subdocument.fields = new HashMap<>();
+            subdocument.fields.put("myfield", getDocumentWorkerFieldValues());
+
+            subdocument.failures = new ArrayList<>();
+            subdocument.failures.add(getDocumentWorkerFailure());
+
+            subdocument.subdocuments = new ArrayList<>();
+
+            documentWorkerDocument.subdocuments.add(subdocument);
+
+            for (int subsubdocumentIndex = 0; subsubdocumentIndex < 5; subsubdocumentIndex++) {
+                final DocumentWorkerDocument subsubdocument = new DocumentWorkerDocument();
+                subsubdocument.reference = subdocument.reference + "/subdocument_" + subsubdocumentIndex;
+                subsubdocument.subdocuments = new ArrayList<>();
+                subdocument.subdocuments.add(subsubdocument);
+            }
+        }
+
+        final DocumentWorkerDocumentTask documentWorkerDocumentTask = new DocumentWorkerDocumentTask();
+        documentWorkerDocumentTask.document = documentWorkerDocument;
+
+        final String json = objectMapper.writeValueAsString(documentWorkerDocumentTask);
+
+        final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask
+            = objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
+
+        final MutableInt count = new MutableInt();
+        countAllSubdocuments(count, deserialisedDocumentWorkerDocumentTask.document);
+        assertEquals(30, count.intValue(), "Sub document count wrong");
+        assertEquals(1, deserialisedDocumentWorkerDocumentTask.document.failures.size(),
+                     "Failures count incorrect");
+
+        final List<DocumentWorkerFailure> actualFailures
+            = deserialisedDocumentWorkerDocumentTask.document.failures.stream()
+                .filter(f -> f.failureId.equals("id")).collect(Collectors.toList());
+
+        assertEquals(1, actualFailures.size());
+        final DocumentWorkerFailure truncationFailure = actualFailures.get(0);
+        assertEquals("message", truncationFailure.failureMessage);
+        assertNotNull(truncationFailure.failureStack);
+    }
+
+    @Test
+    public void deserializeAndEqualsLimitTest() throws JsonProcessingException
+    {
+
+        final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
+
+        documentWorkerDocument.reference = "root";
+
+        documentWorkerDocument.fields = new HashMap<>();
+        documentWorkerDocument.fields.put("field", getDocumentWorkerFieldValues());
+
+        documentWorkerDocument.subdocuments = new ArrayList<>();
+
+        for (int subdocumentIndex = 0; subdocumentIndex < 100; subdocumentIndex++) {
+            final DocumentWorkerDocument subdocument = new DocumentWorkerDocument();
+            subdocument.reference = documentWorkerDocument.reference + "/subdocument_" + subdocumentIndex;
+
+            subdocument.fields = new HashMap<>();
+            subdocument.fields.put("myfield", getDocumentWorkerFieldValues());
+
+            subdocument.failures = new ArrayList<>();
+            subdocument.failures.add(getDocumentWorkerFailure());
+
+            subdocument.subdocuments = new ArrayList<>();
+
+            documentWorkerDocument.subdocuments.add(subdocument);
+        }
+
+        final DocumentWorkerDocumentTask documentWorkerDocumentTask = new DocumentWorkerDocumentTask();
+        documentWorkerDocumentTask.document = documentWorkerDocument;
+
+        final String json = objectMapper.writeValueAsString(documentWorkerDocumentTask);
+
+        final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask
+            = objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
+
+        final MutableInt count = new MutableInt();
+        countAllSubdocuments(count, deserialisedDocumentWorkerDocumentTask.document);
+        assertEquals(100, count.intValue(), "Sub document count wrong");
+        assertNull(deserialisedDocumentWorkerDocumentTask.document.failures);
+    }
+
+    @Test
+    public void deserializeNoSubDocsTest() throws JsonProcessingException
+    {
+
+        final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
+
+        documentWorkerDocument.reference = "root";
+
+        documentWorkerDocument.fields = new HashMap<>();
+        documentWorkerDocument.fields.put("field", getDocumentWorkerFieldValues());
+
+        final DocumentWorkerDocumentTask documentWorkerDocumentTask = new DocumentWorkerDocumentTask();
+        documentWorkerDocumentTask.document = documentWorkerDocument;
+
+        final String json = objectMapper.writeValueAsString(documentWorkerDocumentTask);
+
+        final DocumentWorkerDocumentTask deserialisedDocumentWorkerDocumentTask
+            = objectMapper.readValue(json, DocumentWorkerDocumentTask.class);
+
+        final MutableInt count = new MutableInt();
+        countAllSubdocuments(count, deserialisedDocumentWorkerDocumentTask.document);
+        assertEquals(0, count.intValue(), "Sub document count wrong");
+        assertNull(deserialisedDocumentWorkerDocumentTask.document.failures);
+    }
+
+    @Test
     void deserializeInvalidDocumentTest() throws JsonProcessingException
     {
         final String json = "[]";
@@ -143,6 +272,21 @@ class DocumentWorkerDocumentDeserializerTest
 
         Assertions.assertEquals(
             "Expected '[' at [Source: (String)\"{\"subdocuments\":{}}\"; line: 1, column: 18]",
+            thrown.getMessage());
+    }
+
+    @Test
+    void deserializeInvalidFieldTest() throws JsonProcessingException
+    {
+        final String json = "{\"dummyField\":{}}";
+
+        final IllegalStateException thrown = Assertions.assertThrows(
+            IllegalStateException.class, () -> {
+                objectMapper.readValue(json, DocumentWorkerDocument.class);
+            });
+
+        Assertions.assertEquals(
+            "Unexpected field 'dummyField' at [Source: (String)\"{\"dummyField\":{}}\"; line: 1, column: 16]",
             thrown.getMessage());
     }
 
