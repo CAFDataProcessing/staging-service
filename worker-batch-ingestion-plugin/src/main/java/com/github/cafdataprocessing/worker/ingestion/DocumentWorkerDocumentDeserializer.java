@@ -84,11 +84,11 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
             throw new IllegalStateException(
                 String.format("Expected '{' at %s", jsonParser.getCurrentLocation().toString()));
         }
-        
+
         final DocumentWorkerDocument documentWorkerDocument = new DocumentWorkerDocument();
 
         jsonParser.nextToken();
-        
+
         while (jsonParser.currentToken() != JsonToken.END_OBJECT) {
             if (jsonParser.currentToken() != JsonToken.FIELD_NAME) {
                 throw new IllegalStateException(
@@ -148,13 +148,13 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
         }
 
         jsonParser.nextToken();
-        
+
         final List<DocumentWorkerDocument> documentWorkerSubdocumentList = new ArrayList<>();
-        
+
         while (jsonParser.currentToken() != JsonToken.END_ARRAY) {
 
             totalSubdocuments.increment();
-            
+
             if (totalSubdocuments.intValue() <= totalSubdocumentLimit) {
                 documentWorkerSubdocumentList.add(
                     deserializeDocumentWorkerDocument(jsonParser, deserializationContext,
