@@ -91,6 +91,7 @@ public class DocumentWorkerDocumentDeserializer extends StdDeserializer<Document
         
         while (jsonParser.currentToken() != JsonToken.END_OBJECT) {
             if (jsonParser.currentToken() != JsonToken.FIELD_NAME) {
+                //If the current token isn't a field name then json parsing isn't working as expected
                 throw new IllegalStateException(
                         String.format("Expected 'Field' at %s", jsonParser.getCurrentLocation().toString()));
             }
