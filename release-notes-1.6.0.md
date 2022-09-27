@@ -1,5 +1,3 @@
-!not-ready-for-release!
-
 #### Version Number
 ${version-number}
 
@@ -7,3 +5,4 @@ ${version-number}
 - US568175: The number of subdocuments sent for ingestion can now be restricted in the batch-ingestion-plugin.
 
 #### Known Issues
+- None
