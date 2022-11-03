@@ -282,6 +282,17 @@ public class FileSystemDao implements BatchDao
         }
     }
 
+    @Override
+    public String getBatchStatus(TenantId tenantId, BatchId batchId) throws BatchNotFoundException {
+        if(batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()){
+            return "The Batch "+batchId+" processing is completed successfully.";
+        } else if(batchPathProvider.isBatchInProgress(tenantId, batchId)){
+            return "The Batch "+batchId+" processing is in-progress.";
+        } else{
+            throw new BatchNotFoundException("The batch "+batchId.getValue()+" doesn't exist.");
+        }
+    }
+
     private boolean checkAllSubfilesSafely(final Path path)
     {
         try {
@@ -317,7 +328,7 @@ public class FileSystemDao implements BatchDao
     /**
      * Returns a list of the path to all sub files in all folders provide
      *
-     * @param tenantFolders List of Path objects that represent all current tenant in_progress folders
+     * @param tenantFolder List of Path objects that represent all current tenant in_progress folders
      * @return return a Stream of paths to all subfiles under all folders provided
      */
     private Stream<Path> getAllBatchFilesForAllDirectories(final Path tenantFolder)

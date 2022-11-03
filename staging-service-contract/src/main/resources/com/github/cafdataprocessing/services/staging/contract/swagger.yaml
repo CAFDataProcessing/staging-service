@@ -144,6 +144,39 @@ paths:
           description: The batch does not exist.
         "500":
           description: The request failed due to an unexpected server error.
+  "/batchStatus":
+    parameters:
+      - in: header
+        name: X-TENANT-ID
+        description: Identifies the tenant making the request.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+        required: true
+      - in: query
+        name: batchId
+        description: Identifies the batch.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    get:
+      tags:
+        - Staging
+      operationId: getBatchStatus
+      summary: Gets the upload status of the specified batch.
+      responses:
+        "200":
+          description: Successfully fetched the status of the batch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+        "404":
+          description: The batch does not exist.
+        "500":
+          description: The request failed due to an unexpected server error.
 components:
   schemas:
     StatusResponse:

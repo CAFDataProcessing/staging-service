@@ -36,7 +36,7 @@ public class StagingServiceIT
 {
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
-//        private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+//  private static final String STAGING_SERVICE_URI = "http://localhost:8080";
     private final StagingApi stagingApi;
 
     public StagingServiceIT()
@@ -55,6 +55,20 @@ public class StagingServiceIT
         final String[] documentFiles = new String[]{"batch1.json"};
         final String batchId = "test-batch1";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+        final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
+        assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+    }
+
+    @Test
+    public void uploadDocumentsToBatchAndGetStatusTest() throws Exception
+    {
+        final String tenantId = "tenant-test-batch8";
+        final String[] contentFiles = new String[]{"Reference_File_Big1.txt", "Reference_File_Big2.txt"};
+        final String[] documentFiles = new String[]{"batch8.json"};
+        final String batchId = "test-batch8";
+        stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+        String batchStatus = stagingApi.getBatchStatus(tenantId, batchId).getMessage();
+        assertTrue("Batch completed successfully", batchStatus.equals("The Batch "+batchId+" processing is completed successfully."));
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
     }

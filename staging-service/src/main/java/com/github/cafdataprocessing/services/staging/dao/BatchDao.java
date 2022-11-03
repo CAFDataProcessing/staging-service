@@ -40,4 +40,6 @@ public interface BatchDao
 
     void cleanUpStaleInprogressBatches();
 
+    String getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException;
+
 }

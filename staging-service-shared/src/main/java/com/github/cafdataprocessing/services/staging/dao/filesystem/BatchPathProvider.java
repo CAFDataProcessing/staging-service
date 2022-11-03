@@ -21,6 +21,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.StagingException
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +108,11 @@ public class BatchPathProvider
     public Path getTenantInprogressDirectory(final TenantId tenantId)
     {
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
+    }
+
+    public boolean isBatchInProgress(final TenantId tenantId, final BatchId batchId){
+        final Path pathForBatches = getTenantInprogressDirectory(tenantId);
+        return Arrays.stream(pathForBatches.toFile().list()).anyMatch(batch -> batch.endsWith(batchId.getValue()));
     }
 
     public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
