@@ -137,19 +137,23 @@ public class StagingController implements StagingApi
             @ApiParam(value = "Identifies the tenant making the request.", required = true)
             @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
             @ApiParam(value = "Identifies the batch.", required = true)
-            @RequestParam("batchId") String batchId) {
+            @RequestParam("batchId") String batchId)
+    {
         final StatusResponse status = new StatusResponse();
         try {
-            String statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
+            final String statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
             status.setMessage(statusResponse);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
-        } catch (InvalidTenantIdException | InvalidBatchIdException ex){
-            LOGGER.error("Invalid X-TENANT-ID or Invalid Batch Id", ex);
+        } catch (InvalidTenantIdException ex) {
+            LOGGER.error("Invalid X-TENANT-ID.", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (InvalidBatchIdException ex) {
+            LOGGER.error("Invalid Batch Id.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final BatchNotFoundException ex) {
             LOGGER.error("Batch not found.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
-        } catch (StagingException ex) {
+        } catch (final StagingException ex) {
             LOGGER.error("Internal server error.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }

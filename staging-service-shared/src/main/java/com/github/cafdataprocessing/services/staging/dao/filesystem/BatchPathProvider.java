@@ -110,7 +110,8 @@ public class BatchPathProvider
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
-    public boolean isBatchInProgress(final TenantId tenantId, final BatchId batchId){
+    public boolean isBatchInProgress(final TenantId tenantId, final BatchId batchId)
+    {
         final Path pathForBatches = getTenantInprogressDirectory(tenantId);
         return Arrays.stream(pathForBatches.toFile().list()).anyMatch(batch -> batch.endsWith(batchId.getValue()));
     }
