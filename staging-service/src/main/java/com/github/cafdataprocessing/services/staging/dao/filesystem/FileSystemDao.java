@@ -290,7 +290,7 @@ public class FileSystemDao implements BatchDao
         } else if (batchPathProvider.isBatchInProgress(tenantId, batchId)) {
             return BatchStatus.INPROGRESS;
         } else {
-            return BatchStatus.NOTFOUND;
+            throw new BatchNotFoundException(batchId.getValue());
         }
     }
 

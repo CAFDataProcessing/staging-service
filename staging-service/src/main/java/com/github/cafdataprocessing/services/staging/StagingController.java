@@ -143,11 +143,9 @@ public class StagingController implements StagingApi
         try {
             final BatchDao.BatchStatus statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
             if (statusResponse == BatchDao.BatchStatus.COMPLETED) {
-                status.setMessage("The Batch " + batchId + " processing is completed successfully.");
-            } else if (statusResponse == BatchDao.BatchStatus.INPROGRESS) {
-                status.setMessage("The Batch "+batchId+" processing is in-progress.");
+                status.setMessage("Staging batch '" + batchId + "' is completed.");
             } else {
-                throw new BatchNotFoundException("The batch " + batchId + " doesn't exist.");
+                status.setMessage("Staging batch '" + batchId + "' is in progress.");
             }
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
         } catch (final InvalidTenantIdException ex) {
