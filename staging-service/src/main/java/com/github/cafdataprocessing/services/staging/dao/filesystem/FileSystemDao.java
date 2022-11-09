@@ -283,14 +283,14 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public String getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException
+    public BatchStatus getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException
     {
-        if(batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()){
-            return "The Batch "+batchId+" processing is completed successfully.";
-        } else if(batchPathProvider.isBatchInProgress(tenantId, batchId)){
-            return "The Batch "+batchId+" processing is in-progress.";
-        } else{
-            throw new BatchNotFoundException("The batch "+batchId.getValue()+" doesn't exist.");
+        if (batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()) {
+            return BatchStatus.COMPLETED;
+        } else if (batchPathProvider.isBatchInProgress(tenantId, batchId)) {
+            return BatchStatus.INPROGRESS;
+        } else {
+            return BatchStatus.NOTFOUND;
         }
     }
 
