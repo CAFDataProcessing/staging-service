@@ -54,6 +54,17 @@ public final class BatchNameProvider
         }
     }
 
+    public static String getBatchId(final String fileName)
+    {
+        final String noCreationTimeFileName = fileName.substring(23);
+
+        final int endOfThreadId = noCreationTimeFileName.indexOf('-');
+        final String noThreadIdFileName = noCreationTimeFileName.substring(endOfThreadId + 1);
+
+        final int endOfServiceId = noThreadIdFileName.indexOf('-');
+        return noThreadIdFileName.substring(endOfServiceId + 1);
+    }
+
     private static String cleanseTime(final String utcFormattedTime)
     {
         return utcFormattedTime.replaceAll(":", "");
