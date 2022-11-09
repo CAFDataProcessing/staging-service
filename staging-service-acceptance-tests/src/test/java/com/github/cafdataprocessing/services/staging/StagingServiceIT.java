@@ -68,7 +68,7 @@ public class StagingServiceIT
         final String batchId = "test-batch8";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         String batchStatus = stagingApi.getBatchStatus(tenantId, batchId).getMessage();
-        assertTrue("Batch completed successfully", batchStatus.equals("The Batch "+batchId+" processing is completed successfully."));
+        assertTrue("Batch completed successfully", batchStatus.equals("Staging batch '" + batchId + "' is completed."));
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
     }
