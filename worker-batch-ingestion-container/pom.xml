@@ -423,7 +423,7 @@
                             <alias>worker-ingestion</alias>
                             <name>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}worker-ingestion${dockerProjectVersion}</name>
                             <build>
-                                <from>${dockerHubPublic}/cafapi/opensuse-jre11:3</from>
+                                <from>${dockerHubPublic}/cafapi/opensuse-jre17:1</from>
                                 <labels>
                                     <caf.worker-framework.version>${caf.worker-batch-framework.version}</caf.worker-framework.version>
                                 </labels>
