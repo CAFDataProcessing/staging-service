@@ -44,6 +44,7 @@ public interface BatchDao
 
     public enum BatchStatus {
         COMPLETED,
-        INPROGRESS;
+        INPROGRESS,
+        ABANDONED;
     }
 }

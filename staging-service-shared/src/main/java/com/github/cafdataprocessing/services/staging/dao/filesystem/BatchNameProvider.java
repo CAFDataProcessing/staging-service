@@ -19,6 +19,7 @@ import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 public final class BatchNameProvider
 {
@@ -39,7 +40,7 @@ public final class BatchNameProvider
 
     private static String getCurrentTimeAsString()
     {
-        return cleanseTime(Instant.now().toString());
+        return cleanseTime(Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());
     }
 
     public static long getFileCreationTime(final String fileName)

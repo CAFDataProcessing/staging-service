@@ -17,6 +17,7 @@ package com.github.cafdataprocessing.services.staging.dao;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchNameProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
@@ -61,7 +62,7 @@ public class FileSystemDaoTest
     {
         tenantId = new TenantId(TEST_TENANT_ID);
         baseDirName = getTempBaseBatchDir();
-        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000, true);
+        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 3600000, true);
     }
 
     @After
@@ -428,6 +429,29 @@ public class FileSystemDaoTest
         assertEquals(0, batchesAfterDelete.size());
     }
 
+    @Test
+    public void getBatchStatusTest() throws Exception
+    {
+        final BatchId batchIdInProgress = new BatchId("test-batch-inprogress");
+        final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
+        Files.createDirectories(Paths.get(inProgressDirectoryName, "/"+BatchNameProvider.getBatchDirectoryName(batchIdInProgress)));
+        assertEquals("In Progress",BatchDao.BatchStatus.INPROGRESS, fileSystemDao.getBatchStatus(tenantId, batchIdInProgress));
+
+        final BatchId batchIdCompleted = new BatchId("test-batch-completed");
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
+        Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
+        assertEquals("Completed", BatchDao.BatchStatus.COMPLETED, fileSystemDao.getBatchStatus(tenantId, batchIdCompleted));
+
+        final BatchId batchIdAbandoned = new BatchId("test-batch-stale");
+        final String abandonedDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
+        final String tempDirectoryName = BatchNameProvider.getBatchDirectoryName(batchIdAbandoned);
+        final String abandonedBatchName = tempDirectoryName.substring(0,11)
+                + (Integer.parseInt(tempDirectoryName.substring(11,13)) - 2)
+                + tempDirectoryName.substring(13,tempDirectoryName.length());
+        Files.createDirectories(Paths.get(abandonedDirectoryName, "/"+abandonedBatchName));
+        assertEquals("Abandoned",BatchDao.BatchStatus.ABANDONED, fileSystemDao.getBatchStatus(tenantId, batchIdAbandoned));
+    }
+
     private String getTempBaseBatchDir() throws Exception
     {
         return Files.createTempDirectory(BATCH_BASE_FOLDER).toString();
@@ -444,4 +468,8 @@ public class FileSystemDaoTest
         return uuid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     }
 
+    private String getInProgressBatchDir(final TenantId tenantId, final String baseDir) throws Exception
+    {
+        return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.INPROGRESS_FOLDER)).toString();
+    }
 }

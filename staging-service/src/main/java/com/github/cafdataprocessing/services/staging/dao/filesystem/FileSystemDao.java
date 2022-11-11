@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -287,6 +288,8 @@ public class FileSystemDao implements BatchDao
     {
         if (batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()) {
             return BatchStatus.COMPLETED;
+        } else if (skipBatchFileCleanup && isInProgressBatchAbandoned(batchPathProvider.getTenantInprogressDirectory(tenantId), batchId)) {
+            return BatchStatus.ABANDONED;
         } else if (batchPathProvider.isBatchInProgress(tenantId, batchId)) {
             return BatchStatus.INPROGRESS;
         } else {
@@ -352,5 +355,12 @@ public class FileSystemDao implements BatchDao
     {
         final long fileCreationTime = BatchNameProvider.getFileCreationTime(filename);
         return (Instant.now().toEpochMilli() - fileAgeThreshold) >= fileCreationTime;
+    }
+
+    private boolean isInProgressBatchAbandoned(final Path path, final BatchId batchId)
+    {
+        return Arrays.stream(path.toFile().list())
+                    .filter(this::shouldDelete)
+                    .anyMatch(batch -> BatchNameProvider.getBatchId(batch).equals(batchId.getValue()));
     }
 }
