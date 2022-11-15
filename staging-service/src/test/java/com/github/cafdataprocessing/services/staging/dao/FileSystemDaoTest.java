@@ -445,9 +445,11 @@ public class FileSystemDaoTest
         final BatchId batchIdAbandoned = new BatchId("test-batch-stale");
         final String abandonedDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
         final String tempDirectoryName = BatchNameProvider.getBatchDirectoryName(batchIdAbandoned);
+        System.out.println(tempDirectoryName);
         final String abandonedBatchName = tempDirectoryName.substring(0,11)
-                + (Integer.parseInt(tempDirectoryName.substring(11,13)) - 2)
+                + (String.format("%02d",Integer.parseInt(tempDirectoryName.substring(11,13)) - 2))
                 + tempDirectoryName.substring(13,tempDirectoryName.length());
+        System.out.println(abandonedBatchName);
         Files.createDirectories(Paths.get(abandonedDirectoryName, "/"+abandonedBatchName));
         assertEquals("Abandoned",BatchDao.BatchStatus.ABANDONED, fileSystemDao.getBatchStatus(tenantId, batchIdAbandoned));
     }
