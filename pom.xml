@@ -55,7 +55,7 @@
         <okhttp-version>2.7.5</okhttp-version>
         <enforceBannedDependencies>true</enforceBannedDependencies>
         <enforceCorrectDependencies>true</enforceCorrectDependencies>
-        <fasterxmlVersion>2.12.5</fasterxmlVersion>
+        <fasterxmlVersion>2.12.7.1</fasterxmlVersion>
         <springDataVersion>2.0.9.RELEASE</springDataVersion>
         <caf.worker-batch-framework.version>3.6.0-88</caf.worker-batch-framework.version>
         <fabric8.docker.maven.version>0.37.0</fabric8.docker.maven.version>
