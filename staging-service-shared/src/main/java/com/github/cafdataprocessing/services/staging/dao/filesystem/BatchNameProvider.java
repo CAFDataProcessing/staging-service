@@ -17,13 +17,20 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
+import java.util.TimeZone;
 
 public final class BatchNameProvider
 {
     private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
-
+    private static final String DATE_TIME_ISO_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
     public static String getBatchDirectoryName(final BatchId batchId)
     {
         return getCurrentTimeAsString()
@@ -39,7 +46,11 @@ public final class BatchNameProvider
 
     private static String getCurrentTimeAsString()
     {
-        return cleanseTime(Instant.now().toString());
+        TimeZone timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
+        DateFormat dateFormat = new SimpleDateFormat(DATE_TIME_ISO_PATTERN);
+        dateFormat.setTimeZone(timeZone);
+        String currentTimeAsString = dateFormat.format(new Date());
+        return cleanseTime(currentTimeAsString);
     }
 
     public static long getFileCreationTime(final String fileName)
