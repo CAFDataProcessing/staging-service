@@ -17,7 +17,6 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
