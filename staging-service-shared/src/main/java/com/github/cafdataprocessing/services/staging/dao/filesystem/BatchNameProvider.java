@@ -17,13 +17,10 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
-import java.util.TimeZone;
 
 public final class BatchNameProvider
 {
@@ -44,10 +41,8 @@ public final class BatchNameProvider
 
     private static String getCurrentTimeAsString()
     {
-        TimeZone timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
-        DateFormat dateFormat = new SimpleDateFormat(DATE_TIME_ISO_PATTERN);
-        dateFormat.setTimeZone(timeZone);
-        String currentTimeAsString = dateFormat.format(new Date());
+        final DateTimeFormatter formatToday = DateTimeFormatter.ofPattern(DATE_TIME_ISO_PATTERN).withZone(ZoneOffset.UTC);
+        final String currentTimeAsString = formatToday.format(Instant.now());
         return cleanseTime(currentTimeAsString);
     }
 
@@ -80,5 +75,9 @@ public final class BatchNameProvider
     public static boolean validateFileName(final String fileName)
     {
         return fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}.[0-9]{3}Z-.*-.*-.*");
+    }
+
+    public static void main(String[] args) {
+        getCurrentTimeAsString();
     }
 }
