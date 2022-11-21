@@ -25,7 +25,7 @@ import java.time.format.DateTimeParseException;
 public final class BatchNameProvider
 {
     private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
-    private static final String DATE_TIME_ISO_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+    private static final String DATE_TIME_ISO_PATTERN = "yyyy-MM-dd'T'HHmmss.SSSX";
     private static final DateTimeFormatter formatToday = DateTimeFormatter.ofPattern(DATE_TIME_ISO_PATTERN).withZone(ZoneOffset.UTC);
     public static String getBatchDirectoryName(final BatchId batchId)
     {
