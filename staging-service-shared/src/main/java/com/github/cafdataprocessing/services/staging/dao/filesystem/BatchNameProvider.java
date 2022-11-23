@@ -18,12 +18,16 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public final class BatchNameProvider
 {
     private static final String SUBBATCH_FILE_SUFFIX = "-json.batch";
+    private static final String DATE_TIME_ISO_PATTERN = "yyyy-MM-dd'T'HHmmss.SSSX";
+    private static final DateTimeFormatter formatToday = DateTimeFormatter.ofPattern(DATE_TIME_ISO_PATTERN).withZone(ZoneOffset.UTC);
 
     public static String getBatchDirectoryName(final BatchId batchId)
     {
@@ -40,7 +44,7 @@ public final class BatchNameProvider
 
     private static String getCurrentTimeAsString()
     {
-        return cleanseTime(Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());
+        return formatToday.format(Instant.now());
     }
 
     public static long getFileCreationTime(final String fileName)
@@ -64,11 +68,6 @@ public final class BatchNameProvider
 
         final int endOfServiceId = noThreadIdFileName.indexOf('-');
         return noThreadIdFileName.substring(endOfServiceId + 1);
-    }
-
-    private static String cleanseTime(final String utcFormattedTime)
-    {
-        return utcFormattedTime.replaceAll(":", "");
     }
 
     private static String reverseCleanseTimeString(final String timeString)
