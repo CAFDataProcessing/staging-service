@@ -63,7 +63,7 @@ public class StagingServiceIT
     public void uploadDocumentsToBatchAndGetStatusTest() throws Exception
     {
         final String tenantId = "tenant-test-batch8";
-        final String[] contentFiles = new String[]{"Reference_File_Big1.txt", "Reference_File_Big2.txt"};
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
         final String[] documentFiles = new String[]{"batch8.json"};
         final String batchId = "test-batch8";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
