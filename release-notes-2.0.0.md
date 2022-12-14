@@ -7,7 +7,7 @@ ${version-number}
 #### New Features
 - US593021: Updated to run on Java 17.
 
-### Bug Fixes
+#### Bug Fixes
 - US607098: Fixed a potential issue in the 'Stale batches cleanup' scheduler, due to a change in the behavior
    of Instant.now() method between JDK8 and later versions causing a change in how the directories are named.
 
