@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 
 public final class BatchNameProvider
 {
@@ -82,5 +81,18 @@ public final class BatchNameProvider
     public static boolean validateFileName(final String fileName)
     {
         return fileName.matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}.[0-9]{3}Z-.*-.*-.*");
+    }
+
+    public static String extractThreadIDAndServiceID(final String fileName)
+    {
+        //Example File name: 2022-11-11T132455.509Z-28-2726eec0-test-batch10
+        //return: 28-2726eec0  || ThreadID-ServiceID
+        final String noCreationTimeFileName = fileName.substring(23);
+        String threadID = noCreationTimeFileName.substring(0,noCreationTimeFileName.indexOf('-'));
+        final int endOfThreadId = noCreationTimeFileName.indexOf('-');
+        final String noThreadIdFileName = noCreationTimeFileName.substring(endOfThreadId + 1);
+        final int endOfServiceId = noThreadIdFileName.indexOf('-');
+        String serviceID = noThreadIdFileName.substring(0,endOfServiceId);
+        return threadID+"-"+serviceID;
     }
 }

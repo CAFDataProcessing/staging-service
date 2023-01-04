@@ -172,7 +172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StatusResponse"
+                $ref: "#/components/schemas/BatchStatusResponse"
         "404":
           description: The batch does not exist.
         "500":
@@ -197,3 +197,46 @@ components:
           items:
             type: string
             description: The batch identifier
+    BatchStatusResponse:
+      title: BatchStatusResponse
+      description: The Response object with status of the batch
+      type: object
+      properties:
+        batchID:
+          type: string
+          description: ID of the batch
+        batchStatus:
+          $ref: '#/components/schemas/BatchStatus'
+    BatchStatus:
+      title: BatchStatus
+      description: The status of the batch
+      type: object
+      properties:
+        batchComplete:
+          type: boolean
+        inProgress:
+          $ref: '#/components/schemas/InProgress'
+    InProgress:
+      title: InProgress
+      type: object
+      properties:
+        numberOfBatches:
+          type: integer
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/InProgressMetrics'
+    InProgressMetrics:
+      title: InProgressMetrics
+      type: object
+      properties:
+        bytesReceived:
+          type: integer
+          format: int64
+        bytesPerSecond:
+          type: integer
+          format: int64
+          nullable: true
+        lastModifiedDate:
+          type: string
+          format: date-time

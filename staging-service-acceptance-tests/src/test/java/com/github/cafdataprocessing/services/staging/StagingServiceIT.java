@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import com.github.cafdataprocessing.services.staging.client.StagingBatchStatusResponse;
 
 public class StagingServiceIT
 {
@@ -67,10 +68,10 @@ public class StagingServiceIT
         final String[] documentFiles = new String[]{"batch8.json"};
         final String batchId = "test-batch8";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
-        String batchStatus = stagingApi.getBatchStatus(tenantId, batchId).getMessage();
-        assertTrue("Batch completed successfully", batchStatus.equals("Staging batch '" + batchId + "' is completed."));
+        StagingBatchStatusResponse batchStatus = stagingApi.getBatchStatus(tenantId, batchId);
+        assertTrue("Batch completed successfully", batchStatus.getBatchStatus().isBatchComplete());
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+        assertEquals("uploadDocumentsToBatchTest, 1 batch uploaded", 1, response.getEntries().size());
     }
 
     @Test

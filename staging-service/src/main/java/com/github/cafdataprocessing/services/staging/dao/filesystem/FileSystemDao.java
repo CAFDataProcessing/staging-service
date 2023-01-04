@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -50,6 +49,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import com.github.cafdataprocessing.services.staging.models.BatchStatus;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
+import com.github.cafdataprocessing.services.staging.models.InProgress;
+import com.github.cafdataprocessing.services.staging.models.InProgressMetrics;
+import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import com.github.cafdataprocessing.services.staging.utils.Tracker;
 
 @EnableScheduling
 public class FileSystemDao implements BatchDao
@@ -284,17 +290,46 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public BatchStatus getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException
+    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException
     {
+        boolean batchInCompletedState = false;
+        BatchStatusResponse responseBean = new BatchStatusResponse();
+        responseBean.setBatchID(batchId.getValue());
+        BatchStatus batchStatus = new BatchStatus();
+        InProgress inProgress = new InProgress();
         if (batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()) {
-            return BatchStatus.COMPLETED;
-        } else if (skipBatchFileCleanup && isInProgressBatchAbandoned(batchPathProvider.getTenantInprogressDirectory(tenantId), batchId)) {
-            return BatchStatus.ABANDONED;
-        } else if (batchPathProvider.isBatchInProgress(tenantId, batchId)) {
-            return BatchStatus.INPROGRESS;
+            batchStatus.setBatchComplete(true);
+            batchInCompletedState = true;
         } else {
+            batchStatus.batchComplete(false);
+        }
+        List<InProgressMetrics> inProgressMetricsList =
+                new ArrayList<>();
+        //get threadIDs for requested batchId from filesystem
+        List<String> listOfInProgressBatches = batchPathProvider.getListOfInProgressThreadFromFileSystem(tenantId, batchId);
+        if(!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
             throw new BatchNotFoundException(batchId.getValue());
         }
+        Map<String, Tracker> trackerMap = BatchProgressTracker.getInProgressTrackerMap();
+        listOfInProgressBatches.forEach(batchThread -> {
+            InProgressMetrics inProgressMetrics= new InProgressMetrics();
+            if (!batchThread.contains(ServiceIdentifier.getServiceId()))
+                batchPathProvider.monitorBatchProgressInFileSystem(tenantId, batchId, batchThread);
+            if(trackerMap.get(batchThread) != null) {
+                inProgressMetrics.setLastModifiedDate(trackerMap.get(batchThread).getLastModifiedTime());
+                inProgressMetrics.setBytesReceived(trackerMap.get(batchThread).getNumberOfBytesReceived());
+                inProgressMetrics.setBytesPerSecond(trackerMap.get(batchThread).getFileUploadRate());
+                inProgressMetricsList.add(inProgressMetrics);
+            }
+        });
+        // Remove the entry from TrackerMap for batch processed by different staging service
+        trackerMap.entrySet().removeIf(entry ->!entry.getKey().contains(ServiceIdentifier.getServiceId()));
+        // Build and return the Response
+        inProgress.setNumberOfBatches(inProgressMetricsList.size());
+        inProgress.setMetrics(inProgressMetricsList);
+        batchStatus.setInProgress(inProgress);
+        responseBean.setBatchStatus(batchStatus);
+        return responseBean;
     }
 
     private boolean checkAllSubfilesSafely(final Path path)
@@ -355,12 +390,5 @@ public class FileSystemDao implements BatchDao
     {
         final long fileCreationTime = BatchNameProvider.getFileCreationTime(filename);
         return (Instant.now().toEpochMilli() - fileAgeThreshold) >= fileCreationTime;
-    }
-
-    private boolean isInProgressBatchAbandoned(final Path path, final BatchId batchId)
-    {
-        return Arrays.stream(path.toFile().list())
-                    .filter(this::shouldDelete)
-                    .anyMatch(batch -> BatchNameProvider.getBatchId(batch).equals(batchId.getValue()));
     }
 }

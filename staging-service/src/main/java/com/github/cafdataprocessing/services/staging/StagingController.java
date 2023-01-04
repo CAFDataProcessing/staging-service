@@ -18,8 +18,11 @@ package com.github.cafdataprocessing.services.staging;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.exceptions.*;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
+import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.util.List;
@@ -86,6 +89,7 @@ public class StagingController implements StagingApi
     {
 
         final ServletFileUpload fileUpload = new ServletFileUpload();
+        BatchProgressTracker.updateTracker(fileUpload);
         final FileItemIterator fileItemIterator;
         try {
             fileItemIterator = fileUpload.getItemIterator(request);
@@ -96,11 +100,11 @@ public class StagingController implements StagingApi
         try {
             batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
             LOGGER.debug("Staged batch: {}", batchId);
+            BatchProgressTracker.getInProgressTrackerMap().remove(Thread.currentThread().getId()+"-"+ ServiceIdentifier.getServiceId());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex) {
             LOGGER.error("Error getting multipart files", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
-
         } catch (final StagingException ex) {
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
@@ -133,23 +137,15 @@ public class StagingController implements StagingApi
     }
 
     @Override
-    public ResponseEntity<StatusResponse> getBatchStatus(
+    public ResponseEntity<BatchStatusResponse> getBatchStatus(
             @ApiParam(value = "Identifies the tenant making the request.", required = true)
             @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
             @ApiParam(value = "Identifies the batch.", required = true)
             @RequestParam("batchId") String batchId)
     {
-        final StatusResponse status = new StatusResponse();
         try {
-            final BatchDao.BatchStatus statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
-            if (statusResponse == BatchDao.BatchStatus.COMPLETED) {
-                status.setMessage("Staging batch '" + batchId + "' is completed.");
-            } else if (statusResponse == BatchDao.BatchStatus.INPROGRESS) {
-                status.setMessage("Staging batch '" + batchId + "' is in progress.");
-            } else if (statusResponse == BatchDao.BatchStatus.ABANDONED) {
-                status.setMessage("Staging batch '" + batchId + "' is abandoned.");
-            }
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(status);
+            final BatchStatusResponse statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(statusResponse);
         } catch (final InvalidTenantIdException ex) {
             LOGGER.error("Invalid X-TENANT-ID.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());

@@ -18,12 +18,28 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import com.github.cafdataprocessing.services.staging.utils.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class BatchPathProvider
 {
@@ -110,12 +126,66 @@ public class BatchPathProvider
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
-    public boolean isBatchInProgress(final TenantId tenantId, final BatchId batchId)
+    public void monitorBatchProgressInFileSystem(final TenantId tenantId, final BatchId batchId, String threadID)
     {
         final Path pathForBatches = getTenantInprogressDirectory(tenantId);
-        return Arrays
-            .stream(pathForBatches.toFile().list())
-            .anyMatch(batch -> BatchNameProvider.getBatchId(batch).equals(batchId.getValue()));
+        final long[] size = new long[1];
+        try (Stream<Path> fileStream = Files.list(pathForBatches)) {
+            fileStream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()) &&
+                            !batch.getFileName().toString().contains(ServiceIdentifier.getServiceId()))
+                    .map(batch -> batch.resolve("files"))
+                    .forEach(batch -> {
+                        try (Stream<Path> filePath = Files.walk(batch)) {
+                            size[0] = filePath.mapToLong(file -> file.toFile().length()).sum();
+                        } catch (IOException e) {
+                            LOGGER.info("Folder might have been deleted or moved.");
+                        }
+                        try (Stream<Path> files = Files.list(batch)) {
+                            Optional<Path> lastModifiedFile = files.max(Comparator.comparing(BatchPathProvider::getLastModified));
+                            if (lastModifiedFile.isPresent()) {
+                                Path file = lastModifiedFile.get();
+                                Map<String, Tracker> trackerMap = BatchProgressTracker.getInProgressTrackerMap();
+                                /*Check the file system and see differences between last modified time
+                                by making thread sleep for 1 second to confirm if upload is progressing*/
+                                Instant prevTime = getLastModified(file);
+                                threadSleep();
+                                Instant currTime = getLastModified(file);
+                                if (ChronoUnit.MILLIS.between(prevTime, currTime) > 0) {
+                                    Tracker tracker = new Tracker();
+                                    tracker.setLastModifiedTime(currTime);
+                                    tracker.setNumberOfBytesReceived(size[0]);
+                                    trackerMap.put(threadID, tracker);
+                                }
+                            }
+                        } catch (IllegalStateException | IOException e) {
+                            LOGGER.info("The file might have been moved to Completed.");
+                        }
+                    });
+        } catch (IOException e) {
+            LOGGER.info("The file might have been moved to Completed.");
+        }
+    }
+
+    private static Instant getLastModified(Path p)
+    {
+        try {
+            return Files.readAttributes(p, BasicFileAttributes.class).lastModifiedTime().toInstant();
+        } catch (IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+    }
+
+    public List<String> getListOfInProgressThreadFromFileSystem(TenantId tenantId, BatchId batchId)
+    {
+        Path inProgressPath = getTenantInprogressDirectory(tenantId);
+        List<String> list = new ArrayList<>();
+        try (Stream<Path> stream = Files.list(inProgressPath)) {
+            stream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
+                    .forEach(path -> list.add(BatchNameProvider.extractThreadIDAndServiceID(path.getFileName().toString())));
+        } catch (IOException e) {
+            LOGGER.info("The folder might have been moved or deleted.");
+        }
+        return list;
     }
 
     public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
@@ -145,6 +215,15 @@ public class BatchPathProvider
         public UnexpectedInvalidBatchIdException(final BatchId batchId)
         {
             super("Invalid batch id: " + batchId);
+        }
+    }
+
+    private static void threadSleep()
+    {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

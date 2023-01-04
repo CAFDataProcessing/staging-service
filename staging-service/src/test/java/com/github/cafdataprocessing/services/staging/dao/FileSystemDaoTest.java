@@ -30,12 +30,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -435,23 +437,13 @@ public class FileSystemDaoTest
         final BatchId batchIdInProgress = new BatchId("test-batch-inprogress");
         final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(inProgressDirectoryName, "/"+BatchNameProvider.getBatchDirectoryName(batchIdInProgress)));
-        assertEquals("In Progress",BatchDao.BatchStatus.INPROGRESS, fileSystemDao.getBatchStatus(tenantId, batchIdInProgress));
-
+        BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdInProgress);
+        assertFalse(response.getBatchStatus().isBatchComplete());
         final BatchId batchIdCompleted = new BatchId("test-batch-completed");
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
-        assertEquals("Completed", BatchDao.BatchStatus.COMPLETED, fileSystemDao.getBatchStatus(tenantId, batchIdCompleted));
-
-        final BatchId batchIdAbandoned = new BatchId("test-batch-stale");
-        final String abandonedDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
-        final String tempDirectoryName = BatchNameProvider.getBatchDirectoryName(batchIdAbandoned);
-        System.out.println(tempDirectoryName);
-        final String abandonedBatchName = tempDirectoryName.substring(0,11)
-                + (String.format("%02d",Integer.parseInt(tempDirectoryName.substring(11,13)) - 2))
-                + tempDirectoryName.substring(13,tempDirectoryName.length());
-        System.out.println(abandonedBatchName);
-        Files.createDirectories(Paths.get(abandonedDirectoryName, "/"+abandonedBatchName));
-        assertEquals("Abandoned",BatchDao.BatchStatus.ABANDONED, fileSystemDao.getBatchStatus(tenantId, batchIdAbandoned));
+        response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
+        assertTrue(response.getBatchStatus().isBatchComplete());
     }
 
     private String getTempBaseBatchDir() throws Exception
