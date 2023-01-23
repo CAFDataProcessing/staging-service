@@ -64,7 +64,7 @@ public class FileSystemDaoTest
     {
         tenantId = new TenantId(TEST_TENANT_ID);
         baseDirName = getTempBaseBatchDir();
-        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 3600000, true);
+        this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000, true);
     }
 
     @After
