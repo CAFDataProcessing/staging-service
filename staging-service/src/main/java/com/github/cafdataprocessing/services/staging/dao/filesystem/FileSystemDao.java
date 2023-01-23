@@ -309,7 +309,7 @@ public class FileSystemDao implements BatchDao
         for (String batchThread : listOfInProgressBatches) {
             InProgressMetrics inProgressMetrics = new InProgressMetrics();
             if (!batchThread.contains(ServiceIdentifier.getServiceId())) {
-                batchProgressTracker.putAll(batchPathProvider.monitorBatchProgressInFileSystem(tenantId, batchId, batchThread));
+                batchProgressTracker.putAll(batchPathProvider.monitorBatchProgressOfDifferentServices(batchThread));
             }
             final Tracker tracker = batchProgressTracker.get(batchThread);
             if (tracker != null) {

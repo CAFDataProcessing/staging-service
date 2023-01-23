@@ -23,6 +23,7 @@ import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import com.github.cafdataprocessing.services.staging.utils.Tracker;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +50,8 @@ public class BatchPathProvider
 
     public static final String MOVED_TO_PROGRESS = "The in-progress folder might have been moved to Completed.";
     private final Path basePath;
+
+    private final List<Path> inProgressBatchesOfDifferentServices = new ArrayList<>();
 
     public BatchPathProvider(final String basePath)
     {
@@ -127,26 +130,17 @@ public class BatchPathProvider
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
-    public Map<String, Tracker> monitorBatchProgressInFileSystem(final TenantId tenantId, final BatchId batchId, final String threadID) throws ServiceUnavailableException {
-        final Path pathForBatches = getTenantInprogressDirectory(tenantId);
+    public Map<String, Tracker> monitorBatchProgressOfDifferentServices(final String threadID) throws ServiceUnavailableException
+    {
         final Tracker tracker = new Tracker();
         final Map<String, Tracker> trackerMap = new HashMap<>();
-        try (final Stream<Path> fileStream = Files.list(pathForBatches))
-        {
-            Stream<Path> pathStream = fileStream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()) &&
-                            !batch.getFileName().toString().contains(ServiceIdentifier.getServiceId()))
-                    .map(batch -> batch.resolve("files"));
-            Iterator<Path> pathIterable = pathStream.iterator();
-            while (pathIterable.hasNext())
-            {
-                Path batch = pathIterable.next();
+        try{
+            for (Path batch: inProgressBatchesOfDifferentServices) {
                 final long size = getBatchSize(batch);
                 trackProgress(threadID, tracker, trackerMap, size, batch);
             }
-        } catch (final IOException e)
-        {
-            LOGGER.info(MOVED_TO_PROGRESS, e);
-        } catch (final InterruptedException e)
+        }
+        catch (final InterruptedException e)
         {
             throw new ServiceUnavailableException("The service is unavailable, please try again.", e);
         }
@@ -162,12 +156,20 @@ public class BatchPathProvider
     {
         final Path inProgressPath = getTenantInprogressDirectory(tenantId);
         List<String> list = new ArrayList<>();
-        try (final Stream<Path> stream = Files.list(inProgressPath)) {
-            list = stream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
-                    .map(path -> BatchNameProvider.extractThreadIDAndServiceID(path.getFileName().toString()))
-                    .collect(Collectors.toList());
-        } catch (final IOException e) {
-            LOGGER.error(MOVED_TO_PROGRESS, e);
+        try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(inProgressPath)){
+            for (Path batch: directoryStream)
+            {
+                if(BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
+                {
+                    list.add(BatchNameProvider.extractThreadIDAndServiceID(batch.getFileName().toString()));
+                    if(!batch.getFileName().toString().contains(ServiceIdentifier.getServiceId()))
+                    {
+                        inProgressBatchesOfDifferentServices.add(batch);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while traversing In-progress folder for the tenant: "+ tenantId.getValue(), e);
         }
         return list;
     }
