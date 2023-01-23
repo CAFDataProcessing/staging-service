@@ -20,13 +20,14 @@ import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
+import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-import java.util.List;
-import org.apache.commons.fileupload.FileItemIterator;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
+import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+import org.apache.commons.fileupload.FileItemIterator;
 
 public interface BatchDao
 {
@@ -41,6 +42,6 @@ public interface BatchDao
 
     void cleanUpStaleInprogressBatches();
 
-    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException;
+    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException, ServiceUnavailableException;
 
 }

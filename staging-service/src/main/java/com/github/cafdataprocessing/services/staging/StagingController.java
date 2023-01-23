@@ -87,9 +87,9 @@ public class StagingController implements StagingApi
         @PathVariable("batchId") String batchId,
         HttpServletRequest request)
     {
-
         final ServletFileUpload fileUpload = new ServletFileUpload();
-        BatchProgressTracker.updateTracker(fileUpload);
+        final BatchProgressTracker batchProgressTracker = new BatchProgressTracker();
+        batchProgressTracker.updateTracker(fileUpload);
         final FileItemIterator fileItemIterator;
         try {
             fileItemIterator = fileUpload.getItemIterator(request);
@@ -100,13 +100,14 @@ public class StagingController implements StagingApi
         try {
             batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
             LOGGER.debug("Staged batch: {}", batchId);
-            BatchProgressTracker.getInProgressTrackerMap().remove(Thread.currentThread().getId()+"-"+ ServiceIdentifier.getServiceId());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex) {
             LOGGER.error("Error getting multipart files", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final StagingException ex) {
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        } finally {
+            batchProgressTracker.remove(Thread.currentThread().getId(), ServiceIdentifier.getServiceId());
         }
     }
 
@@ -158,6 +159,9 @@ public class StagingController implements StagingApi
         } catch (final StagingException ex) {
             LOGGER.error("Internal server error.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        } catch (ServiceUnavailableException ex) {
+            LOGGER.error("Service Unavailable.", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
         }
     }
 

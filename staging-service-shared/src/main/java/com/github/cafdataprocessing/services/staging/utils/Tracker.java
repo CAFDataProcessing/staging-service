@@ -20,27 +20,36 @@ import java.time.Instant;
 public class Tracker
 {
     private Instant lastModifiedTime;
-    private Long numberOfBytesReceived = null;
-    private Long fileUploadRate = null;
+    private Long numberOfBytesReceived;
+    private Long fileUploadRateInBytesPerSecond;
+    private Instant uploadStartTime;
+
+    private boolean isProgressing;
+
+    public Tracker() {
+        this.lastModifiedTime = null;
+        this.numberOfBytesReceived = null;
+        this.fileUploadRateInBytesPerSecond = null;
+        this.uploadStartTime = null;
+        this.isProgressing = false;
+    }
 
     public Instant getUploadStartTime()
     {
         return uploadStartTime;
     }
 
-    public void setUploadStartTime(Instant uploadStartTime)
+    public void setUploadStartTime(final Instant uploadStartTime)
     {
         this.uploadStartTime = uploadStartTime;
     }
-
-    private Instant uploadStartTime;
 
     public Instant getLastModifiedTime()
     {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(Instant lastModifiedTime)
+    public void setLastModifiedTime(final Instant lastModifiedTime)
     {
         this.lastModifiedTime = lastModifiedTime;
     }
@@ -50,13 +59,29 @@ public class Tracker
         return numberOfBytesReceived;
     }
 
-    public void setNumberOfBytesReceived(long numberOfBytesReceived)
+    public void setNumberOfBytesReceived(final long numberOfBytesReceived)
     {
         this.numberOfBytesReceived = numberOfBytesReceived;
     }
 
-    public Long getFileUploadRate() {
-        return fileUploadRate;
+    public Long getFileUploadRateInBytesPerSecond()
+    {
+        return fileUploadRateInBytesPerSecond;
+    }
+
+    public void setFileUploadRateInBytesPerSecond(final long fileUploadRateInBytesPerSecond)
+    {
+        this.fileUploadRateInBytesPerSecond = fileUploadRateInBytesPerSecond;
+    }
+
+    public boolean isProgressing()
+    {
+        return isProgressing;
+    }
+
+    public void setProgressing(final boolean progressing)
+    {
+        isProgressing = progressing;
     }
 
     @Override
@@ -65,13 +90,9 @@ public class Tracker
         return "Tracker{" +
                 "lastModifiedTime=" + lastModifiedTime +
                 ", numberOfBytesReceived=" + numberOfBytesReceived +
-                ", fileUploadRate='" + fileUploadRate + '\'' +
+                ", fileUploadRateInBytesPerSecond=" + fileUploadRateInBytesPerSecond +
                 ", uploadStartTime=" + uploadStartTime +
+                ", isProgressing=" + isProgressing +
                 '}';
-    }
-
-    public void setFileUploadRate(long fileUploadRate)
-    {
-        this.fileUploadRate = fileUploadRate;
     }
 }

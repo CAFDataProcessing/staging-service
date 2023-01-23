@@ -16,6 +16,7 @@
 package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
+import com.github.cafdataprocessing.services.staging.utils.ExtractedThreadAndServiceIDs;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -60,13 +61,8 @@ public final class BatchNameProvider
 
     public static String getBatchId(final String fileName)
     {
-        final String noCreationTimeFileName = fileName.substring(23);
-
-        final int endOfThreadId = noCreationTimeFileName.indexOf('-');
-        final String noThreadIdFileName = noCreationTimeFileName.substring(endOfThreadId + 1);
-
-        final int endOfServiceId = noThreadIdFileName.indexOf('-');
-        return noThreadIdFileName.substring(endOfServiceId + 1);
+        final int endOfThreadId = fileName.indexOf('-',23);
+        return fileName.substring(fileName.indexOf('-', endOfThreadId+1)+1);
     }
 
     private static String reverseCleanseTimeString(final String timeString)
@@ -87,12 +83,9 @@ public final class BatchNameProvider
     {
         //Example File name: 2022-11-11T132455.509Z-28-2726eec0-test-batch10
         //return: 28-2726eec0  || ThreadID-ServiceID
-        final String noCreationTimeFileName = fileName.substring(23);
-        String threadID = noCreationTimeFileName.substring(0,noCreationTimeFileName.indexOf('-'));
-        final int endOfThreadId = noCreationTimeFileName.indexOf('-');
-        final String noThreadIdFileName = noCreationTimeFileName.substring(endOfThreadId + 1);
-        final int endOfServiceId = noThreadIdFileName.indexOf('-');
-        String serviceID = noThreadIdFileName.substring(0,endOfServiceId);
-        return threadID+"-"+serviceID;
+        final int endOfThreadId = fileName.indexOf('-',23);
+        final String threadID = fileName.substring(23,endOfThreadId);
+        final String serviceID = fileName.substring(endOfThreadId+1, fileName.indexOf('-',endOfThreadId+1));
+        return new ExtractedThreadAndServiceIDs(threadID, serviceID).getCombinedIDs();
     }
 }

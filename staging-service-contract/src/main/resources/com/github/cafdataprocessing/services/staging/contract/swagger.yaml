@@ -202,7 +202,7 @@ components:
       description: The Response object with status of the batch
       type: object
       properties:
-        batchID:
+        batchId:
           type: string
           description: ID of the batch
         batchStatus:
@@ -220,8 +220,6 @@ components:
       title: InProgress
       type: object
       properties:
-        numberOfBatches:
-          type: integer
         metrics:
           type: array
           items:
@@ -240,3 +238,5 @@ components:
         lastModifiedDate:
           type: string
           format: date-time
+        isProgressing:
+          type: boolean

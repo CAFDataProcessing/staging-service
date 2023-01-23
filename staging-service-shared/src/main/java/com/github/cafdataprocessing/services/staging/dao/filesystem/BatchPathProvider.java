@@ -17,8 +17,10 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
+import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import com.github.cafdataprocessing.services.staging.utils.Tracker;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,19 +29,17 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
-import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import com.github.cafdataprocessing.services.staging.utils.Tracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BatchPathProvider
 {
@@ -47,6 +47,7 @@ public class BatchPathProvider
     public static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
+    public static final String MOVED_TO_PROGRESS = "The in-progress folder might have been moved to Completed.";
     private final Path basePath;
 
     public BatchPathProvider(final String basePath)
@@ -126,64 +127,47 @@ public class BatchPathProvider
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
-    public void monitorBatchProgressInFileSystem(final TenantId tenantId, final BatchId batchId, String threadID)
-    {
+    public Map<String, Tracker> monitorBatchProgressInFileSystem(final TenantId tenantId, final BatchId batchId, final String threadID) throws ServiceUnavailableException {
         final Path pathForBatches = getTenantInprogressDirectory(tenantId);
-        final long[] size = new long[1];
-        try (Stream<Path> fileStream = Files.list(pathForBatches)) {
-            fileStream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()) &&
+        final Tracker tracker = new Tracker();
+        final Map<String, Tracker> trackerMap = new HashMap<>();
+        try (final Stream<Path> fileStream = Files.list(pathForBatches))
+        {
+            Stream<Path> pathStream = fileStream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()) &&
                             !batch.getFileName().toString().contains(ServiceIdentifier.getServiceId()))
-                    .map(batch -> batch.resolve("files"))
-                    .forEach(batch -> {
-                        try (Stream<Path> filePath = Files.walk(batch)) {
-                            size[0] = filePath.mapToLong(file -> file.toFile().length()).sum();
-                        } catch (IOException e) {
-                            LOGGER.info("Folder might have been deleted or moved.");
-                        }
-                        try (Stream<Path> files = Files.list(batch)) {
-                            Optional<Path> lastModifiedFile = files.max(Comparator.comparing(BatchPathProvider::getLastModified));
-                            if (lastModifiedFile.isPresent()) {
-                                Path file = lastModifiedFile.get();
-                                Map<String, Tracker> trackerMap = BatchProgressTracker.getInProgressTrackerMap();
-                                /*Check the file system and see differences between last modified time
-                                by making thread sleep for 1 second to confirm if upload is progressing*/
-                                Instant prevTime = getLastModified(file);
-                                threadSleep();
-                                Instant currTime = getLastModified(file);
-                                if (ChronoUnit.MILLIS.between(prevTime, currTime) > 0) {
-                                    Tracker tracker = new Tracker();
-                                    tracker.setLastModifiedTime(currTime);
-                                    tracker.setNumberOfBytesReceived(size[0]);
-                                    trackerMap.put(threadID, tracker);
-                                }
-                            }
-                        } catch (IllegalStateException | IOException e) {
-                            LOGGER.info("The file might have been moved to Completed.");
-                        }
-                    });
-        } catch (IOException e) {
-            LOGGER.info("The file might have been moved to Completed.");
+                    .map(batch -> batch.resolve("files"));
+            Iterator<Path> pathIterable = pathStream.iterator();
+            while (pathIterable.hasNext())
+            {
+                Path batch = pathIterable.next();
+                final long size = getBatchSize(batch);
+                trackProgress(threadID, tracker, trackerMap, size, batch);
+            }
+        } catch (final IOException e)
+        {
+            LOGGER.info(MOVED_TO_PROGRESS, e);
+        } catch (final InterruptedException e)
+        {
+            throw new ServiceUnavailableException("The service is unavailable, please try again.", e);
         }
+        return trackerMap;
     }
 
-    private static Instant getLastModified(Path p)
+    private static Instant getLastModified(Path p) throws IOException
     {
-        try {
-            return Files.readAttributes(p, BasicFileAttributes.class).lastModifiedTime().toInstant();
-        } catch (IOException ioe) {
-            throw new IllegalStateException(ioe);
-        }
+        return Files.readAttributes(p, BasicFileAttributes.class).lastModifiedTime().toInstant();
     }
 
-    public List<String> getListOfInProgressThreadFromFileSystem(TenantId tenantId, BatchId batchId)
+    public List<String> getListOfInProgressThreadFromFileSystem(final TenantId tenantId, final BatchId batchId)
     {
-        Path inProgressPath = getTenantInprogressDirectory(tenantId);
+        final Path inProgressPath = getTenantInprogressDirectory(tenantId);
         List<String> list = new ArrayList<>();
-        try (Stream<Path> stream = Files.list(inProgressPath)) {
-            stream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
-                    .forEach(path -> list.add(BatchNameProvider.extractThreadIDAndServiceID(path.getFileName().toString())));
-        } catch (IOException e) {
-            LOGGER.info("The folder might have been moved or deleted.");
+        try (final Stream<Path> stream = Files.list(inProgressPath)) {
+            list = stream.filter(batch -> BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
+                    .map(path -> BatchNameProvider.extractThreadIDAndServiceID(path.getFileName().toString()))
+                    .collect(Collectors.toList());
+        } catch (final IOException e) {
+            LOGGER.error(MOVED_TO_PROGRESS, e);
         }
         return list;
     }
@@ -194,6 +178,45 @@ public class BatchPathProvider
         return (new BatchPathProvider(storePath)).getPathForBatch(tenantId, batchId).resolve(contentFolder);
     }
 
+    private long getBatchSize(final Path batch)
+    {
+        long size = 0;
+        try (Stream<Path> filePath = Files.list(batch)) {
+            size = filePath.mapToLong(file -> file.toFile().length()).sum();
+        } catch (IOException e) {
+            LOGGER.error(MOVED_TO_PROGRESS, e);
+        }
+        return size;
+    }
+
+    private void trackProgress(final String threadID, final Tracker tracker, final Map<String, Tracker> trackerMap, final long size, final Path batch) throws InterruptedException
+    {
+        try (Stream<Path> files = Files.list(batch)) {
+            Optional<Path> lastModifiedFile = files.max(Comparator.comparing(path -> {
+                Instant instant = Instant.now();
+                try{
+                    instant = BatchPathProvider.getLastModified(path);
+                } catch (IOException e){
+                    LOGGER.error(MOVED_TO_PROGRESS, e);
+                }
+                return instant;
+            }));
+            if (lastModifiedFile.isPresent()) {
+                Path file = lastModifiedFile.get();
+                /*Check the file system and see differences between last modified time
+                by making thread sleep for 1 second to confirm if upload is progressing*/
+                Instant prevTime = getLastModified(file);
+                Thread.sleep(1000);
+                Instant currTime = getLastModified(file);
+                tracker.setProgressing(ChronoUnit.MILLIS.between(prevTime, currTime) > 0);
+                tracker.setLastModifiedTime(currTime);
+                tracker.setNumberOfBytesReceived(size);
+                trackerMap.put(threadID, tracker);
+            }
+        } catch (IOException e) {
+            LOGGER.info(MOVED_TO_PROGRESS, e);
+        }
+    }
     private static final class UnexpectedInvalidBasePathException extends RuntimeException
     {
         public UnexpectedInvalidBasePathException(final String basePath)
@@ -215,15 +238,6 @@ public class BatchPathProvider
         public UnexpectedInvalidBatchIdException(final BatchId batchId)
         {
             super("Invalid batch id: " + batchId);
-        }
-    }
-
-    private static void threadSleep()
-    {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 }

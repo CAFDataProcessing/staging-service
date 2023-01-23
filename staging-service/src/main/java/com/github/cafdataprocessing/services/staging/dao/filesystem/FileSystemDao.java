@@ -22,7 +22,15 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
+import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import com.github.cafdataprocessing.services.staging.models.BatchStatus;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
+import com.github.cafdataprocessing.services.staging.models.InProgress;
+import com.github.cafdataprocessing.services.staging.models.InProgressMetrics;
+import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import com.github.cafdataprocessing.services.staging.utils.Tracker;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,13 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import com.github.cafdataprocessing.services.staging.models.BatchStatus;
-import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
-import com.github.cafdataprocessing.services.staging.models.InProgress;
-import com.github.cafdataprocessing.services.staging.models.InProgressMetrics;
-import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import com.github.cafdataprocessing.services.staging.utils.Tracker;
+
 
 @EnableScheduling
 public class FileSystemDao implements BatchDao
@@ -73,6 +75,7 @@ public class FileSystemDao implements BatchDao
     private final int fieldValueSizeThreshold;
     private final long fileAgeThreshold;
     private final boolean skipBatchFileCleanup;
+    private final BatchProgressTracker batchProgressTracker = new BatchProgressTracker();
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold,
@@ -290,42 +293,36 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException
-    {
-        boolean batchInCompletedState = false;
-        BatchStatusResponse responseBean = new BatchStatusResponse();
-        responseBean.setBatchID(batchId.getValue());
-        BatchStatus batchStatus = new BatchStatus();
-        InProgress inProgress = new InProgress();
-        if (batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists()) {
-            batchStatus.setBatchComplete(true);
-            batchInCompletedState = true;
-        } else {
-            batchStatus.batchComplete(false);
-        }
-        List<InProgressMetrics> inProgressMetricsList =
-                new ArrayList<>();
+    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException, ServiceUnavailableException {
+        final BatchStatusResponse responseBean = new BatchStatusResponse();
+        responseBean.setBatchId(batchId.getValue());
+        final BatchStatus batchStatus = new BatchStatus();
+        final InProgress inProgress = new InProgress();
+        final boolean batchInCompletedState = batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists();
+        batchStatus.setBatchComplete(batchInCompletedState);
+        final List<InProgressMetrics> inProgressMetricsList = new ArrayList<>();
         //get threadIDs for requested batchId from filesystem
-        List<String> listOfInProgressBatches = batchPathProvider.getListOfInProgressThreadFromFileSystem(tenantId, batchId);
+        final List<String> listOfInProgressBatches = batchPathProvider.getListOfInProgressThreadFromFileSystem(tenantId, batchId);
         if(!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
             throw new BatchNotFoundException(batchId.getValue());
         }
-        Map<String, Tracker> trackerMap = BatchProgressTracker.getInProgressTrackerMap();
-        listOfInProgressBatches.forEach(batchThread -> {
-            InProgressMetrics inProgressMetrics= new InProgressMetrics();
-            if (!batchThread.contains(ServiceIdentifier.getServiceId()))
-                batchPathProvider.monitorBatchProgressInFileSystem(tenantId, batchId, batchThread);
-            if(trackerMap.get(batchThread) != null) {
-                inProgressMetrics.setLastModifiedDate(trackerMap.get(batchThread).getLastModifiedTime());
-                inProgressMetrics.setBytesReceived(trackerMap.get(batchThread).getNumberOfBytesReceived());
-                inProgressMetrics.setBytesPerSecond(trackerMap.get(batchThread).getFileUploadRate());
+        for (String batchThread : listOfInProgressBatches) {
+            InProgressMetrics inProgressMetrics = new InProgressMetrics();
+            if (!batchThread.contains(ServiceIdentifier.getServiceId())) {
+                batchProgressTracker.putAll(batchPathProvider.monitorBatchProgressInFileSystem(tenantId, batchId, batchThread));
+            }
+            final Tracker tracker = batchProgressTracker.get(batchThread);
+            if (tracker != null) {
+                inProgressMetrics.setLastModifiedDate(tracker.getLastModifiedTime());
+                inProgressMetrics.setBytesReceived(tracker.getNumberOfBytesReceived());
+                inProgressMetrics.setBytesPerSecond(tracker.getFileUploadRateInBytesPerSecond());
+                inProgressMetrics.setIsProgressing(tracker.isProgressing());
                 inProgressMetricsList.add(inProgressMetrics);
             }
-        });
+        }
         // Remove the entry from TrackerMap for batch processed by different staging service
-        trackerMap.entrySet().removeIf(entry ->!entry.getKey().contains(ServiceIdentifier.getServiceId()));
+        batchProgressTracker.removeTrackerOfDifferentService();
         // Build and return the Response
-        inProgress.setNumberOfBatches(inProgressMetricsList.size());
         inProgress.setMetrics(inProgressMetricsList);
         batchStatus.setInProgress(inProgress);
         responseBean.setBatchStatus(batchStatus);
