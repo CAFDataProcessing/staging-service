@@ -17,7 +17,6 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
-import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import com.github.cafdataprocessing.services.staging.utils.Tracker;
@@ -33,11 +32,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,19 +127,13 @@ public class BatchPathProvider
         return getPathForTenant(tenantId).resolve(INPROGRESS_FOLDER);
     }
 
-    public Map<String, Tracker> monitorBatchProgressOfDifferentServices(final String threadID) throws ServiceUnavailableException
+    public Map<String, Tracker> monitorBatchProgressOfDifferentServices(final String threadID) throws InterruptedException
     {
         final Tracker tracker = new Tracker();
         final Map<String, Tracker> trackerMap = new HashMap<>();
-        try{
-            for (Path batch: inProgressBatchesOfDifferentServices) {
-                final long size = getBatchSize(batch);
-                trackProgress(threadID, tracker, trackerMap, size, batch);
-            }
-        }
-        catch (final InterruptedException e)
-        {
-            throw new ServiceUnavailableException("The service is unavailable, please try again.", e);
+        for (Path batch: inProgressBatchesOfDifferentServices) {
+            final long size = getBatchSize(batch);
+            trackProgress(threadID, tracker, trackerMap, size, batch);
         }
         return trackerMap;
     }
@@ -186,7 +177,7 @@ public class BatchPathProvider
         try (Stream<Path> filePath = Files.list(batch)) {
             size = filePath.mapToLong(file -> file.toFile().length()).sum();
         } catch (IOException e) {
-            LOGGER.error(MOVED_TO_PROGRESS, e);
+            LOGGER.info(MOVED_TO_PROGRESS, e);
         }
         return size;
     }
@@ -199,7 +190,7 @@ public class BatchPathProvider
                 try{
                     instant = BatchPathProvider.getLastModified(path);
                 } catch (IOException e){
-                    LOGGER.error(MOVED_TO_PROGRESS, e);
+                    LOGGER.info(MOVED_TO_PROGRESS, e);
                 }
                 return instant;
             }));

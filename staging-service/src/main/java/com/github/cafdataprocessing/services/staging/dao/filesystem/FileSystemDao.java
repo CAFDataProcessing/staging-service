@@ -22,7 +22,6 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
-import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.models.BatchStatus;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
@@ -293,7 +292,7 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException, ServiceUnavailableException {
+    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException, InterruptedException {
         final BatchStatusResponse responseBean = new BatchStatusResponse();
         responseBean.setBatchId(batchId.getValue());
         final BatchStatus batchStatus = new BatchStatus();

@@ -17,7 +17,7 @@ package com.github.cafdataprocessing.services.staging.utils;
 
 import java.time.Instant;
 
-public class Tracker
+public final class Tracker
 {
     private Instant lastModifiedTime;
     private Long numberOfBytesReceived;

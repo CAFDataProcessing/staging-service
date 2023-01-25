@@ -15,7 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging.utils;
 
-public class ExtractedThreadAndServiceIDs {
+public final class ExtractedThreadAndServiceIDs {
     private String threadID;
     private String serviceID;
 

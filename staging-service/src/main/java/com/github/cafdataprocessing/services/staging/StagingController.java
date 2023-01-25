@@ -159,7 +159,7 @@ public class StagingController implements StagingApi
         } catch (final StagingException ex) {
             LOGGER.error("Internal server error.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        } catch (ServiceUnavailableException ex) {
+        } catch (InterruptedException ex) {
             LOGGER.error("Service Unavailable.", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
         }

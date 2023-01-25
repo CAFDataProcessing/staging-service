@@ -20,7 +20,6 @@ import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
-import com.github.cafdataprocessing.services.staging.exceptions.ServiceUnavailableException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import java.util.List;
@@ -42,6 +41,6 @@ public interface BatchDao
 
     void cleanUpStaleInprogressBatches();
 
-    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException, ServiceUnavailableException;
+    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException, InterruptedException;
 
 }
