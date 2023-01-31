@@ -306,8 +306,8 @@ public class FileSystemDao implements BatchDao
         if (!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
             throw new BatchNotFoundException(batchId.getValue());
         }
-        for (String batchThread : listOfInProgressBatches) {
-            InProgressMetrics inProgressMetrics = new InProgressMetrics();
+        for (final String batchThread : listOfInProgressBatches) {
+            final InProgressMetrics inProgressMetrics = new InProgressMetrics();
             if (!batchThread.contains(ServiceIdentifier.getServiceId())) {
                 batchProgressTracker.putAll(batchPathProvider.monitorBatchProgressOfDifferentServices(batchThread));
             }

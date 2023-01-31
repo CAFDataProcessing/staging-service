@@ -131,14 +131,14 @@ public class BatchPathProvider
     {
         final Tracker tracker = new Tracker();
         final Map<String, Tracker> trackerMap = new HashMap<>();
-        for (Path batch : inProgressBatchesOfDifferentServices) {
+        for (final Path batch : inProgressBatchesOfDifferentServices) {
             final long size = getBatchSize(batch);
             trackProgress(threadID, tracker, trackerMap, size, batch);
         }
         return trackerMap;
     }
 
-    private static Instant getLastModified(Path p) throws IOException
+    private static Instant getLastModified(final Path p) throws IOException
     {
         return Files.readAttributes(p, BasicFileAttributes.class).lastModifiedTime().toInstant();
     }
@@ -146,9 +146,9 @@ public class BatchPathProvider
     public List<String> getListOfInProgressThreadFromFileSystem(final TenantId tenantId, final BatchId batchId)
     {
         final Path inProgressPath = getTenantInprogressDirectory(tenantId);
-        List<String> list = new ArrayList<>();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(inProgressPath)) {
-            for (Path batch : directoryStream) {
+        final List<String> list = new ArrayList<>();
+        try (final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(inProgressPath)) {
+            for (final Path batch : directoryStream) {
                 if (BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue())) {
                     list.add(BatchNameProvider.extractThreadIDAndServiceID(batch.getFileName().toString()));
                     if (!batch.getFileName().toString().contains(ServiceIdentifier.getServiceId())) {
@@ -156,7 +156,7 @@ public class BatchPathProvider
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("Error while traversing In-progress folder for the tenant: " + tenantId.getValue(), e);
         }
         return list;
@@ -175,9 +175,9 @@ public class BatchPathProvider
     private long getBatchSize(final Path batch)
     {
         long size = 0;
-        try (Stream<Path> filePath = Files.list(batch)) {
+        try (final Stream<Path> filePath = Files.list(batch)) {
             size = filePath.mapToLong(file -> file.toFile().length()).sum();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.info(MOVED_TO_PROGRESS, e);
         }
         return size;
@@ -191,29 +191,29 @@ public class BatchPathProvider
         final Path batch
     ) throws InterruptedException
     {
-        try (Stream<Path> files = Files.list(batch)) {
-            Optional<Path> lastModifiedFile = files.max(Comparator.comparing(path -> {
+        try (final Stream<Path> files = Files.list(batch)) {
+            final Optional<Path> lastModifiedFile = files.max(Comparator.comparing(path -> {
                 Instant instant = Instant.now();
                 try {
                     instant = BatchPathProvider.getLastModified(path);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     LOGGER.info(MOVED_TO_PROGRESS, e);
                 }
                 return instant;
             }));
             if (lastModifiedFile.isPresent()) {
-                Path file = lastModifiedFile.get();
+                final Path file = lastModifiedFile.get();
                 /*Check the file system and see differences between last modified time
                 by making thread sleep for 1 second to confirm if upload is progressing*/
-                Instant prevTime = getLastModified(file);
+                final Instant prevTime = getLastModified(file);
                 Thread.sleep(1000);
-                Instant currTime = getLastModified(file);
+                final Instant currTime = getLastModified(file);
                 tracker.setProgressing(ChronoUnit.MILLIS.between(prevTime, currTime) > 0);
                 tracker.setLastModifiedTime(currTime);
                 tracker.setNumberOfBytesReceived(size);
                 trackerMap.put(threadID, tracker);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.info(MOVED_TO_PROGRESS, e);
         }
     }

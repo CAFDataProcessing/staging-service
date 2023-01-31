@@ -72,15 +72,15 @@ public final class BatchProgressTracker
         @Override
         public void update(final long totalBytesRead, final long contentLength, final int item)
         {
-            long totalBytesInMBytes = totalBytesRead / 1_048_576;
+            final long totalBytesInMBytes = totalBytesRead / 1_048_576;
             if (megaBytes == totalBytesInMBytes) {
                 return;
             }
             megaBytes = totalBytesInMBytes;
-            Instant now = Instant.now();
-            long diff = ChronoUnit.MILLIS.between(tracker.getUploadStartTime(), now);
+            final Instant now = Instant.now();
+            final long diff = ChronoUnit.MILLIS.between(tracker.getUploadStartTime(), now);
             if (diff > 0) {
-                long speed = Math.floorDiv(totalBytesRead, diff);
+                final long speed = Math.floorDiv(totalBytesRead, diff);
                 tracker.setFileUploadRateInBytesPerSecond(speed * 1000);
                 tracker.setNumberOfBytesReceived(totalBytesRead);
                 tracker.setLastModifiedTime(now);
