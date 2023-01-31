@@ -22,6 +22,7 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathPro
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.io.FileUtils;

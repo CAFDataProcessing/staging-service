@@ -22,6 +22,7 @@ import com.github.cafdataprocessing.services.staging.client.MultiPartContent;
 import com.github.cafdataprocessing.services.staging.client.MultiPartDocument;
 import com.github.cafdataprocessing.services.staging.client.StagingApi;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchList;
+import com.github.cafdataprocessing.services.staging.client.StagingBatchStatusResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +32,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import com.github.cafdataprocessing.services.staging.client.StagingBatchStatusResponse;
 
 public class StagingServiceIT
 {

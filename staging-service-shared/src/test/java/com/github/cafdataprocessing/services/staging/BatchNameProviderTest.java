@@ -15,13 +15,13 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchNameProvider;
+import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
+import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
-import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchNameProvider;
-import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 
 public final class BatchNameProviderTest
 {

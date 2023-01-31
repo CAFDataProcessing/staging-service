@@ -15,13 +15,12 @@
  */
 package com.github.cafdataprocessing.services.staging.utils;
 
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 public final class BatchProgressTracker
 {
