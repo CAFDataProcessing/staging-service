@@ -41,6 +41,7 @@ public interface BatchDao
 
     void cleanUpStaleInprogressBatches();
 
-    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId) throws BatchNotFoundException, StagingException, InterruptedException;
+    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId)
+        throws BatchNotFoundException, StagingException, InterruptedException;
 
 }

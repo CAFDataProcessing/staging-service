@@ -61,8 +61,8 @@ public final class BatchNameProvider
 
     public static String getBatchId(final String fileName)
     {
-        final int endOfThreadId = fileName.indexOf('-',23);
-        return fileName.substring(fileName.indexOf('-', endOfThreadId+1)+1);
+        final int endOfThreadId = fileName.indexOf('-', 23);
+        return fileName.substring(fileName.indexOf('-', endOfThreadId + 1) + 1);
     }
 
     private static String reverseCleanseTimeString(final String timeString)
@@ -83,9 +83,9 @@ public final class BatchNameProvider
     {
         //Example File name: 2022-11-11T132455.509Z-28-2726eec0-test-batch10
         //return: 28-2726eec0  || ThreadID-ServiceID
-        final int endOfThreadId = fileName.indexOf('-',23);
-        final String threadID = fileName.substring(23,endOfThreadId);
-        final String serviceID = fileName.substring(endOfThreadId+1, fileName.indexOf('-',endOfThreadId+1));
+        final int endOfThreadId = fileName.indexOf('-', 23);
+        final String threadID = fileName.substring(23, endOfThreadId);
+        final String serviceID = fileName.substring(endOfThreadId + 1, fileName.indexOf('-', endOfThreadId + 1));
         return new ExtractedThreadAndServiceIDs(threadID, serviceID).getCombinedIDs();
     }
 }

@@ -131,7 +131,7 @@ public class BatchPathProvider
     {
         final Tracker tracker = new Tracker();
         final Map<String, Tracker> trackerMap = new HashMap<>();
-        for (Path batch: inProgressBatchesOfDifferentServices) {
+        for (Path batch : inProgressBatchesOfDifferentServices) {
             final long size = getBatchSize(batch);
             trackProgress(threadID, tracker, trackerMap, size, batch);
         }
@@ -147,26 +147,27 @@ public class BatchPathProvider
     {
         final Path inProgressPath = getTenantInprogressDirectory(tenantId);
         List<String> list = new ArrayList<>();
-        try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(inProgressPath)){
-            for (Path batch: directoryStream)
-            {
-                if(BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue()))
-                {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(inProgressPath)) {
+            for (Path batch : directoryStream) {
+                if (BatchNameProvider.getBatchId(batch.getFileName().toString()).equals(batchId.getValue())) {
                     list.add(BatchNameProvider.extractThreadIDAndServiceID(batch.getFileName().toString()));
-                    if(!batch.getFileName().toString().contains(ServiceIdentifier.getServiceId()))
-                    {
+                    if (!batch.getFileName().toString().contains(ServiceIdentifier.getServiceId())) {
                         inProgressBatchesOfDifferentServices.add(batch);
                     }
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Error while traversing In-progress folder for the tenant: "+ tenantId.getValue(), e);
+            LOGGER.error("Error while traversing In-progress folder for the tenant: " + tenantId.getValue(), e);
         }
         return list;
     }
 
-    public static Path getStorageRefFolderPathForBatch(final TenantId tenantId, final BatchId batchId, final String storePath,
-                                                       final String contentFolder)
+    public static Path getStorageRefFolderPathForBatch(
+        final TenantId tenantId,
+        final BatchId batchId,
+        final String storePath,
+        final String contentFolder
+    )
     {
         return (new BatchPathProvider(storePath)).getPathForBatch(tenantId, batchId).resolve(contentFolder);
     }
@@ -182,14 +183,20 @@ public class BatchPathProvider
         return size;
     }
 
-    private void trackProgress(final String threadID, final Tracker tracker, final Map<String, Tracker> trackerMap, final long size, final Path batch) throws InterruptedException
+    private void trackProgress(
+        final String threadID,
+        final Tracker tracker,
+        final Map<String, Tracker> trackerMap,
+        final long size,
+        final Path batch
+    ) throws InterruptedException
     {
         try (Stream<Path> files = Files.list(batch)) {
             Optional<Path> lastModifiedFile = files.max(Comparator.comparing(path -> {
                 Instant instant = Instant.now();
-                try{
+                try {
                     instant = BatchPathProvider.getLastModified(path);
-                } catch (IOException e){
+                } catch (IOException e) {
                     LOGGER.info(MOVED_TO_PROGRESS, e);
                 }
                 return instant;
@@ -210,6 +217,7 @@ public class BatchPathProvider
             LOGGER.info(MOVED_TO_PROGRESS, e);
         }
     }
+
     private static final class UnexpectedInvalidBasePathException extends RuntimeException
     {
         public UnexpectedInvalidBasePathException(final String basePath)

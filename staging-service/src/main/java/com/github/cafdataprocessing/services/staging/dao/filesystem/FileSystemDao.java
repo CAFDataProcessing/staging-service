@@ -57,7 +57,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-
 @EnableScheduling
 public class FileSystemDao implements BatchDao
 {
@@ -292,7 +291,9 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId) throws BatchNotFoundException, InterruptedException {
+    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId)
+        throws BatchNotFoundException, InterruptedException
+    {
         final BatchStatusResponse responseBean = new BatchStatusResponse();
         responseBean.setBatchId(batchId.getValue());
         final BatchStatus batchStatus = new BatchStatus();
@@ -302,7 +303,7 @@ public class FileSystemDao implements BatchDao
         final List<InProgressMetrics> inProgressMetricsList = new ArrayList<>();
         //get threadIDs for requested batchId from filesystem
         final List<String> listOfInProgressBatches = batchPathProvider.getListOfInProgressThreadFromFileSystem(tenantId, batchId);
-        if(!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
+        if (!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
             throw new BatchNotFoundException(batchId.getValue());
         }
         for (String batchThread : listOfInProgressBatches) {

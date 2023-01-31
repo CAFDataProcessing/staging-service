@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class BatchProgressTracker
 {
-
     private static final ConcurrentHashMap<String, Tracker> inProgressTrackerMap = new ConcurrentHashMap<>();
 
     public void updateTracker(final ServletFileUpload fileUpload)
@@ -35,7 +34,7 @@ public final class BatchProgressTracker
 
     public void remove(final long threadId, final String serviceId)
     {
-        inProgressTrackerMap.remove(threadId+"-"+serviceId);
+        inProgressTrackerMap.remove(threadId + "-" + serviceId);
     }
 
     public void putAll(final Map<String, Tracker> tempMap)
@@ -45,7 +44,7 @@ public final class BatchProgressTracker
 
     public void removeTrackerOfDifferentService()
     {
-        inProgressTrackerMap.entrySet().removeIf(entry ->!entry.getKey().contains(ServiceIdentifier.getServiceId()));
+        inProgressTrackerMap.entrySet().removeIf(entry -> !entry.getKey().contains(ServiceIdentifier.getServiceId()));
     }
 
     public Tracker get(final String batchThread)
@@ -62,6 +61,7 @@ public final class BatchProgressTracker
     {
         private final Tracker tracker;
         private long megaBytes;
+
         public ProgressListenerImpl()
         {
             final Tracker newTracker = new Tracker();
@@ -69,19 +69,18 @@ public final class BatchProgressTracker
             this.tracker = newTracker;
             this.megaBytes = -1;
         }
+
         @Override
         public void update(final long totalBytesRead, final long contentLength, final int item)
         {
             long totalBytesInMBytes = totalBytesRead / 1_048_576;
-            if (megaBytes == totalBytesInMBytes)
-            {
+            if (megaBytes == totalBytesInMBytes) {
                 return;
             }
             megaBytes = totalBytesInMBytes;
             Instant now = Instant.now();
             long diff = ChronoUnit.MILLIS.between(tracker.getUploadStartTime(), now);
-            if (diff > 0)
-            {
+            if (diff > 0) {
                 long speed = Math.floorDiv(totalBytesRead, diff);
                 tracker.setFileUploadRateInBytesPerSecond(speed * 1000);
                 tracker.setNumberOfBytesReceived(totalBytesRead);
@@ -92,4 +91,3 @@ public final class BatchProgressTracker
         }
     }
 }
-

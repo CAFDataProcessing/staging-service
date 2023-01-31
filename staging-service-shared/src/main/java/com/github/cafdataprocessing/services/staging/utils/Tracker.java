@@ -23,10 +23,10 @@ public final class Tracker
     private Long numberOfBytesReceived;
     private Long fileUploadRateInBytesPerSecond;
     private Instant uploadStartTime;
-
     private boolean isProgressing;
 
-    public Tracker() {
+    public Tracker()
+    {
         this.lastModifiedTime = null;
         this.numberOfBytesReceived = null;
         this.fileUploadRateInBytesPerSecond = null;
@@ -87,12 +87,12 @@ public final class Tracker
     @Override
     public String toString()
     {
-        return "Tracker{" +
-                "lastModifiedTime=" + lastModifiedTime +
-                ", numberOfBytesReceived=" + numberOfBytesReceived +
-                ", fileUploadRateInBytesPerSecond=" + fileUploadRateInBytesPerSecond +
-                ", uploadStartTime=" + uploadStartTime +
-                ", isProgressing=" + isProgressing +
-                '}';
+        return "Tracker{"
+            + "lastModifiedTime=" + lastModifiedTime
+            + ", numberOfBytesReceived=" + numberOfBytesReceived
+            + ", fileUploadRateInBytesPerSecond=" + fileUploadRateInBytesPerSecond
+            + ", uploadStartTime=" + uploadStartTime
+            + ", isProgressing=" + isProgressing
+            + '}';
     }
 }

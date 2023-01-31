@@ -436,7 +436,7 @@ public class FileSystemDaoTest
     {
         final BatchId batchIdInProgress = new BatchId("test-batch-inprogress");
         final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
-        Files.createDirectories(Paths.get(inProgressDirectoryName, "/"+BatchNameProvider.getBatchDirectoryName(batchIdInProgress)));
+        Files.createDirectories(Paths.get(inProgressDirectoryName, "/" + BatchNameProvider.getBatchDirectoryName(batchIdInProgress)));
         BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdInProgress);
         assertFalse(response.getBatchStatus().isBatchComplete());
         final BatchId batchIdCompleted = new BatchId("test-batch-completed");

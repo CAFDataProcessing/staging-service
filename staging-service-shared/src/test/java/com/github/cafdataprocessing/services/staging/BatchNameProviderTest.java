@@ -23,10 +23,11 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchNamePro
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 
-public final class BatchNameProviderTest {
-
+public final class BatchNameProviderTest
+{
     @Test
-    void testValidBatchId() {
+    void testValidBatchId()
+    {
         try {
             final String id = "abc-xyz";
             final BatchId bid = new BatchId(id);
@@ -40,7 +41,8 @@ public final class BatchNameProviderTest {
     }
 
     @Test
-    void testValidBatchIdLikeServiceId() {
+    void testValidBatchIdLikeServiceId()
+    {
         try {
             final String id = ServiceIdentifier.getServiceId();
             final BatchId bid = new BatchId(id);
@@ -54,7 +56,8 @@ public final class BatchNameProviderTest {
     }
 
     @Test
-    void testValidLongerBatchId() {
+    void testValidLongerBatchId()
+    {
         try {
             final String id = "pqr-abc-xyz";
             final BatchId bid = new BatchId(id);
@@ -68,11 +71,12 @@ public final class BatchNameProviderTest {
     }
 
     @Test
-    void testInvalidBatchId() {
+    void testInvalidBatchId()
+    {
         assertThrows(
             InvalidBatchIdException.class,
             () -> new BatchId("abc.."),
             "Expected InvalidBatchIdException"
         );
-     }
+    }
 }

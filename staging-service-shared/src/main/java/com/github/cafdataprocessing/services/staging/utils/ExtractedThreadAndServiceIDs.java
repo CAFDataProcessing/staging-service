@@ -15,32 +15,39 @@
  */
 package com.github.cafdataprocessing.services.staging.utils;
 
-public final class ExtractedThreadAndServiceIDs {
+public final class ExtractedThreadAndServiceIDs
+{
     private String threadID;
     private String serviceID;
 
-    public ExtractedThreadAndServiceIDs(final String threadID, final String serviceID) {
+    public ExtractedThreadAndServiceIDs(final String threadID, final String serviceID)
+    {
         this.threadID = threadID;
         this.serviceID = serviceID;
     }
 
-    public String getThreadID() {
+    public String getThreadID()
+    {
         return threadID;
     }
 
-    public void setThreadID(final String threadID) {
+    public void setThreadID(final String threadID)
+    {
         this.threadID = threadID;
     }
 
-    public String getServiceID() {
+    public String getServiceID()
+    {
         return serviceID;
     }
 
-    public void setServiceID(final String serviceID) {
+    public void setServiceID(final String serviceID)
+    {
         this.serviceID = serviceID;
     }
 
-    public String getCombinedIDs(){
-        return this.threadID+"-"+this.serviceID;
+    public String getCombinedIDs()
+    {
+        return this.threadID + "-" + this.serviceID;
     }
 }
