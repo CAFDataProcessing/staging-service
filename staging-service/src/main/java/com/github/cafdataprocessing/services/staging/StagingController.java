@@ -16,13 +16,12 @@
 package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.statusreporting.BatchProgressListener;
 import com.github.cafdataprocessing.services.staging.exceptions.*;
 import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
-import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
 import java.util.List;
@@ -87,29 +86,40 @@ public class StagingController implements StagingApi
         @PathVariable("batchId") String batchId,
         HttpServletRequest request)
     {
-
-        final ServletFileUpload fileUpload = new ServletFileUpload();
-        final BatchProgressTracker batchProgressTracker = new BatchProgressTracker();
-        batchProgressTracker.updateTracker(fileUpload);
-        final FileItemIterator fileItemIterator;
+        final TenantId tenantId;
+        final BatchId batchIdObj;
         try {
-            fileItemIterator = fileUpload.getItemIterator(request);
-        } catch (final FileUploadException | IOException ex) {
-            LOGGER.error("Error getting FileItemIterator", ex);
+            tenantId = new TenantId(X_TENANT_ID);
+            batchIdObj = new BatchId(batchId);
+        } catch (final InvalidTenantIdException ex) {
+            LOGGER.error("Invalid X-TENANT-ID", ex);
+            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (final InvalidBatchIdException ex) {
+            LOGGER.error("Invalid batchId", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-        try {
-            batchDao.saveFiles(new TenantId(X_TENANT_ID), new BatchId(batchId), fileItemIterator);
-            LOGGER.debug("Staged batch: {}", batchId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (final InvalidTenantIdException | InvalidBatchIdException | IncompleteBatchException | InvalidBatchException ex) {
-            LOGGER.error("Error getting multipart files", ex);
-            throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
 
-        } catch (final StagingException ex) {
-            throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        } finally {
-            batchProgressTracker.remove(Thread.currentThread().getId(), ServiceIdentifier.getServiceId());
+        try (final BatchProgressListener batchProgressListener = new BatchProgressListener(tenantId, batchIdObj)) {
+            final ServletFileUpload fileUpload = new ServletFileUpload();
+            fileUpload.setProgressListener(batchProgressListener);
+            final FileItemIterator fileItemIterator;
+            try {
+                fileItemIterator = fileUpload.getItemIterator(request);
+            } catch (final FileUploadException | IOException ex) {
+                LOGGER.error("Error getting FileItemIterator", ex);
+                throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+            }
+            try {
+                batchDao.saveFiles(tenantId, batchIdObj, fileItemIterator);
+                LOGGER.debug("Staged batch: {}", batchId);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (final IncompleteBatchException | InvalidBatchException ex) {
+                LOGGER.error("Error getting multipart files", ex);
+                throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
+
+            } catch (final StagingException ex) {
+                throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+            }
         }
     }
 
@@ -150,19 +160,19 @@ public class StagingController implements StagingApi
             final BatchStatusResponse statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(statusResponse);
         } catch (final InvalidTenantIdException ex) {
-            LOGGER.error("Invalid X-TENANT-ID.", ex);
+            LOGGER.error("Invalid X-TENANT-ID", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final InvalidBatchIdException ex) {
-            LOGGER.error("Invalid Batch Id.", ex);
+            LOGGER.error("Invalid Batch Id", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final BatchNotFoundException ex) {
-            LOGGER.error("Batch not found.", ex);
+            LOGGER.error("Batch not found", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
         } catch (final StagingException ex) {
-            LOGGER.error("Internal server error.", ex);
+            LOGGER.error("Internal server error", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         } catch (final InterruptedException ex) {
-            LOGGER.error("Service Unavailable.", ex);
+            LOGGER.error("Service Unavailable", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
         }
     }

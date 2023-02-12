@@ -17,7 +17,6 @@ package com.github.cafdataprocessing.services.staging.dao;
 
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
-import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchNameProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
@@ -37,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -434,15 +432,10 @@ public class FileSystemDaoTest
     @Test
     public void getBatchStatusTest() throws Exception
     {
-        final BatchId batchIdInProgress = new BatchId("test-batch-inprogress");
-        final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
-        Files.createDirectories(Paths.get(inProgressDirectoryName, "/" + BatchNameProvider.getBatchDirectoryName(batchIdInProgress)));
-        BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdInProgress);
-        assertFalse(response.getBatchStatus().isBatchComplete());
         final BatchId batchIdCompleted = new BatchId("test-batch-completed");
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
         Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
-        response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
+        final BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
         assertTrue(response.getBatchStatus().isBatchComplete());
     }
 
@@ -462,8 +455,4 @@ public class FileSystemDaoTest
         return uuid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     }
 
-    private String getInProgressBatchDir(final TenantId tenantId, final String baseDir) throws Exception
-    {
-        return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.INPROGRESS_FOLDER)).toString();
-    }
 }

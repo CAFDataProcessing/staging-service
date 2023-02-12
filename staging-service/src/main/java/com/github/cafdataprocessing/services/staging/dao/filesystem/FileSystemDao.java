@@ -18,18 +18,13 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.statusreporting.BatchStatusProvider;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
-import com.github.cafdataprocessing.services.staging.models.BatchStatus;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
-import com.github.cafdataprocessing.services.staging.models.InProgress;
-import com.github.cafdataprocessing.services.staging.models.InProgressMetrics;
-import com.github.cafdataprocessing.services.staging.utils.BatchProgressTracker;
-import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import com.github.cafdataprocessing.services.staging.utils.Tracker;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,19 +62,20 @@ public class FileSystemDao implements BatchDao
     private static final String CONTENT_FILES = "files";
 
     private final BatchPathProvider batchPathProvider;
+    private final BatchStatusProvider batchStatusProvider;
     private final int subbatchSize;
     private final String storagePath;
     private final String basePath;
     private final int fieldValueSizeThreshold;
     private final long fileAgeThreshold;
     private final boolean skipBatchFileCleanup;
-    private final BatchProgressTracker batchProgressTracker = new BatchProgressTracker();
 
     public FileSystemDao(final String basePath, final int subbatchSize,
                          final String storagePath, final int fieldValueSizeThreshold,
                          final long fileAgeThreshold, final boolean skipBatchFileCleanup)
     {
         batchPathProvider = new BatchPathProvider(basePath);
+        this.batchStatusProvider = new BatchStatusProvider(batchPathProvider);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
         this.basePath = basePath;
@@ -292,41 +288,9 @@ public class FileSystemDao implements BatchDao
 
     @Override
     public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId)
-        throws BatchNotFoundException, InterruptedException
+        throws BatchNotFoundException, StagingException, InterruptedException
     {
-        final BatchStatusResponse responseBean = new BatchStatusResponse();
-        responseBean.setBatchId(batchId.getValue());
-        final BatchStatus batchStatus = new BatchStatus();
-        final InProgress inProgress = new InProgress();
-        final boolean batchInCompletedState = batchPathProvider.getPathForBatch(tenantId, batchId).toFile().exists();
-        batchStatus.setBatchComplete(batchInCompletedState);
-        final List<InProgressMetrics> inProgressMetricsList = new ArrayList<>();
-        //get threadIDs for requested batchId from filesystem
-        final List<String> listOfInProgressBatches = batchPathProvider.getListOfInProgressThreadFromFileSystem(tenantId, batchId);
-        if (!batchInCompletedState && listOfInProgressBatches.isEmpty()) {
-            throw new BatchNotFoundException(batchId.getValue());
-        }
-        for (final String batchThread : listOfInProgressBatches) {
-            final InProgressMetrics inProgressMetrics = new InProgressMetrics();
-            if (!batchThread.contains(ServiceIdentifier.getServiceId())) {
-                batchProgressTracker.putAll(batchPathProvider.monitorBatchProgressOfDifferentServices(batchThread));
-            }
-            final Tracker tracker = batchProgressTracker.get(batchThread);
-            if (tracker != null) {
-                inProgressMetrics.setLastModifiedDate(tracker.getLastModifiedTime());
-                inProgressMetrics.setBytesReceived(tracker.getNumberOfBytesReceived());
-                inProgressMetrics.setBytesPerSecond(tracker.getFileUploadRateInBytesPerSecond());
-                inProgressMetrics.setIsProgressing(tracker.isProgressing());
-                inProgressMetricsList.add(inProgressMetrics);
-            }
-        }
-        // Remove the entry from TrackerMap for batch processed by different staging service
-        batchProgressTracker.removeTrackerOfDifferentService();
-        // Build and return the Response
-        inProgress.setMetrics(inProgressMetricsList);
-        batchStatus.setInProgress(inProgress);
-        responseBean.setBatchStatus(batchStatus);
-        return responseBean;
+        return batchStatusProvider.getStatus(tenantId, batchId);
     }
 
     private boolean checkAllSubfilesSafely(final Path path)

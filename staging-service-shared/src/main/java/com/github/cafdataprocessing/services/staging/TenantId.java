@@ -17,7 +17,7 @@ package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 
-public class TenantId
+public final class TenantId implements Comparable<TenantId>
 {
     private final String value;
 
@@ -32,6 +32,30 @@ public class TenantId
     public String getValue()
     {
         return value;
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (!(obj instanceof TenantId)) {
+            return false;
+        }
+
+        final TenantId other = (TenantId) obj;
+
+        return value.equals(other.value);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return value.hashCode();
+    }
+
+    @Override
+    public int compareTo(final TenantId other)
+    {
+        return value.compareTo(other.value);
     }
 
     @Override
