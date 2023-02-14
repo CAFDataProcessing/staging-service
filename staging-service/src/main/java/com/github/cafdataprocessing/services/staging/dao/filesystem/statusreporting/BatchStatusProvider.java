@@ -100,7 +100,7 @@ public final class BatchStatusProvider
         return response;
     }
 
-    private List<Path> getOtherServicesInProgressBatchDirectories(final TenantId tenantId, final BatchId batchId)
+    private List<Path> getOtherServicesInProgressBatchDirectories(final TenantId tenantId, final BatchId batchId) throws StagingException
     {
         final Path tenantInProgressDir = batchPathProvider.getTenantInprogressDirectory(tenantId);
         final String batchIdStr = batchId.getValue();
@@ -114,6 +114,7 @@ public final class BatchStatusProvider
             }
         } catch (final IOException e) {
             LOGGER.error("Error while traversing In-progress folder for the tenant: " + tenantId, e);
+            throw new StagingException("Error while traversing In-progress folder for the tenant: "+tenantId, e);
         }
         return list;
     }
