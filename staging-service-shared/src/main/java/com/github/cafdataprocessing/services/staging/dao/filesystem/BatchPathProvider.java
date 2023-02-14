@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class BatchPathProvider
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchPathProvider.class);
-    private static final String INPROGRESS_FOLDER = "in_progress";
+    public static final String INPROGRESS_FOLDER = "in_progress";
     public static final String COMPLETED_FOLDER = "completed";
 
     private final Path basePath;

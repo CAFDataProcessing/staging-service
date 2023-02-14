@@ -433,7 +433,9 @@ public class FileSystemDaoTest
     public void getBatchStatusTest() throws Exception
     {
         final BatchId batchIdCompleted = new BatchId("test-batch-completed");
+        final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
         final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
+        Files.createDirectories(Paths.get(inProgressDirectoryName, "/test-batch-inprogress"));
         Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
         final BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
         assertTrue(response.getBatchStatus().isBatchComplete());
@@ -444,6 +446,10 @@ public class FileSystemDaoTest
         return Files.createTempDirectory(BATCH_BASE_FOLDER).toString();
     }
 
+    private String getInProgressBatchDir(final TenantId tenantId, final String baseDir) throws Exception
+    {
+        return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.INPROGRESS_FOLDER)).toString();
+    }
     private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception
     {
         return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
