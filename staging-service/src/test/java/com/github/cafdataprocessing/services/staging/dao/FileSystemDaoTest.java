@@ -450,6 +450,7 @@ public class FileSystemDaoTest
     {
         return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.INPROGRESS_FOLDER)).toString();
     }
+
     private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception
     {
         return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.COMPLETED_FOLDER)).toString();
