@@ -113,9 +113,8 @@ public final class BatchStatusProvider
                     list.add(batch);
                 }
             }
-        } catch (final IOException e) {
-            LOGGER.error("Error while traversing In-progress folder for the tenant: " + tenantId, e);
-            throw new StagingException("Error while traversing In-progress folder for the tenant: " + tenantId, e);
+        } catch (final IOException ex) {
+            throw new StagingException("Error while traversing in-progress folder", ex);
         }
         return list;
     }
