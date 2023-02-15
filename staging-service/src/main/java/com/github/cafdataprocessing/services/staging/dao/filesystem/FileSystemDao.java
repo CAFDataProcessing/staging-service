@@ -18,11 +18,13 @@ package com.github.cafdataprocessing.services.staging.dao.filesystem;
 import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
+import com.github.cafdataprocessing.services.staging.dao.filesystem.statusreporting.BatchStatusProvider;
 import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundException;
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +62,7 @@ public class FileSystemDao implements BatchDao
     private static final String CONTENT_FILES = "files";
 
     private final BatchPathProvider batchPathProvider;
+    private final BatchStatusProvider batchStatusProvider;
     private final int subbatchSize;
     private final String storagePath;
     private final String basePath;
@@ -72,6 +75,7 @@ public class FileSystemDao implements BatchDao
                          final long fileAgeThreshold, final boolean skipBatchFileCleanup)
     {
         batchPathProvider = new BatchPathProvider(basePath);
+        this.batchStatusProvider = new BatchStatusProvider(batchPathProvider);
         this.subbatchSize = subbatchSize;
         this.storagePath = storagePath;
         this.basePath = basePath;
@@ -280,6 +284,13 @@ public class FileSystemDao implements BatchDao
         } catch (final IOException ex) {
             LOGGER.error("An exception occured trying to read the files in the base directory.", ex);
         }
+    }
+
+    @Override
+    public BatchStatusResponse getBatchStatus(final TenantId tenantId, final BatchId batchId)
+        throws BatchNotFoundException, StagingException, InterruptedException
+    {
+        return batchStatusProvider.getStatus(tenantId, batchId);
     }
 
     private boolean checkAllSubfilesSafely(final Path path)

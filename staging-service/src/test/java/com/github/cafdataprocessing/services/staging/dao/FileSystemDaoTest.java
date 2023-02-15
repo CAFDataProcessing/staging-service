@@ -21,6 +21,7 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathPro
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -428,9 +429,26 @@ public class FileSystemDaoTest
         assertEquals(0, batchesAfterDelete.size());
     }
 
+    @Test
+    public void getBatchStatusTest() throws Exception
+    {
+        final BatchId batchIdCompleted = new BatchId("test-batch-completed");
+        final String inProgressDirectoryName = getInProgressBatchDir(tenantId, baseDirName);
+        final String completedDirectoryName = getCompletedBatchDir(tenantId, baseDirName);
+        Files.createDirectories(Paths.get(inProgressDirectoryName, "/test-batch-inprogress"));
+        Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
+        final BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
+        assertTrue(response.getBatchStatus().isBatchComplete());
+    }
+
     private String getTempBaseBatchDir() throws Exception
     {
         return Files.createTempDirectory(BATCH_BASE_FOLDER).toString();
+    }
+
+    private String getInProgressBatchDir(final TenantId tenantId, final String baseDir) throws Exception
+    {
+        return Files.createDirectories(Paths.get(baseDir, tenantId.getValue(), BatchPathProvider.INPROGRESS_FOLDER)).toString();
     }
 
     private String getCompletedBatchDir(final TenantId tenantId, final String baseDir) throws Exception

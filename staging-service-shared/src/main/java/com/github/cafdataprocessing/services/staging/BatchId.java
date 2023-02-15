@@ -17,7 +17,7 @@ package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 
-public class BatchId
+public final class BatchId implements Comparable<BatchId>
 {
     private final String value;
 
@@ -32,6 +32,30 @@ public class BatchId
     public String getValue()
     {
         return value;
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (!(obj instanceof BatchId)) {
+            return false;
+        }
+
+        final BatchId other = (BatchId) obj;
+
+        return value.equals(other.value);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return value.hashCode();
+    }
+
+    @Override
+    public int compareTo(final BatchId other)
+    {
+        return value.compareTo(other.value);
     }
 
     @Override

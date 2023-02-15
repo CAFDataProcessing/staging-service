@@ -21,6 +21,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.BatchNotFoundExc
 import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
+import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -39,5 +40,8 @@ public interface BatchDao
     void deleteBatch(TenantId tenantId, @Size(min = 1) BatchId BatchId) throws BatchNotFoundException, StagingException;
 
     void cleanUpStaleInprogressBatches();
+
+    BatchStatusResponse getBatchStatus(TenantId tenantId, @Size(max = 1) BatchId batchId)
+        throws BatchNotFoundException, StagingException, InterruptedException;
 
 }

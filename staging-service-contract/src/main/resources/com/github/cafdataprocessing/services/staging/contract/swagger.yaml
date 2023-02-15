@@ -144,6 +144,39 @@ paths:
           description: The batch does not exist.
         "500":
           description: The request failed due to an unexpected server error.
+  "/batchStatus":
+    parameters:
+      - in: header
+        name: X-TENANT-ID
+        description: Identifies the tenant making the request.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+        required: true
+      - in: query
+        name: batchId
+        description: Identifies the batch.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    get:
+      tags:
+        - Staging
+      operationId: getBatchStatus
+      summary: Gets the upload status of the specified batch.
+      responses:
+        "200":
+          description: Successfully fetched the status of the batch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchStatusResponse"
+        "404":
+          description: The batch does not exist.
+        "500":
+          description: The request failed due to an unexpected server error.
 components:
   schemas:
     StatusResponse:
@@ -164,3 +197,46 @@ components:
           items:
             type: string
             description: The batch identifier
+    BatchStatusResponse:
+      title: BatchStatusResponse
+      description: The Response object with status of the batch
+      type: object
+      properties:
+        batchId:
+          type: string
+          description: ID of the batch
+        batchStatus:
+          $ref: '#/components/schemas/BatchStatus'
+    BatchStatus:
+      title: BatchStatus
+      description: The status of the batch
+      type: object
+      properties:
+        batchComplete:
+          type: boolean
+        inProgress:
+          $ref: '#/components/schemas/InProgress'
+    InProgress:
+      title: InProgress
+      type: object
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/InProgressMetrics'
+    InProgressMetrics:
+      title: InProgressMetrics
+      type: object
+      properties:
+        bytesReceived:
+          type: integer
+          format: int64
+        bytesPerSecond:
+          type: integer
+          format: int64
+          nullable: true
+        lastModifiedDate:
+          type: string
+          format: date-time
+        isProgressing:
+          type: boolean

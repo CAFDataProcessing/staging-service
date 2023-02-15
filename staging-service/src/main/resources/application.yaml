@@ -54,6 +54,8 @@ spring:
   servlet:
     multipart:
       enabled: false
+  jackson:
+    default-property-inclusion: non_null
 staging:
     basePath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
     subbatchSize: ${CAF_STAGING_SERVICE_SUBBATCH_SIZE:250}

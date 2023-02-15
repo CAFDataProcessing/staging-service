@@ -22,6 +22,7 @@ import com.github.cafdataprocessing.services.staging.client.MultiPartContent;
 import com.github.cafdataprocessing.services.staging.client.MultiPartDocument;
 import com.github.cafdataprocessing.services.staging.client.StagingApi;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchList;
+import com.github.cafdataprocessing.services.staging.client.StagingBatchStatusResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,6 +58,20 @@ public class StagingServiceIT
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+    }
+
+    @Test
+    public void uploadDocumentsToBatchAndGetStatusTest() throws Exception
+    {
+        final String tenantId = "tenant-test-batch8";
+        final String[] contentFiles = new String[]{"A_Christmas_Carol1.txt", "A_Christmas_Carol2.txt"};
+        final String[] documentFiles = new String[]{"batch8.json"};
+        final String batchId = "test-batch8";
+        stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
+        final StagingBatchStatusResponse batchStatus = stagingApi.getBatchStatus(tenantId, batchId);
+        assertTrue("Batch completed successfully", batchStatus.getBatchStatus().isBatchComplete());
+        final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
+        assertEquals("uploadDocumentsToBatchTest, 1 batch uploaded", 1, response.getEntries().size());
     }
 
     @Test
