@@ -269,13 +269,13 @@
                             <goal>start</goal>
                         </goals>
                     </execution>
-<!--                    <execution>-->
-<!--                        <id>stop</id>-->
-<!--                        <phase>post-integration-test</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>stop</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>upload-docker-container</id>
                         <phase>deploy</phase>
