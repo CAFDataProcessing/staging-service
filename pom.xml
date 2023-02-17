@@ -62,7 +62,7 @@
         <junit.jupiter.version>5.4.1</junit.jupiter.version>
         <hamcrest.version>1.3</hamcrest.version>
         <lombok.version>1.18.6</lombok.version>
-        <worker-document.version>5.2.0-US616155-SNAPSHOT</worker-document.version>
+        <worker-document.version>5.1.0-1038</worker-document.version>
     </properties>
 
     <dependencyManagement>
