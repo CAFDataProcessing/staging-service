@@ -269,13 +269,13 @@
                             <goal>start</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>stop</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>stop</id>-->
+<!--                        <phase>post-integration-test</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>stop</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
                     <execution>
                         <id>upload-docker-container</id>
                         <phase>deploy</phase>
@@ -475,6 +475,8 @@
                                     <CAF_RABBITMQ_USERNAME>guest</CAF_RABBITMQ_USERNAME>
                                     <CAF_RABBITMQ_PASSWORD>guest</CAF_RABBITMQ_PASSWORD>
                                     <CAF_WORKER_INPUT_QUEUE>ingestion-batch-in</CAF_WORKER_INPUT_QUEUE>
+                                    <CAF_LOG_LEVEL>DEBUG</CAF_LOG_LEVEL>
+                                    <CAF_WORKER_ENABLE_DIVERTED_TASK_CHECKING>false</CAF_WORKER_ENABLE_DIVERTED_TASK_CHECKING>
                                 </env>
                                 <volumes>
                                     <from>
