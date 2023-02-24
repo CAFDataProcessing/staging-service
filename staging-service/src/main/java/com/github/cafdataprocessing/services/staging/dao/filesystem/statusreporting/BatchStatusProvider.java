@@ -81,7 +81,7 @@ public final class BatchStatusProvider
             }
 
             if (inProgressReports.isEmpty()) {
-                throw new BatchNotFoundException(batchId.getValue());
+                throw new BatchNotFoundException("Batch '" +batchId.getValue()+ "' not found");
             }
         }
 
