@@ -29,7 +29,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class FieldValidatorTest {
+public class FieldValidatorTest
+{
     final static String FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
@@ -49,7 +50,7 @@ public class FieldValidatorTest {
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
         assertEquals("FIELD-NOT-ALLOWED-FAILURE", document.failures.get(0).failureId);
         assertEquals("INVALID_FIELD" + FAILURE_MESSAGE_SUFFIX,
-                document.failures.get(0).failureMessage);
+                     document.failures.get(0).failureMessage);
     }
 
     private DocumentWorkerDocument createDocument(Map<String, List<DocumentWorkerFieldValue>> documentFields)

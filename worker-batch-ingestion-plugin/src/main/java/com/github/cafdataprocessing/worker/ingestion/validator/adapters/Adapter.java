@@ -15,7 +15,6 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
 
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -24,15 +23,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
 
-public interface Adapter {
+public interface Adapter
+{
     Set<String> adapt(String file) throws AdapterException;
 
-    static String getFileContents(final String filePath) throws AdapterException {
+    static String getFileContents(final String filePath) throws AdapterException
+    {
         try {
             final InputStream inputStream = Files.newInputStream(Paths.get(filePath));
             final StringBuilder sb = new StringBuilder();
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            try ( BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     sb.append(line).append("\n");

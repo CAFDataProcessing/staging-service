@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FieldValidator {
+public class FieldValidator
+{
     final Set<String> allowedFields;
 
     public FieldValidator(final String validationFile) throws AdapterException
@@ -37,20 +38,20 @@ public class FieldValidator {
 
     public DocumentWorkerDocument validate(final DocumentWorkerDocument document)
     {
-        for(final Map.Entry<String, List<DocumentWorkerFieldValue>> pair : document.fields.entrySet()) {
+        for (final Map.Entry<String, List<DocumentWorkerFieldValue>> pair : document.fields.entrySet()) {
             boolean found = false;
-            for(final String allowedField : allowedFields) {
+            for (final String allowedField : allowedFields) {
                 if (pair.getKey().equals(allowedField)) {
                     found = true;
                     break;
                 }
             }
 
-            if(!found) {
+            if (!found) {
                 final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
                 fieldNotAllowedFailure.failureId = "FIELD-NOT-ALLOWED-FAILURE";
                 fieldNotAllowedFailure.failureMessage
-                        = String.format(pair.getKey() + " is not allowed to be set by the agent");
+                    = String.format(pair.getKey() + " is not allowed to be set by the agent");
                 document.failures = new ArrayList<>();
                 document.failures.add(fieldNotAllowedFailure);
                 document.fields.remove(pair.getKey());

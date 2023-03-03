@@ -24,8 +24,8 @@ public class AgentFieldAdapter implements Adapter
     /**
      * Purpose of this class is to have specific logic to turn the agentFields.json file into meaningful validation rules
      *
-     * ie - a list of actual fields that are allowed
-     * this isn't straight forward as there are some "flattened" fields etc. (OCR and METADATA_FILES)
+     * ie - a list of actual fields that are allowed this isn't straight forward as there are some "flattened" fields etc. (OCR and
+     * METADATA_FILES)
      */
 
     @Override
