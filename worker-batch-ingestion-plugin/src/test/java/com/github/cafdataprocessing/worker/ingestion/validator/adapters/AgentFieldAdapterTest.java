@@ -15,7 +15,6 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
 
-
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -24,7 +23,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AgentFieldAdapterTest {
+public class AgentFieldAdapterTest
+{
     private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test.json";
 
     @Test

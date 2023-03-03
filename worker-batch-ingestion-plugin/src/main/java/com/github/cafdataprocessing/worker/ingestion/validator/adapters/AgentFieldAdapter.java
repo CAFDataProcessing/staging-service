@@ -52,7 +52,7 @@ public class AgentFieldAdapter implements Adapter
         final Map<String, Set<String>> flattenedFields = new HashMap<>();
         for (String fieldKey : getFieldKeys()) {
             final JSONObject field = fieldsJsonObject.getJSONObject(fieldKey);
-            if(field.optString("objectEncoding").equals("flattened")) {
+            if (field.optString("objectEncoding").equals("flattened")) {
                 final JSONObject propertiesJsonObject = typesJsonObject.getJSONObject(fieldKey.toLowerCase());
                 flattenedFields.put(fieldKey, propertiesJsonObject.keySet());
             }
