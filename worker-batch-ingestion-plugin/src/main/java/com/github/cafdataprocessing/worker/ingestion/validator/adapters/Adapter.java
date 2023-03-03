@@ -21,11 +21,14 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Set;
 
 public interface Adapter
 {
-    Set<String> adapt(String file) throws AdapterException;
+    Set<String> getFieldKeys() throws AdapterException;
+
+    Map<String, Set<String>> getFlattenedFields();
 
     static String getFileContents(final String filePath) throws AdapterException
     {

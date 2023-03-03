@@ -32,8 +32,8 @@ public class FieldValidator
 
     public FieldValidator(final String validationFile) throws AdapterException
     {
-        AgentFieldAdapter adapter = new AgentFieldAdapter();
-        allowedFields = adapter.adapt(validationFile);
+        AgentFieldAdapter adapter = new AgentFieldAdapter(validationFile);
+        allowedFields = adapter.getFieldKeys();
     }
 
     public DocumentWorkerDocument validate(final DocumentWorkerDocument document)

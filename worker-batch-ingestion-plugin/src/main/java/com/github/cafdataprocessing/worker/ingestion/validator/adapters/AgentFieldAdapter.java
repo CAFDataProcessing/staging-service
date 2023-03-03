@@ -17,6 +17,8 @@ package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class AgentFieldAdapter implements Adapter
@@ -28,13 +30,33 @@ public class AgentFieldAdapter implements Adapter
      * METADATA_FILES)
      */
 
-    @Override
-    public Set<String> adapt(final String file) throws AdapterException
+    private final JSONObject fieldsJsonObject;
+    private final JSONObject typesJsonObject;
+
+    public AgentFieldAdapter(final String file) throws AdapterException
     {
         final JSONObject fileContents = new JSONObject(Adapter.getFileContents(file));
-        final JSONObject fields = new JSONObject(fileContents.optString("fields"));
-        return fields.keySet();
+        this.fieldsJsonObject = new JSONObject(fileContents.optString("fields"));
+        this.typesJsonObject = new JSONObject(fileContents.optString("types"));
+    }
 
-        // TODO - more logic to get all fields including flattened and nested
+    @Override
+    public Set<String> getFieldKeys()
+    {
+        return fieldsJsonObject.keySet();
+    }
+
+    @Override
+    public Map<String, Set<String>> getFlattenedFields()
+    {
+        final Map<String, Set<String>> flattenedFields = new HashMap<>();
+        for (String fieldKey : getFieldKeys()) {
+            final JSONObject field = fieldsJsonObject.getJSONObject(fieldKey);
+            if(field.optString("objectEncoding").equals("flattened")) {
+                final JSONObject propertiesJsonObject = typesJsonObject.getJSONObject(fieldKey.toLowerCase());
+                flattenedFields.put(fieldKey, propertiesJsonObject.keySet());
+            }
+        }
+        return flattenedFields;
     }
 }

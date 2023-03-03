@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
 import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AdapterException;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
@@ -31,12 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class FieldValidatorTest
 {
-    final static String FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
+    final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
     public void testFieldValidatorAgentFields() throws AdapterException
     {
-        final FieldValidator agentFieldValidator = new FieldValidator("target/test-classes/testAgentFields.json");
+        final FieldValidator agentFieldValidator = new FieldValidator("target/test-classes/validator/agentFields-test.json");
 
         final Map<String, List<DocumentWorkerFieldValue>> documentFields = new HashMap<>();
         documentFields.put("ACCOUNTS", Collections.singletonList(new DocumentWorkerFieldValue()));
@@ -49,7 +48,7 @@ public class FieldValidatorTest
         assertEquals(2, document.fields.size());
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
         assertEquals("FIELD-NOT-ALLOWED-FAILURE", document.failures.get(0).failureId);
-        assertEquals("INVALID_FIELD" + FAILURE_MESSAGE_SUFFIX,
+        assertEquals("INVALID_FIELD" + AGENT_FAILURE_MESSAGE_SUFFIX,
                      document.failures.get(0).failureMessage);
     }
 
