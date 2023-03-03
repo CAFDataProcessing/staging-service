@@ -20,6 +20,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,29 +28,55 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
-    final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
+    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test.json";
+    private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
     public void testFieldValidatorAgentFields() throws AdapterException
     {
-        final FieldValidator agentFieldValidator = new FieldValidator("target/test-classes/validator/agentFields-test.json");
+        final int expectedFields = 2;
+        final String fieldName = "INVALID_FIELD";
 
-        final Map<String, List<DocumentWorkerFieldValue>> documentFields = new HashMap<>();
-        documentFields.put("ACCOUNTS", Collections.singletonList(new DocumentWorkerFieldValue()));
-        documentFields.put("COLLECTION_STATUS", Collections.singletonList(new DocumentWorkerFieldValue()));
-        documentFields.put("INVALID_FIELD", Collections.singletonList(new DocumentWorkerFieldValue()));
-        DocumentWorkerDocument document = createDocument(documentFields);
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        DocumentWorkerDocument cleanDoc = agentFieldValidator.validate(document);
+
+        assertEquals(expectedFields, cleanDoc.fields.size());
+        assertFalse(document.fields.containsKey("INVALID_FIELD"));
+        assertEquals("FIELD-NOT-ALLOWED-FAILURE", cleanDoc.failures.get(0).failureId);
+        assertEquals(fieldName + AGENT_FAILURE_MESSAGE_SUFFIX,
+                     cleanDoc.failures.get(0).failureMessage);
+    }
+
+    @Test
+    public void testFieldValidatorFlattenedAgentFields() throws AdapterException
+    {
+        final int expectedFields = 3;
+        final String fieldName = "METADATA_FILES_0_CONTENT";
+
+        List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
         document = agentFieldValidator.validate(document);
 
-        assertEquals(2, document.fields.size());
-        assertFalse(document.fields.containsKey("INVALID_FIELD"));
-        assertEquals("FIELD-NOT-ALLOWED-FAILURE", document.failures.get(0).failureId);
-        assertEquals("INVALID_FIELD" + AGENT_FAILURE_MESSAGE_SUFFIX,
-                     document.failures.get(0).failureMessage);
+        assertEquals(expectedFields, document.fields.size());
+        assertTrue(document.fields.containsKey(fieldName));
+    }
+
+    private Map<String, List<DocumentWorkerFieldValue>> createDocumentFields(final List<String> fieldNames)
+    {
+        final Map<String, List<DocumentWorkerFieldValue>> fields = new HashMap<>();
+        for (String name : fieldNames) {
+            fields.put(name, Collections.singletonList(new DocumentWorkerFieldValue()));
+        }
+        return fields;
     }
 
     private DocumentWorkerDocument createDocument(Map<String, List<DocumentWorkerFieldValue>> documentFields)
