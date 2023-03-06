@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AgentFieldAdapterTest
 {
-    private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test.json";
+    private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test1.json";
 
     @Test
     public void testGetFieldKeys() throws AdapterException

@@ -1,0 +1,16 @@
+{
+  "types": {
+    "person": {
+      "DISPLAY_NAME": {
+        "ignoreCase": true,
+        "type": "FULLTEXT"
+      }
+    }
+  },
+  "fields": {
+    "ACCOUNTS": {
+      "objectEncoding": "json",
+      "type": "person[]"
+    }
+  }
+}

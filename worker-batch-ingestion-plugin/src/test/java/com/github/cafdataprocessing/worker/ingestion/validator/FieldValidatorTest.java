@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
-    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test.json";
+    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test1.json";
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
