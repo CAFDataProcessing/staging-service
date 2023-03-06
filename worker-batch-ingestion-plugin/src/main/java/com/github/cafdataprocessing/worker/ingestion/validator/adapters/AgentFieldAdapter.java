@@ -40,7 +40,7 @@ public class AgentFieldAdapter implements Adapter
     }
 
     @Override
-    public Map<String, Set<String>> getFlattenedFields()
+    public Map<String, Set<String>> getFlattenedFieldKeys()
     {
         final Map<String, Set<String>> flattenedFields = new HashMap<>();
         for (String fieldKey : getFieldKeys()) {

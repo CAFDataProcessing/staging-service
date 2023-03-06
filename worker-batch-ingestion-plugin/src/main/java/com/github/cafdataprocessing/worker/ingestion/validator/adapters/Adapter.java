@@ -28,7 +28,7 @@ public interface Adapter
 {
     Set<String> getFieldKeys() throws AdapterException;
 
-    Map<String, Set<String>> getFlattenedFields();
+    Map<String, Set<String>> getFlattenedFieldKeys();
 
     static String getFileContents(final String filePath) throws AdapterException
     {

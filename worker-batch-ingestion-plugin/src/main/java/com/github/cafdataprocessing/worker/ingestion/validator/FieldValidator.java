@@ -34,7 +34,7 @@ public class FieldValidator
     {
         AgentFieldAdapter adapter = new AgentFieldAdapter(validationFile);
         allowedFields = adapter.getFieldKeys();
-        allowedFlattenedFields = adapter.getFlattenedFields();
+        allowedFlattenedFields = adapter.getFlattenedFieldKeys();
     }
 
     public DocumentWorkerDocument validate(final DocumentWorkerDocument document)

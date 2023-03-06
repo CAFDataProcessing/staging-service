@@ -53,9 +53,7 @@ public class AdapterTest
     @Test
     public void getFileContentsTestAdapterException()
     {
-        final Exception exception = assertThrows(AdapterException.class, () -> {
-                                                 Adapter.getFileContents("FAKE_FILE_PATH");
-                                             });
+        final Exception exception = assertThrows(AdapterException.class, () -> Adapter.getFileContents("FAKE_FILE_PATH"));
 
         final String expectedMessage = "Failed to get file contents";
         final String actualMessage = exception.getMessage();

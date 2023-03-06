@@ -39,20 +39,22 @@ public class AgentFieldAdapterTest
     }
 
     @Test
-    public void testGetFlattenedFieldsOcr() throws AdapterException
+    public void testGetFlattenedFieldKeysOcr() throws AdapterException
     {
         final AgentFieldAdapter adapter = new AgentFieldAdapter(AGENT_TEST_FILE);
-        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFields();
+        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("OCR").contains("CONFIDENCE"));
+        assertEquals(4, flattenedFields.get("OCR").size());
     }
 
     @Test
-    public void testGetFlattenedFieldMetadataFiles() throws AdapterException
+    public void testGetFlattenedFieldKeysMetadataFiles() throws AdapterException
     {
         final AgentFieldAdapter adapter = new AgentFieldAdapter(AGENT_TEST_FILE);
-        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFields();
+        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("METADATA_FILES").contains("CONTENT"));
+        assertEquals(2, flattenedFields.get("METADATA_FILES").size());
     }
 }
