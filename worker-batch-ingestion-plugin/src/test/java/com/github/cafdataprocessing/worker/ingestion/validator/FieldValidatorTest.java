@@ -45,7 +45,7 @@ public class FieldValidatorTest
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
-        DocumentWorkerDocument cleanDoc = agentFieldValidator.validate(document);
+        final DocumentWorkerDocument cleanDoc = agentFieldValidator.validate(document);
 
         assertEquals(expectedFields, cleanDoc.fields.size());
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
