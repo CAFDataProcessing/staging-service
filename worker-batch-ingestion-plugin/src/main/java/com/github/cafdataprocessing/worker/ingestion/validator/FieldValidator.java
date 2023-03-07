@@ -20,7 +20,6 @@ import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AgentFie
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +46,6 @@ public class FieldValidator
                 fieldNotAllowedFailure.failureId = "FIELD-NOT-ALLOWED-FAILURE";
                 fieldNotAllowedFailure.failureMessage
                     = String.format(key + " is not allowed to be set by the agent");
-                document.failures = new ArrayList<>();
                 document.failures.add(fieldNotAllowedFailure);
                 document.fields.remove(key);
             }

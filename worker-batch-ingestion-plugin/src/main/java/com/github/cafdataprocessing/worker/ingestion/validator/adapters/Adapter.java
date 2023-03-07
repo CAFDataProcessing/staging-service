@@ -45,7 +45,7 @@ public interface Adapter
             return sb.toString();
 
         } catch (final IOException ex) {
-            throw new AdapterException("Failed to get file contents", ex);
+            throw new AdapterException("AdapterException: Failed to get file contents from " + filePath, ex);
         }
     }
 }

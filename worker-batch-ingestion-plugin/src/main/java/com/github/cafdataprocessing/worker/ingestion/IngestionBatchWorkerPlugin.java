@@ -23,6 +23,8 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathPro
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
+import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
+import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AdapterException;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
@@ -204,6 +206,10 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 log.error("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n" + ex.getMessage());
                 throw new RuntimeException("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n"
                     + ex.getMessage());
+            } catch (final AdapterException adapterException) {
+                log.error("Exception when attempting to read validation file" + "\n" + adapterException.getMessage());
+                throw new RuntimeException("Exception when attempting to read validation file" + "\n"
+                    + adapterException.getMessage());
             }
         }
         for (final DocumentWorkerDocumentTask document : documents) {
@@ -224,9 +230,17 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     }
 
     private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
-        throws IOException, BatchDefinitionException
+        throws IOException, BatchDefinitionException, AdapterException
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
+        document.document.failures = new ArrayList<>();
+
+        final String validationFile = System.getenv("CAF_VALIDATION_FILE");
+        if (StringUtils.isNotEmpty(validationFile)) {
+            FieldValidator fieldValidator = new FieldValidator(validationFile);
+            document.document = fieldValidator.validate(document.document);
+        }
+
         final Map<String, String> customData = populateCustomData(taskMessageParams);
         if (!customData.isEmpty()) {
             document.customData = customData;

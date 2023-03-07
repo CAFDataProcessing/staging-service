@@ -20,6 +20,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class FieldValidatorTest
         final int expectedFields = 3;
         final String fieldName = "METADATA_FILES_0_CONTENT";
 
-        List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
@@ -68,6 +69,22 @@ public class FieldValidatorTest
 
         assertEquals(expectedFields, document.fields.size());
         assertTrue(document.fields.containsKey(fieldName));
+    }
+
+    @Test
+    public void testFieldValidatorMultipleInvalidFields() throws AdapterException
+    {
+        final int expectedFields = 1;
+        final int expectedDocumentFailures = 2;
+
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "INVALID_FIELD_1", "INVALID_FIELD_2");
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        document = agentFieldValidator.validate(document);
+
+        assertEquals(expectedFields, document.fields.size());
+        assertEquals(expectedDocumentFailures, document.failures.size());
     }
 
     private Map<String, List<DocumentWorkerFieldValue>> createDocumentFields(final List<String> fieldNames)
@@ -83,6 +100,7 @@ public class FieldValidatorTest
     {
         final DocumentWorkerDocument document = new DocumentWorkerDocument();
         document.fields = documentFields;
+        document.failures = new ArrayList<>();
 
         return document;
     }

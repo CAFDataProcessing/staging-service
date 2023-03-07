@@ -21,6 +21,7 @@ import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
 import com.hpe.caf.worker.batch.BatchWorkerTransientException;
 import com.hpe.caf.worker.document.DocumentWorkerConstants;
+import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -35,12 +36,16 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -52,6 +57,15 @@ public final class IngestionWorkerUnitTest
     private BatchWorkerServices testWorkerServices;
     private String taskMessageType;
     private Map<String, String> testTaskMessageParams;
+    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test3.json";
+    private EnvironmentVariables envVars;
+
+    @BeforeEach
+    public void clearEnvironmentVariables()
+    {
+        envVars = new EnvironmentVariables();
+        envVars.set("CAF_VALIDATION_FILE", null);
+    }
 
     @Test
     @DisplayName("Worker Instantiated if CAF_STAGING_SERVICE_BASEPATH is set")
@@ -454,6 +468,62 @@ public final class IngestionWorkerUnitTest
                           () -> plugin.processBatch(testWorkerServices, batchDefinitionNoBatchId,
                                                     taskMessageType, testTaskMessageParams));
         assertThat(ex.getMessage(), containsString("Exception while handling a single batch id: "));
+    }
+
+    @Test
+    @DisplayName("Test validator with validation file and single batch")
+    void testFieldValidator() throws BatchDefinitionException, BatchWorkerTransientException
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+        final int expectedDocumentFailures = 2;
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
+        final String batchDefinition = "tenant6/batch10";
+        taskMessageType = "DocumentMessage";
+
+        envVars.set("CAF_VALIDATION_FILE", AGENT_TEST_FILE);
+
+        plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
+
+        assertThat(constructedMessages.size(), is(equalTo(1)));
+        for (final TaskMessage returnedMessage : constructedMessages) {
+            checkClassifierAndApiVersion(returnedMessage);
+
+            final DocumentWorkerDocumentTask returnedTaskData = (DocumentWorkerDocumentTask) returnedMessage.getTaskData();
+            final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
+
+            assertTrue(returnedDocument.fields.containsKey("OCR_0_0_NAME"));
+            assertEquals(expectedDocumentFailures, returnedDocument.failures.size());
+        }
+    }
+
+    @Test
+    @DisplayName("Test validator with invalid validation file and single batch")
+    void testFieldValidatorInvalidFile()
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
+        final String batchDefinition = "tenant6/batch10";
+        taskMessageType = "DocumentMessage";
+
+        EnvironmentVariables envVars = new EnvironmentVariables();
+        envVars.set("CAF_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
+
+        final Exception exception = assertThrows(RuntimeException.class, ()
+                                                 -> plugin.processBatch(testWorkerServices, batchDefinition,
+                                                                        taskMessageType, testTaskMessageParams));
+
+        final String expectedMessage = "Exception when attempting to read validation file" + "\n"
+            + "AdapterException: Failed to get file contents from INVALID_TEST_FILE_PATH";
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     private static Stream<Arguments> scriptProvider()
