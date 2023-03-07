@@ -15,8 +15,6 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.ValidationFileAdapterException;
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AgentValidationFileAdapter;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 
@@ -31,7 +29,7 @@ public class FieldValidator
 
     public FieldValidator(final String validationFile) throws ValidationFileAdapterException
     {
-        AgentValidationFileAdapter adapter = new AgentValidationFileAdapter(validationFile);
+        ValidationFileAdapter adapter = new ValidationFileAdapter(validationFile);
         allowedFields = adapter.getFieldKeys();
         allowedFlattenedFields = adapter.getFlattenedFieldKeys();
     }

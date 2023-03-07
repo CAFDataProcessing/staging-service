@@ -13,22 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
+package com.github.cafdataprocessing.worker.ingestion.validator;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public interface ValidationFileAdapter
+public class ValidationFileAdapter
 {
-    Set<String> getFieldKeys() throws ValidationFileAdapterException;
+    private final JSONObject fieldsJsonObject;
+    private final JSONObject typesJsonObject;
 
-    Map<String, Set<String>> getFlattenedFieldKeys();
+    public ValidationFileAdapter(final String file) throws ValidationFileAdapterException
+    {
+        final JSONObject fileContents = new JSONObject(getFileContents(file));
+        this.fieldsJsonObject = new JSONObject(fileContents.optString("fields"));
+        this.typesJsonObject = new JSONObject(fileContents.optString("types"));
+    }
+
+    public Set<String> getFieldKeys()
+    {
+        return fieldsJsonObject.keySet();
+    }
+
+    public Map<String, Set<String>> getFlattenedFieldKeys()
+    {
+        final Map<String, Set<String>> flattenedFields = new HashMap<>();
+        for (String fieldKey : getFieldKeys()) {
+            final JSONObject field = fieldsJsonObject.getJSONObject(fieldKey);
+            if (field.optString("objectEncoding").equals("flattened")) {
+                final JSONObject propertiesJsonObject = typesJsonObject.getJSONObject(fieldKey.toLowerCase());
+                flattenedFields.put(fieldKey, propertiesJsonObject.keySet());
+            }
+        }
+        return flattenedFields;
+    }
 
     static String getFileContents(final String filePath) throws ValidationFileAdapterException
     {

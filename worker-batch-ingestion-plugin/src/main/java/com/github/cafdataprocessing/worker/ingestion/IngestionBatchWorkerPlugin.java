@@ -24,7 +24,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdEx
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
 import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.ValidationFileAdapterException;
+import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapterException;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;

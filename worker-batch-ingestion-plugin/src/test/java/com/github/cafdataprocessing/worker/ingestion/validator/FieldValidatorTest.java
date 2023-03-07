@@ -15,7 +15,6 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.ValidationFileAdapterException;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import org.junit.jupiter.api.Test;

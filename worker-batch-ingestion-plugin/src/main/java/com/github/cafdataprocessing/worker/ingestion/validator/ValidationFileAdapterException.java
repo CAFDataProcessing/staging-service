@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
+package com.github.cafdataprocessing.worker.ingestion.validator;
 
 public class ValidationFileAdapterException extends Exception
 {

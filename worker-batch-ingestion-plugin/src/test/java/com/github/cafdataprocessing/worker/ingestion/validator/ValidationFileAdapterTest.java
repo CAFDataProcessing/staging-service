@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
+package com.github.cafdataprocessing.worker.ingestion.validator;
 
+import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapter;
+import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapterException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.Set;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ValidationFileAdapterTest
 {
-    private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test2.json";
+    private static final String AGENT_TEST_FILE_1 = "target/test-classes/validator/agentFields-test1.json";
+    private static final String AGENT_TEST_FILE_2 = "target/test-classes/validator/agentFields-test2.json";
 
     private static final String AGENT_TEST_FILE_CONTENTS
         = "{\n"
@@ -43,9 +48,40 @@ public class ValidationFileAdapterTest
         + "}\n";
 
     @Test
+    public void testGetFieldKeys() throws ValidationFileAdapterException
+    {
+        final int expectedNumberOfFields = 10;
+
+        final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
+        final Set<String> fieldKeys = adapter.getFieldKeys();
+
+        assertEquals(expectedNumberOfFields, fieldKeys.size());
+    }
+
+    @Test
+    public void testGetFlattenedFieldKeysOcr() throws ValidationFileAdapterException
+    {
+        final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
+        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
+
+        assertTrue(flattenedFields.get("OCR").contains("CONFIDENCE"));
+        assertEquals(4, flattenedFields.get("OCR").size());
+    }
+
+    @Test
+    public void testGetFlattenedFieldKeysMetadataFiles() throws ValidationFileAdapterException
+    {
+        final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
+        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
+
+        assertTrue(flattenedFields.get("METADATA_FILES").contains("CONTENT"));
+        assertEquals(2, flattenedFields.get("METADATA_FILES").size());
+    }
+
+    @Test
     public void getFileContentsTestSuccess() throws ValidationFileAdapterException
     {
-        final String result = ValidationFileAdapter.getFileContents(AGENT_TEST_FILE);
+        final String result = ValidationFileAdapter.getFileContents(AGENT_TEST_FILE_2);
 
         assertEquals(AGENT_TEST_FILE_CONTENTS, result);
     }
