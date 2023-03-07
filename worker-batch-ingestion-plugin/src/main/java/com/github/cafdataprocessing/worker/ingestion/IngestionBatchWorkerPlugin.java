@@ -237,7 +237,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 
         final String validationFile = System.getenv("CAF_VALIDATION_FILE");
         if (StringUtils.isNotEmpty(validationFile)) {
-            FieldValidator fieldValidator = new FieldValidator(validationFile);
+            final FieldValidator fieldValidator = new FieldValidator(validationFile);
             document.document = fieldValidator.validate(document.document);
         }
 
