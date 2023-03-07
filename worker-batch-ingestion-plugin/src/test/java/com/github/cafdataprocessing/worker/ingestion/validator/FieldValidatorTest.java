@@ -15,7 +15,7 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AdapterException;
+import com.github.cafdataprocessing.worker.ingestion.validator.adapters.ValidationFileAdapterException;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class FieldValidatorTest
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
-    public void testFieldValidatorAgentFields() throws AdapterException
+    public void testFieldValidatorAgentFields() throws ValidationFileAdapterException
     {
         final int expectedFields = 2;
         final String fieldName = "INVALID_FIELD";
@@ -56,7 +56,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorFlattenedAgentFields() throws AdapterException
+    public void testFieldValidatorFlattenedAgentFields() throws ValidationFileAdapterException
     {
         final int expectedFields = 3;
         final String fieldName = "METADATA_FILES_0_CONTENT";
@@ -72,7 +72,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorMultipleInvalidFields() throws AdapterException
+    public void testFieldValidatorMultipleInvalidFields() throws ValidationFileAdapterException
     {
         final int expectedFields = 1;
         final int expectedDocumentFailures = 2;

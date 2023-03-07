@@ -15,9 +15,9 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator.adapters;
 
-public class AdapterException extends Exception
+public class ValidationFileAdapterException extends Exception
 {
-    AdapterException(final String message, final Throwable cause)
+    ValidationFileAdapterException(final String message, final Throwable cause)
     {
         super(message, cause);
     }

@@ -21,14 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class AgentFieldAdapter implements Adapter
+public class AgentValidationFileAdapter implements ValidationFileAdapter
 {
     private final JSONObject fieldsJsonObject;
     private final JSONObject typesJsonObject;
 
-    public AgentFieldAdapter(final String file) throws AdapterException
+    public AgentValidationFileAdapter(final String file) throws ValidationFileAdapterException
     {
-        final JSONObject fileContents = new JSONObject(Adapter.getFileContents(file));
+        final JSONObject fileContents = new JSONObject(ValidationFileAdapter.getFileContents(file));
         this.fieldsJsonObject = new JSONObject(fileContents.optString("fields"));
         this.typesJsonObject = new JSONObject(fileContents.optString("types"));
     }

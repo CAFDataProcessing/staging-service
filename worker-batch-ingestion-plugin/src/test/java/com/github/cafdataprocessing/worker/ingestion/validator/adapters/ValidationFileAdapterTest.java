@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class AdapterTest
+public class ValidationFileAdapterTest
 {
     private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test2.json";
 
@@ -43,9 +43,9 @@ public class AdapterTest
         + "}\n";
 
     @Test
-    public void getFileContentsTestSuccess() throws AdapterException
+    public void getFileContentsTestSuccess() throws ValidationFileAdapterException
     {
-        final String result = Adapter.getFileContents(AGENT_TEST_FILE);
+        final String result = ValidationFileAdapter.getFileContents(AGENT_TEST_FILE);
 
         assertEquals(AGENT_TEST_FILE_CONTENTS, result);
     }
@@ -54,9 +54,11 @@ public class AdapterTest
     public void getFileContentsTestAdapterException()
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
-        final Exception exception = assertThrows(AdapterException.class, () -> Adapter.getFileContents(fakeFilePath));
+        final Exception exception = assertThrows(ValidationFileAdapterException.class,
+                                                 () -> ValidationFileAdapter.getFileContents(fakeFilePath));
 
-        final String expectedMessage = "AdapterException: Failed to get file contents from " + fakeFilePath;
+        final String expectedMessage = "ValidationFileAdapterException: Failed to get file contents from "
+            + fakeFilePath;
         final String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);

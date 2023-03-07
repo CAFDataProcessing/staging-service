@@ -521,7 +521,7 @@ public final class IngestionWorkerUnitTest
                                                                         taskMessageType, testTaskMessageParams));
 
         final String expectedMessage = "Exception when attempting to read validation file" + "\n"
-            + "AdapterException: Failed to get file contents from INVALID_TEST_FILE_PATH";
+            + "ValidationFileAdapterException: Failed to get file contents from INVALID_TEST_FILE_PATH";
 
         assertEquals(expectedMessage, exception.getMessage());
     }

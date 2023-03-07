@@ -23,25 +23,25 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AgentFieldAdapterTest
+public class AgentValidationFileAdapterTest
 {
     private static final String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test1.json";
 
     @Test
-    public void testGetFieldKeys() throws AdapterException
+    public void testGetFieldKeys() throws ValidationFileAdapterException
     {
         final int expectedNumberOfFields = 10;
 
-        final AgentFieldAdapter adapter = new AgentFieldAdapter(AGENT_TEST_FILE);
+        final AgentValidationFileAdapter adapter = new AgentValidationFileAdapter(AGENT_TEST_FILE);
         final Set<String> fieldKeys = adapter.getFieldKeys();
 
         assertEquals(expectedNumberOfFields, fieldKeys.size());
     }
 
     @Test
-    public void testGetFlattenedFieldKeysOcr() throws AdapterException
+    public void testGetFlattenedFieldKeysOcr() throws ValidationFileAdapterException
     {
-        final AgentFieldAdapter adapter = new AgentFieldAdapter(AGENT_TEST_FILE);
+        final AgentValidationFileAdapter adapter = new AgentValidationFileAdapter(AGENT_TEST_FILE);
         final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("OCR").contains("CONFIDENCE"));
@@ -49,9 +49,9 @@ public class AgentFieldAdapterTest
     }
 
     @Test
-    public void testGetFlattenedFieldKeysMetadataFiles() throws AdapterException
+    public void testGetFlattenedFieldKeysMetadataFiles() throws ValidationFileAdapterException
     {
-        final AgentFieldAdapter adapter = new AgentFieldAdapter(AGENT_TEST_FILE);
+        final AgentValidationFileAdapter adapter = new AgentValidationFileAdapter(AGENT_TEST_FILE);
         final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("METADATA_FILES").contains("CONTENT"));

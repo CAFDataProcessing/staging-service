@@ -24,13 +24,13 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 
-public interface Adapter
+public interface ValidationFileAdapter
 {
-    Set<String> getFieldKeys() throws AdapterException;
+    Set<String> getFieldKeys() throws ValidationFileAdapterException;
 
     Map<String, Set<String>> getFlattenedFieldKeys();
 
-    static String getFileContents(final String filePath) throws AdapterException
+    static String getFileContents(final String filePath) throws ValidationFileAdapterException
     {
         try {
             final InputStream inputStream = Files.newInputStream(Paths.get(filePath));
@@ -45,7 +45,8 @@ public interface Adapter
             return sb.toString();
 
         } catch (final IOException ex) {
-            throw new AdapterException("AdapterException: Failed to get file contents from " + filePath, ex);
+            throw new ValidationFileAdapterException("ValidationFileAdapterException: Failed to get file contents from "
+                + filePath, ex);
         }
     }
 }

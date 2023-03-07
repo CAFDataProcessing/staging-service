@@ -24,7 +24,7 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdEx
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
 import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
-import com.github.cafdataprocessing.worker.ingestion.validator.adapters.AdapterException;
+import com.github.cafdataprocessing.worker.ingestion.validator.adapters.ValidationFileAdapterException;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
@@ -206,10 +206,10 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 log.error("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n" + ex.getMessage());
                 throw new RuntimeException("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n"
                     + ex.getMessage());
-            } catch (final AdapterException adapterException) {
-                log.error("Exception when attempting to read validation file" + "\n" + adapterException.getMessage());
+            } catch (final ValidationFileAdapterException validationFileAdapterException) {
+                log.error("Exception when attempting to read validation file" + "\n" + validationFileAdapterException.getMessage());
                 throw new RuntimeException("Exception when attempting to read validation file" + "\n"
-                    + adapterException.getMessage());
+                    + validationFileAdapterException.getMessage());
             }
         }
         for (final DocumentWorkerDocumentTask document : documents) {
@@ -230,7 +230,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     }
 
     private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
-        throws IOException, BatchDefinitionException, AdapterException
+        throws IOException, BatchDefinitionException, ValidationFileAdapterException
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
         document.document.failures = new ArrayList<>();
