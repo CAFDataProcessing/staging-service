@@ -18,6 +18,8 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,12 @@ public class FieldValidator
 {
     final Set<String> allowedFields;
     final Map<String, Set<String>> allowedFlattenedFields;
+
+    public FieldValidator()
+    {
+        allowedFields = Collections.emptySet();
+        allowedFlattenedFields = new HashMap<>();
+    }
 
     public FieldValidator(final String validationFile) throws ValidationFileAdapterException
     {

@@ -57,7 +57,6 @@ public final class IngestionWorkerUnitTest
     private BatchWorkerServices testWorkerServices;
     private String taskMessageType;
     private Map<String, String> testTaskMessageParams;
-    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test3.json";
     private EnvironmentVariables envVars;
 
     @BeforeEach
@@ -474,8 +473,10 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with validation file and single batch")
     void testFieldValidator() throws BatchDefinitionException, BatchWorkerTransientException
     {
+        final String agentTestFile = "target/test-classes/validator/agentFields-test3.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 2;
+        envVars.set("CAF_VALIDATION_FILE", agentTestFile);
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
@@ -483,8 +484,6 @@ public final class IngestionWorkerUnitTest
         testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
         final String batchDefinition = "tenant6/batch10";
         taskMessageType = "DocumentMessage";
-
-        envVars.set("CAF_VALIDATION_FILE", AGENT_TEST_FILE);
 
         plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
 
@@ -501,24 +500,13 @@ public final class IngestionWorkerUnitTest
     }
 
     @Test
-    @DisplayName("Test validator with invalid validation file and single batch")
+    @DisplayName("Test validator with invalid validation file")
     void testFieldValidatorInvalidFile()
     {
-        final List<TaskMessage> constructedMessages = new ArrayList<>();
-
-        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
-        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
-
-        testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
-        final String batchDefinition = "tenant6/batch10";
-        taskMessageType = "DocumentMessage";
-
         EnvironmentVariables envVars = new EnvironmentVariables();
         envVars.set("CAF_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
 
-        final Exception exception = assertThrows(RuntimeException.class, ()
-                                                 -> plugin.processBatch(testWorkerServices, batchDefinition,
-                                                                        taskMessageType, testTaskMessageParams));
+        final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 
         final String expectedMessage = "Exception when attempting to read validation file" + "\n"
             + "ValidationFileAdapterException: Failed to get file contents from INVALID_TEST_FILE_PATH";

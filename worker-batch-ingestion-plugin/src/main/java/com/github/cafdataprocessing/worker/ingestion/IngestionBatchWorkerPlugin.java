@@ -66,6 +66,8 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 {
     private final ObjectMapper mapper;
     private final BatchPathProvider fileSystemProvider;
+    private final String validationFile;
+    private final FieldValidator fieldValidator;
 
     public IngestionBatchWorkerPlugin()
     {
@@ -90,6 +92,20 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         simpleModule.addDeserializer(DocumentWorkerDocument.class,
                                      new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
+
+        validationFile = System.getenv("CAF_VALIDATION_FILE");
+        if (StringUtils.isNotEmpty(validationFile)) {
+            try {
+                fieldValidator = new FieldValidator(validationFile);
+            } catch (final ValidationFileAdapterException validationFileAdapterException) {
+                log.error("Exception when attempting to read validation file" + "\n"
+                    + validationFileAdapterException.getMessage());
+                throw new RuntimeException("Exception when attempting to read validation file" + "\n"
+                    + validationFileAdapterException.getMessage());
+            }
+        } else {
+            fieldValidator = new FieldValidator();
+        }
     }
 
     @Override
@@ -206,10 +222,6 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 log.error("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n" + ex.getMessage());
                 throw new RuntimeException("Exception while deserializing the json of " + line + "\nFile: " + subbatchFileName + "\n"
                     + ex.getMessage());
-            } catch (final ValidationFileAdapterException validationFileAdapterException) {
-                log.error("Exception when attempting to read validation file" + "\n" + validationFileAdapterException.getMessage());
-                throw new RuntimeException("Exception when attempting to read validation file" + "\n"
-                    + validationFileAdapterException.getMessage());
             }
         }
         for (final DocumentWorkerDocumentTask document : documents) {
@@ -230,14 +242,12 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     }
 
     private DocumentWorkerDocumentTask createDocument(final String line, final Map<String, String> taskMessageParams)
-        throws IOException, BatchDefinitionException, ValidationFileAdapterException
+        throws IOException, BatchDefinitionException
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
         document.document.failures = new ArrayList<>();
 
-        final String validationFile = System.getenv("CAF_VALIDATION_FILE");
         if (StringUtils.isNotEmpty(validationFile)) {
-            final FieldValidator fieldValidator = new FieldValidator(validationFile);
             document.document = fieldValidator.validate(document.document);
         }
 
