@@ -74,6 +74,26 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     }
 
     @Test
+    public void healthCheckTestNoMemory()
+    {
+        DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorPropertiesNoMemory = new DiskSpaceHealthIndicatorProperties();
+        diskSpaceHealthIndicatorPropertiesNoMemory.setPath(folder.getRoot());
+        diskSpaceHealthIndicatorPropertiesNoMemory.setThreshold(DataSize.ofMegabytes(0));
+
+        StagingProperties stagingPropertiesNoMemory = new StagingProperties();
+        stagingPropertiesNoMemory.setHealthcheckTimeoutSeconds(60);
+        stagingPropertiesNoMemory.setFieldValueSizeThreshold(0);
+        controller = new StagingController(fileSystemDao,
+                                           request,
+                                           diskSpaceHealthIndicatorPropertiesNoMemory,
+                                           stagingPropertiesNoMemory);
+
+        final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+    }
+
+    @Test
     public void healthCheckTestReadOnly()
     {
         final Path file = folder.getRoot().toPath().resolve("/test");

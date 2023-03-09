@@ -76,11 +76,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
     {
         Path created = null;
 
-        try {
-            Files.deleteIfExists(healthcheckFile);
-        } catch (final IOException e) {
-            //Ignoring exception here due to wanting the healthcheck to only fail on the write check
-        }
+        attemptFileDelete(healthcheckFile);
 
         try {
             //Create new healthcheck file for current healtcheck run
@@ -103,7 +99,15 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
             LOGGER.warn("Exception thrown trying to write healthcheck file to directory {} during healthcheck",
                         healthcheckFile.toString(), e);
         } finally {
-            Files.deleteIfExists(created);
+            attemptFileDelete(created);
+        }
+    }
+
+    private void attemptFileDelete(final Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (final IOException e) {
+            //Ignoring exception here due to wanting the healthcheck to only fail on the write check
         }
     }
 }
