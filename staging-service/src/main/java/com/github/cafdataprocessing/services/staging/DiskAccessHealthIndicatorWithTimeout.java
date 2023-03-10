@@ -103,7 +103,7 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
             LOGGER.warn("Exception thrown trying to write healthcheck file to directory {} during healthcheck",
                         healthcheckFile.toString(), e);
         } finally {
-            if(created != null) {
+            if (created != null) {
                 Files.deleteIfExists(created);
             }
         }
