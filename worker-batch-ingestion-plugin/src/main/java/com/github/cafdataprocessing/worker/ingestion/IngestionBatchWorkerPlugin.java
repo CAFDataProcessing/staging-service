@@ -24,6 +24,8 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdEx
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
 import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
+import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidatorInterface;
+import com.github.cafdataprocessing.worker.ingestion.validator.NullFieldValidator;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
@@ -65,8 +67,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 {
     private final ObjectMapper mapper;
     private final BatchPathProvider fileSystemProvider;
-    private final String validationFile;
-    private final FieldValidator fieldValidator;
+    private final FieldValidatorInterface fieldValidator;
 
     public IngestionBatchWorkerPlugin()
     {
@@ -92,7 +93,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                                      new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
 
-        validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
+        final String validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
         if (StringUtils.isNotEmpty(validationFile)) {
             try {
                 fieldValidator = new FieldValidator(validationFile);
@@ -101,7 +102,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                 throw new RuntimeException(ex.getMessage());
             }
         } else {
-            fieldValidator = new FieldValidator();
+            fieldValidator = NullFieldValidator.INSTANCE;
         }
     }
 
@@ -244,9 +245,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
         document.document.failures = new ArrayList<>();
 
-        if (StringUtils.isNotEmpty(validationFile)) {
-            document.document = fieldValidator.validate(document.document);
-        }
+        document.document = fieldValidator.validate(document.document);
 
         final Map<String, String> customData = populateCustomData(taskMessageParams);
         if (!customData.isEmpty()) {

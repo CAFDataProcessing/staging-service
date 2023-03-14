@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class FieldValidator
+public final class FieldValidator implements FieldValidatorInterface
 {
     private final Set<String> allowedFields;
     private final Map<String, Set<String>> allowedFlattenedFields;
@@ -43,6 +43,7 @@ public final class FieldValidator
         allowedFlattenedFields = adapter.getFlattenedFieldKeys();
     }
 
+    @Override
     public DocumentWorkerDocument validate(final DocumentWorkerDocument document)
     {
         final Set<String> keySet = new HashSet<>(document.fields.keySet());
