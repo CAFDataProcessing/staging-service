@@ -19,6 +19,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +37,7 @@ public class FieldValidatorTest
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
-    public void testFieldValidatorAgentFields() throws ValidationFileAdapterException
+    public void testFieldValidatorAgentFields() throws IOException
     {
         final int expectedFields = 2;
         final String fieldName = "INVALID_FIELD";
@@ -49,13 +50,13 @@ public class FieldValidatorTest
 
         assertEquals(expectedFields, cleanDoc.fields.size());
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
-        assertEquals("FIELD-NOT-ALLOWED-FAILURE", cleanDoc.failures.get(0).failureId);
+        assertEquals("IW-001", cleanDoc.failures.get(0).failureId);
         assertEquals(fieldName + AGENT_FAILURE_MESSAGE_SUFFIX,
                      cleanDoc.failures.get(0).failureMessage);
     }
 
     @Test
-    public void testFieldValidatorFlattenedAgentFields() throws ValidationFileAdapterException
+    public void testFieldValidatorFlattenedAgentFields() throws IOException
     {
         final int expectedFields = 3;
         final String fieldName = "METADATA_FILES_0_CONTENT";
@@ -71,7 +72,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorMultipleInvalidFields() throws ValidationFileAdapterException
+    public void testFieldValidatorMultipleInvalidFields() throws IOException
     {
         final int expectedFields = 1;
         final int expectedDocumentFailures = 2;

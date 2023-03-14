@@ -24,7 +24,6 @@ import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdEx
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
 import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
-import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapterException;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
@@ -93,15 +92,13 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                                      new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
 
-        validationFile = System.getenv("CAF_VALIDATION_FILE");
+        validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
         if (StringUtils.isNotEmpty(validationFile)) {
             try {
                 fieldValidator = new FieldValidator(validationFile);
-            } catch (final ValidationFileAdapterException validationFileAdapterException) {
-                log.error("Exception when attempting to read validation file" + "\n"
-                    + validationFileAdapterException.getMessage());
-                throw new RuntimeException("Exception when attempting to read validation file" + "\n"
-                    + validationFileAdapterException.getMessage());
+            } catch (final IOException ex) {
+                log.error(ex.getMessage(), ex.getCause());
+                throw new RuntimeException(ex.getMessage());
             }
         } else {
             fieldValidator = new FieldValidator();

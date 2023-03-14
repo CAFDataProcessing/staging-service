@@ -18,16 +18,17 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FieldValidator
+public final class FieldValidator
 {
-    final Set<String> allowedFields;
-    final Map<String, Set<String>> allowedFlattenedFields;
+    private final Set<String> allowedFields;
+    private final Map<String, Set<String>> allowedFlattenedFields;
 
     public FieldValidator()
     {
@@ -35,9 +36,9 @@ public class FieldValidator
         allowedFlattenedFields = new HashMap<>();
     }
 
-    public FieldValidator(final String validationFile) throws ValidationFileAdapterException
+    public FieldValidator(final String validationFile) throws IOException
     {
-        ValidationFileAdapter adapter = new ValidationFileAdapter(validationFile);
+        final ValidationFileAdapter adapter = new ValidationFileAdapter(validationFile);
         allowedFields = adapter.getFieldKeys();
         allowedFlattenedFields = adapter.getFlattenedFieldKeys();
     }
@@ -49,9 +50,8 @@ public class FieldValidator
         for (final String key : keySet) {
             if (!(isValidField(key) || isValidFlattenedField(key))) {
                 final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
-                fieldNotAllowedFailure.failureId = "FIELD-NOT-ALLOWED-FAILURE";
-                fieldNotAllowedFailure.failureMessage
-                    = String.format(key + " is not allowed to be set by the agent");
+                fieldNotAllowedFailure.failureId = "IW-001";
+                fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
                 document.failures.add(fieldNotAllowedFailure);
                 document.fields.remove(key);
             }
@@ -61,12 +61,7 @@ public class FieldValidator
 
     private boolean isValidField(final String fieldKey)
     {
-        for (final String allowedField : allowedFields) {
-            if (fieldKey.equals(allowedField)) {
-                return true;
-            }
-        }
-        return false;
+        return allowedFields.contains(fieldKey);
     }
 
     private boolean isValidFlattenedField(final String fieldKey)

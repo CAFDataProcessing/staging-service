@@ -63,7 +63,7 @@ public final class IngestionWorkerUnitTest
     public void clearEnvironmentVariables()
     {
         envVars = new EnvironmentVariables();
-        envVars.set("CAF_VALIDATION_FILE", null);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", null);
     }
 
     @Test
@@ -476,7 +476,7 @@ public final class IngestionWorkerUnitTest
         final String agentTestFile = "target/test-classes/validator/agentFields-test3.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 2;
-        envVars.set("CAF_VALIDATION_FILE", agentTestFile);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
@@ -504,12 +504,11 @@ public final class IngestionWorkerUnitTest
     void testFieldValidatorInvalidFile()
     {
         EnvironmentVariables envVars = new EnvironmentVariables();
-        envVars.set("CAF_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 
-        final String expectedMessage = "Exception when attempting to read validation file" + "\n"
-            + "ValidationFileAdapterException: Failed to get file contents from INVALID_TEST_FILE_PATH";
+        final String expectedMessage = "Failed to read Validation File";
 
         assertEquals(expectedMessage, exception.getMessage());
     }

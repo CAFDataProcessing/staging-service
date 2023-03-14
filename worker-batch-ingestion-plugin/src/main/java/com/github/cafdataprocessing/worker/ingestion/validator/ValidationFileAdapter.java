@@ -27,12 +27,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ValidationFileAdapter
+final class ValidationFileAdapter
 {
     private final JSONObject fieldsJsonObject;
     private final JSONObject typesJsonObject;
 
-    public ValidationFileAdapter(final String file) throws ValidationFileAdapterException
+    public ValidationFileAdapter(final String file) throws IOException
     {
         final JSONObject fileContents = new JSONObject(getFileContents(file));
         this.fieldsJsonObject = new JSONObject(fileContents.optString("fields"));
@@ -47,7 +47,7 @@ public class ValidationFileAdapter
     public Map<String, Set<String>> getFlattenedFieldKeys()
     {
         final Map<String, Set<String>> flattenedFields = new HashMap<>();
-        for (String fieldKey : getFieldKeys()) {
+        for (final String fieldKey : getFieldKeys()) {
             final JSONObject field = fieldsJsonObject.getJSONObject(fieldKey);
             if (field.optString("objectEncoding").equals("flattened")) {
                 final JSONObject propertiesJsonObject = typesJsonObject.getJSONObject(fieldKey.toLowerCase());
@@ -57,7 +57,7 @@ public class ValidationFileAdapter
         return flattenedFields;
     }
 
-    static String getFileContents(final String filePath) throws ValidationFileAdapterException
+    static String getFileContents(final String filePath) throws IOException
     {
         try {
             final InputStream inputStream = Files.newInputStream(Paths.get(filePath));
@@ -72,8 +72,7 @@ public class ValidationFileAdapter
             return sb.toString();
 
         } catch (final IOException ex) {
-            throw new ValidationFileAdapterException("ValidationFileAdapterException: Failed to get file contents from "
-                + filePath, ex);
+            throw new IOException("Failed to read Validation File", ex);
         }
     }
 }

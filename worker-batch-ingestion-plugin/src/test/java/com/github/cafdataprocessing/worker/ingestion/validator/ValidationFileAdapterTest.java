@@ -15,10 +15,9 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapter;
-import com.github.cafdataprocessing.worker.ingestion.validator.ValidationFileAdapterException;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class ValidationFileAdapterTest
         + "}\n";
 
     @Test
-    public void testGetFieldKeys() throws ValidationFileAdapterException
+    public void testGetFieldKeys() throws IOException
     {
         final int expectedNumberOfFields = 10;
 
@@ -59,7 +58,7 @@ public class ValidationFileAdapterTest
     }
 
     @Test
-    public void testGetFlattenedFieldKeysOcr() throws ValidationFileAdapterException
+    public void testGetFlattenedFieldKeysOcr() throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
         final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
@@ -69,7 +68,7 @@ public class ValidationFileAdapterTest
     }
 
     @Test
-    public void testGetFlattenedFieldKeysMetadataFiles() throws ValidationFileAdapterException
+    public void testGetFlattenedFieldKeysMetadataFiles() throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
         final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
@@ -79,7 +78,7 @@ public class ValidationFileAdapterTest
     }
 
     @Test
-    public void getFileContentsTestSuccess() throws ValidationFileAdapterException
+    public void getFileContentsTestSuccess() throws IOException
     {
         final String result = ValidationFileAdapter.getFileContents(AGENT_TEST_FILE_2);
 
@@ -90,11 +89,10 @@ public class ValidationFileAdapterTest
     public void getFileContentsTestAdapterException()
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
-        final Exception exception = assertThrows(ValidationFileAdapterException.class,
+        final Exception exception = assertThrows(IOException.class,
                                                  () -> ValidationFileAdapter.getFileContents(fakeFilePath));
 
-        final String expectedMessage = "ValidationFileAdapterException: Failed to get file contents from "
-            + fakeFilePath;
+        final String expectedMessage = "Failed to read Validation File";
         final String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);
