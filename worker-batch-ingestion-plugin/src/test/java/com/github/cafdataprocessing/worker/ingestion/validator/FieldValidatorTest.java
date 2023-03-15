@@ -87,6 +87,26 @@ public class FieldValidatorTest
         assertEquals(expectedDocumentFailures, document.failures.size());
     }
 
+    @Test
+    public void testFieldValidatorAgentFieldsWithSubDocument() throws IOException
+    {
+        final int expectedSubDocFields = 1;
+        final String fieldName = "INVALID_FIELD";
+
+        final DocumentWorkerDocument document = createDocument(createDocumentFields(Collections.singletonList("ACCOUNTS")));
+
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        final DocumentWorkerDocument subDocument = createDocument(createDocumentFields(fieldNames));
+        document.subdocuments = new ArrayList<>();
+        document.subdocuments.add(subDocument);
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        final DocumentWorkerDocument cleanDoc = agentFieldValidator.validate(document);
+
+        assertEquals(expectedSubDocFields, cleanDoc.fields.size());
+        assertFalse(document.fields.containsKey("INVALID_FIELD"));
+    }
+
     private Map<String, List<DocumentWorkerFieldValue>> createDocumentFields(final List<String> fieldNames)
     {
         final Map<String, List<DocumentWorkerFieldValue>> fields = new HashMap<>();

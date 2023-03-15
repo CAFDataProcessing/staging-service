@@ -244,10 +244,6 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
 
-        if (document.document.failures == null) {
-            document.document.failures = new ArrayList<>();
-        }
-
         document.document = fieldValidator.validate(document.document);
 
         final Map<String, String> customData = populateCustomData(taskMessageParams);

@@ -41,6 +41,10 @@ public final class FieldValidator implements FieldValidatorInterface
     {
         final Set<String> keySet = new HashSet<>(document.fields.keySet());
 
+        if (document.failures == null) {
+            document.failures = new ArrayList<>();
+        }
+
         for (final String key : keySet) {
             if (!(isValidField(key) || isValidFlattenedField(key))) {
                 final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
@@ -50,6 +54,15 @@ public final class FieldValidator implements FieldValidatorInterface
                 document.fields.remove(key);
             }
         }
+
+        if (document.subdocuments != null) {
+            final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
+            document.subdocuments = new ArrayList<>();
+            subDocs.replaceAll(this::validate);
+
+            document.subdocuments = subDocs;
+        }
+
         return document;
     }
 
