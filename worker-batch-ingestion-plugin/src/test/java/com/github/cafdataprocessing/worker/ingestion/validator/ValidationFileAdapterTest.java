@@ -25,26 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ValidationFileAdapterTest
 {
-    private static final String AGENT_TEST_FILE_1 = "target/test-classes/validator/agentFields-test1.json";
-    private static final String AGENT_TEST_FILE_2 = "target/test-classes/validator/agentFields-test2.json";
-
-    private static final String AGENT_TEST_FILE_CONTENTS
-        = "{\n"
-        + "  \"types\": {\n"
-        + "    \"person\": {\n"
-        + "      \"DISPLAY_NAME\": {\n"
-        + "        \"ignoreCase\": true,\n"
-        + "        \"type\": \"FULLTEXT\"\n"
-        + "      }\n"
-        + "    }\n"
-        + "  },\n"
-        + "  \"fields\": {\n"
-        + "    \"ACCOUNTS\": {\n"
-        + "      \"objectEncoding\": \"json\",\n"
-        + "      \"type\": \"person[]\"\n"
-        + "    }\n"
-        + "  }\n"
-        + "}\n";
+    private static final String AGENT_TEST_FILE_1 = "validator/agentFields-test1.json";
 
     @Test
     public void testGetFieldKeys() throws IOException
@@ -84,7 +65,7 @@ public class ValidationFileAdapterTest
         final Exception exception = assertThrows(IOException.class,
                                                  () -> new ValidationFileAdapter(fakeFilePath));
 
-        final String expectedMessage = "Failed to read Validation File " + fakeFilePath;
+        final String expectedMessage = "Failed to read Validation File: " + fakeFilePath;
         final String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);

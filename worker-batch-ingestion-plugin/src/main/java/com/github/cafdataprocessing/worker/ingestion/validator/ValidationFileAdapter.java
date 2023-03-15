@@ -32,7 +32,7 @@ final class ValidationFileAdapter
 
     public ValidationFileAdapter(final String file) throws IOException
     {
-        final InputStream input = ValidationFileAdapter.class.getClassLoader().getResourceAsStream(file);
+        final InputStream input = getClass().getClassLoader().getResourceAsStream(file);
 
         if (input != null) {
             final ObjectMapper mapper = new ObjectMapper();
@@ -41,7 +41,7 @@ final class ValidationFileAdapter
             this.fieldsJsonObject = fileContents.get("fields");
             this.typesJsonObject = fileContents.get("types");
         } else {
-            throw new IOException("Failed to read Validation File " + file);
+            throw new IOException("Failed to read Validation File: " + file);
         }
 
     }

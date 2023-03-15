@@ -473,7 +473,7 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with validation file and single batch")
     void testFieldValidator() throws BatchDefinitionException, BatchWorkerTransientException
     {
-        final String agentTestFile = "target/test-classes/validator/agentFields-test3.json";
+        final String agentTestFile = "validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 2;
         envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
@@ -508,7 +508,7 @@ public final class IngestionWorkerUnitTest
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 
-        final String expectedMessage = "Failed to read Validation File";
+        final String expectedMessage = "Failed to read Validation File: INVALID_TEST_FILE_PATH";
 
         assertEquals(expectedMessage, exception.getMessage());
     }

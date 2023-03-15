@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
-    private final static String AGENT_TEST_FILE = "target/test-classes/validator/agentFields-test1.json";
+    private final static String AGENT_TEST_FILE = "validator/agentFields-test1.json";
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
 
     @Test
@@ -65,7 +65,7 @@ public class FieldValidatorTest
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
-        document = agentFieldValidator.validate(document);
+        agentFieldValidator.validate(document);
 
         assertEquals(expectedFields, document.fields.size());
         assertTrue(document.fields.containsKey(fieldName));
@@ -81,7 +81,7 @@ public class FieldValidatorTest
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
-        document = agentFieldValidator.validate(document);
+        agentFieldValidator.validate(document);
 
         assertEquals(expectedFields, document.fields.size());
         assertEquals(expectedDocumentFailures, document.failures.size());
