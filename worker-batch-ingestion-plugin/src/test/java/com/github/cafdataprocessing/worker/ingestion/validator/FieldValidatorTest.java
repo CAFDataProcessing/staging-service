@@ -29,20 +29,21 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
     private final static String AGENT_TEST_FILE = "validator/agentFields-test1.json";
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
+    private final static String INVALID_FIELD_NAME = "INVALID_FIELD_NAME";
 
     @Test
     public void testFieldValidatorAgentFields() throws IOException
     {
         final int expectedFields = 2;
-        final String fieldName = "INVALID_FIELD";
 
-        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", INVALID_FIELD_NAME);
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
@@ -51,7 +52,7 @@ public class FieldValidatorTest
         assertEquals(expectedFields, cleanDoc.fields.size());
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
         assertEquals("IW-001", cleanDoc.failures.get(0).failureId);
-        assertEquals(fieldName + AGENT_FAILURE_MESSAGE_SUFFIX,
+        assertEquals(INVALID_FIELD_NAME + AGENT_FAILURE_MESSAGE_SUFFIX,
                      cleanDoc.failures.get(0).failureMessage);
     }
 
@@ -91,11 +92,10 @@ public class FieldValidatorTest
     public void testFieldValidatorAgentFieldsWithSubDocument() throws IOException
     {
         final int expectedSubDocFields = 1;
-        final String fieldName = "INVALID_FIELD";
 
         final DocumentWorkerDocument document = createDocument(createDocumentFields(Collections.singletonList("ACCOUNTS")));
 
-        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", INVALID_FIELD_NAME);
         final DocumentWorkerDocument subDocument = createDocument(createDocumentFields(fieldNames));
         document.subdocuments = new ArrayList<>();
         document.subdocuments.add(subDocument);
@@ -104,7 +104,41 @@ public class FieldValidatorTest
         final DocumentWorkerDocument cleanDoc = agentFieldValidator.validate(document);
 
         assertEquals(expectedSubDocFields, cleanDoc.fields.size());
-        assertFalse(document.fields.containsKey("INVALID_FIELD"));
+        assertFalse(document.fields.containsKey(INVALID_FIELD_NAME));
+    }
+
+    @Test
+    public void testFieldValidatorAgentFieldsWithImmutableListOfFailures() throws IOException
+    {
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", INVALID_FIELD_NAME);
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
+
+        // Make list of failures immutable to invoke UnsupportedOperationException
+        document.failures = Collections.unmodifiableList(new ArrayList<>());
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+
+        final Exception exception = assertThrows(UnsupportedOperationException.class,
+                                                 () -> agentFieldValidator.validate(document));
+
+        assertEquals("Error while modifying immutable Collection", exception.getMessage());
+    }
+
+    @Test
+    public void testFieldValidatorAgentFieldsWithImmutableMapOfFields() throws IOException
+    {
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", INVALID_FIELD_NAME);
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
+
+        // Make map of fields immutable to invoke UnsupportedOperationException
+        document.fields = Collections.unmodifiableMap(createDocumentFields(fieldNames));
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+
+        final Exception exception = assertThrows(UnsupportedOperationException.class,
+                                                 () -> agentFieldValidator.validate(document));
+
+        assertEquals("Error while modifying immutable Collection", exception.getMessage());
     }
 
     private Map<String, List<DocumentWorkerFieldValue>> createDocumentFields(final List<String> fieldNames)
@@ -120,7 +154,6 @@ public class FieldValidatorTest
     {
         final DocumentWorkerDocument document = new DocumentWorkerDocument();
         document.fields = documentFields;
-        document.failures = new ArrayList<>();
 
         return document;
     }

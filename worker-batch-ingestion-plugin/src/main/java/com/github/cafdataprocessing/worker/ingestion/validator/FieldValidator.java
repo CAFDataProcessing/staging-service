@@ -46,12 +46,16 @@ public final class FieldValidator implements FieldValidatorInterface
         }
 
         for (final String key : keySet) {
-            if (!(isValidField(key) || isValidFlattenedField(key))) {
-                final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
-                fieldNotAllowedFailure.failureId = "IW-001";
-                fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
-                document.failures.add(fieldNotAllowedFailure);
-                document.fields.remove(key);
+            try {
+                if (!(isValidField(key) || isValidFlattenedField(key))) {
+                    final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
+                    fieldNotAllowedFailure.failureId = "IW-001";
+                    fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
+                    document.failures.add(fieldNotAllowedFailure);
+                    document.fields.remove(key);
+                }
+            } catch (final UnsupportedOperationException ex) {
+                throw new UnsupportedOperationException("Error while modifying immutable Collection", ex);
             }
         }
 
