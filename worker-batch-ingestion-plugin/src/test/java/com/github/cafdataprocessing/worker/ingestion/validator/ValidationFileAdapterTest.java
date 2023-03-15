@@ -78,21 +78,13 @@ public class ValidationFileAdapterTest
     }
 
     @Test
-    public void getFileContentsTestSuccess() throws IOException
-    {
-        final String result = ValidationFileAdapter.getFileContents(AGENT_TEST_FILE_2);
-
-        assertEquals(AGENT_TEST_FILE_CONTENTS, result);
-    }
-
-    @Test
     public void getFileContentsTestAdapterException()
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
         final Exception exception = assertThrows(IOException.class,
-                                                 () -> ValidationFileAdapter.getFileContents(fakeFilePath));
+                                                 () -> new ValidationFileAdapter(fakeFilePath));
 
-        final String expectedMessage = "Failed to read Validation File";
+        final String expectedMessage = "Failed to read Validation File " + fakeFilePath;
         final String actualMessage = exception.getMessage();
 
         assertEquals(expectedMessage, actualMessage);

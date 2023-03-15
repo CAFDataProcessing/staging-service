@@ -18,12 +18,8 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,10 +32,18 @@ final class ValidationFileAdapter
 
     public ValidationFileAdapter(final String file) throws IOException
     {
-        final ObjectMapper mapper = new ObjectMapper();
-        final JsonNode fileContents = mapper.readTree(getFileContents(file));
-        this.fieldsJsonObject = fileContents.get("fields");
-        this.typesJsonObject = fileContents.get("types");
+        final InputStream input = ValidationFileAdapter.class.getClassLoader().getResourceAsStream(file);
+
+        if (input != null) {
+            final ObjectMapper mapper = new ObjectMapper();
+            final JsonNode fileContents = mapper.readTree(input);
+
+            this.fieldsJsonObject = fileContents.get("fields");
+            this.typesJsonObject = fileContents.get("types");
+        } else {
+            throw new IOException("Failed to read Validation File " + file);
+        }
+
     }
 
     public ArrayList<String> getFieldKeys()
@@ -67,24 +71,5 @@ final class ValidationFileAdapter
             }
         }
         return flattenedFields;
-    }
-
-    static String getFileContents(final String filePath) throws IOException
-    {
-        try {
-            final InputStream inputStream = Files.newInputStream(Paths.get(filePath));
-            final StringBuilder sb = new StringBuilder();
-
-            try ( BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-            }
-            return sb.toString();
-
-        } catch (final IOException ex) {
-            throw new IOException("Failed to read Validation File", ex);
-        }
     }
 }
