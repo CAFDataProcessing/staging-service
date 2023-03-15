@@ -15,7 +15,8 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,35 +24,46 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 final class ValidationFileAdapter
 {
-    private final JSONObject fieldsJsonObject;
-    private final JSONObject typesJsonObject;
+    private final JsonNode fieldsJsonObject;
+    private final JsonNode typesJsonObject;
 
     public ValidationFileAdapter(final String file) throws IOException
     {
-        final JSONObject fileContents = new JSONObject(getFileContents(file));
-        this.fieldsJsonObject = new JSONObject(fileContents.optString("fields"));
-        this.typesJsonObject = new JSONObject(fileContents.optString("types"));
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode fileContents = mapper.readTree(getFileContents(file));
+        this.fieldsJsonObject = fileContents.get("fields");
+        this.typesJsonObject = fileContents.get("types");
     }
 
-    public Set<String> getFieldKeys()
+    public ArrayList<String> getFieldKeys()
     {
-        return fieldsJsonObject.keySet();
+        final ArrayList<String> fieldKeys = new ArrayList<>();
+        final Iterator<String> iterator = fieldsJsonObject.fieldNames();
+        iterator.forEachRemaining(fieldKeys::add);
+
+        return fieldKeys;
     }
 
-    public Map<String, Set<String>> getFlattenedFieldKeys()
+    public Map<String, ArrayList<String>> getFlattenedFieldKeys()
     {
-        final Map<String, Set<String>> flattenedFields = new HashMap<>();
+        final Map<String, ArrayList<String>> flattenedFields = new HashMap<>();
         for (final String fieldKey : getFieldKeys()) {
-            final JSONObject field = fieldsJsonObject.getJSONObject(fieldKey);
-            if (field.optString("objectEncoding").equals("flattened")) {
-                final JSONObject propertiesJsonObject = typesJsonObject.getJSONObject(fieldKey.toLowerCase());
-                flattenedFields.put(fieldKey, propertiesJsonObject.keySet());
+            final JsonNode field = fieldsJsonObject.get(fieldKey);
+            if (field.has("objectEncoding")) {
+                if (field.get("objectEncoding").asText().equals("flattened")) {
+                    final JsonNode propertiesJsonObject = typesJsonObject.get(fieldKey.toLowerCase());
+                    final ArrayList<String> fieldKeys = new ArrayList<>();
+                    final Iterator<String> iterator = propertiesJsonObject.fieldNames();
+                    iterator.forEachRemaining(fieldKeys::add);
+                    flattenedFields.put(fieldKey, fieldKeys);
+                }
             }
         }
         return flattenedFields;

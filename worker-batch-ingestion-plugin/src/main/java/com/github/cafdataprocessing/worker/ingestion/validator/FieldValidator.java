@@ -19,22 +19,15 @@ import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public final class FieldValidator implements FieldValidatorInterface
 {
-    private final Set<String> allowedFields;
-    private final Map<String, Set<String>> allowedFlattenedFields;
-
-    public FieldValidator()
-    {
-        allowedFields = Collections.emptySet();
-        allowedFlattenedFields = new HashMap<>();
-    }
+    private final ArrayList<String> allowedFields;
+    private final Map<String, ArrayList<String>> allowedFlattenedFields;
 
     public FieldValidator(final String validationFile) throws IOException
     {
@@ -68,7 +61,7 @@ public final class FieldValidator implements FieldValidatorInterface
     private boolean isValidFlattenedField(final String fieldKey)
     {
         for (final String flattenedPrefix : allowedFlattenedFields.keySet()) {
-            final Set<String> flattenedSuffixes = allowedFlattenedFields.get(flattenedPrefix);
+            final ArrayList<String> flattenedSuffixes = allowedFlattenedFields.get(flattenedPrefix);
             for (final String flattenedSuffix : flattenedSuffixes) {
                 if (fieldKey.startsWith(flattenedPrefix) && fieldKey.endsWith(flattenedSuffix)) {
                     return true;

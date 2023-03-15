@@ -18,7 +18,7 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +52,7 @@ public class ValidationFileAdapterTest
         final int expectedNumberOfFields = 10;
 
         final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
-        final Set<String> fieldKeys = adapter.getFieldKeys();
+        final ArrayList<String> fieldKeys = adapter.getFieldKeys();
 
         assertEquals(expectedNumberOfFields, fieldKeys.size());
     }
@@ -61,7 +61,7 @@ public class ValidationFileAdapterTest
     public void testGetFlattenedFieldKeysOcr() throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
-        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
+        final Map<String, ArrayList<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("OCR").contains("CONFIDENCE"));
         assertEquals(4, flattenedFields.get("OCR").size());
@@ -71,7 +71,7 @@ public class ValidationFileAdapterTest
     public void testGetFlattenedFieldKeysMetadataFiles() throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
-        final Map<String, Set<String>> flattenedFields = adapter.getFlattenedFieldKeys();
+        final Map<String, ArrayList<String>> flattenedFields = adapter.getFlattenedFieldKeys();
 
         assertTrue(flattenedFields.get("METADATA_FILES").contains("CONTENT"));
         assertEquals(2, flattenedFields.get("METADATA_FILES").size());
