@@ -27,8 +27,8 @@ import java.util.Map;
 
 final class ValidationFileAdapter
 {
-    private final JsonNode fieldsJsonObject;
-    private final JsonNode typesJsonObject;
+    private final JsonNode fieldsJsonNode;
+    private final JsonNode typesJsonNode;
 
     public ValidationFileAdapter(final String file) throws IOException
     {
@@ -38,8 +38,8 @@ final class ValidationFileAdapter
             final ObjectMapper mapper = new ObjectMapper();
             final JsonNode fileContents = mapper.readTree(input);
 
-            this.fieldsJsonObject = fileContents.get("fields");
-            this.typesJsonObject = fileContents.get("types");
+            this.fieldsJsonNode = fileContents.get("fields");
+            this.typesJsonNode = fileContents.get("types");
         } else {
             throw new IOException("Failed to read Validation File: " + file);
         }
@@ -49,7 +49,7 @@ final class ValidationFileAdapter
     public ArrayList<String> getFieldKeys()
     {
         final ArrayList<String> fieldKeys = new ArrayList<>();
-        final Iterator<String> iterator = fieldsJsonObject.fieldNames();
+        final Iterator<String> iterator = fieldsJsonNode.fieldNames();
         iterator.forEachRemaining(fieldKeys::add);
 
         return fieldKeys;
@@ -59,10 +59,10 @@ final class ValidationFileAdapter
     {
         final Map<String, ArrayList<String>> flattenedFields = new HashMap<>();
         for (final String fieldKey : getFieldKeys()) {
-            final JsonNode field = fieldsJsonObject.get(fieldKey);
+            final JsonNode field = fieldsJsonNode.get(fieldKey);
             if (field.has("objectEncoding")) {
                 if (field.get("objectEncoding").asText().equals("flattened")) {
-                    final JsonNode propertiesJsonObject = typesJsonObject.get(fieldKey.toLowerCase());
+                    final JsonNode propertiesJsonObject = typesJsonNode.get(fieldKey.toLowerCase());
                     final ArrayList<String> fieldKeys = new ArrayList<>();
                     final Iterator<String> iterator = propertiesJsonObject.fieldNames();
                     iterator.forEachRemaining(fieldKeys::add);
