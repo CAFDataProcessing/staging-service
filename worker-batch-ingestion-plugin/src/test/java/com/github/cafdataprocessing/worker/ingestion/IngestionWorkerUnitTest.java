@@ -482,7 +482,7 @@ public final class IngestionWorkerUnitTest
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
 
         testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
-        final String batchDefinition = "tenant6/batch10";
+        final String batchDefinition = "subbatch:tenant6/batch10/20230306-163000-t04-json.batch";
         taskMessageType = "DocumentMessage";
 
         plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
@@ -495,6 +495,37 @@ public final class IngestionWorkerUnitTest
             final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
 
             assertTrue(returnedDocument.fields.containsKey("OCR_0_0_NAME"));
+            assertEquals(expectedDocumentFailures, returnedDocument.failures.size());
+        }
+    }
+
+    @Test
+    @DisplayName("Test validator with validation file and single batch with existing document failures")
+    void testFieldValidatorWithExistingFailures() throws BatchDefinitionException, BatchWorkerTransientException
+    {
+        final String agentTestFile = "validator/agentFields-test2.json";
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+        final int expectedDocumentFailures = 3;
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:ALPHA", "123456"));
+
+        // Batch File has existing Document Failures
+        final String batchDefinition = "subbatch:tenant6/batch10/20230315-113000-t04-json.batch";
+        taskMessageType = "DocumentMessage";
+
+        plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
+
+        assertThat(constructedMessages.size(), is(equalTo(1)));
+        for (final TaskMessage returnedMessage : constructedMessages) {
+            checkClassifierAndApiVersion(returnedMessage);
+
+            final DocumentWorkerDocumentTask returnedTaskData = (DocumentWorkerDocumentTask) returnedMessage.getTaskData();
+            final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
+
             assertEquals(expectedDocumentFailures, returnedDocument.failures.size());
         }
     }

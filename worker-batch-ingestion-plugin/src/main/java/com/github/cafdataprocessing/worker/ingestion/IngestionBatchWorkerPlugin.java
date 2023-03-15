@@ -243,7 +243,10 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         throws IOException, BatchDefinitionException
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
-        document.document.failures = new ArrayList<>();
+
+        if (document.document.failures == null) {
+            document.document.failures = new ArrayList<>();
+        }
 
         document.document = fieldValidator.validate(document.document);
 
