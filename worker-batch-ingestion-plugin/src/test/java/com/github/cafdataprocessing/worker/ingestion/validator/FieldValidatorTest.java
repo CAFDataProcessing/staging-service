@@ -57,10 +57,26 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorFlattenedAgentFields() throws IOException
+    public void testFieldValidatorFlattenedAgentFieldsMetadataFiles() throws IOException
     {
         final int expectedFields = 3;
         final String fieldName = "METADATA_FILES_0_CONTENT";
+
+        final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
+        DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
+
+        final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        agentFieldValidator.validate(document);
+
+        assertEquals(expectedFields, document.fields.size());
+        assertTrue(document.fields.containsKey(fieldName));
+    }
+
+    @Test
+    public void testFieldValidatorFlattenedAgentFieldsOcr() throws IOException
+    {
+        final int expectedFields = 3;
+        final String fieldName = "OCR_3_5_CONFIDENCE";
 
         final List<String> fieldNames = Arrays.asList("ACCOUNTS", "COLLECTION_STATUS", fieldName);
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));

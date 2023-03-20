@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -49,26 +48,49 @@ final class ValidationFileAdapter
     public ArrayList<String> getFieldKeys()
     {
         final ArrayList<String> fieldKeys = new ArrayList<>();
-        final Iterator<String> iterator = fieldsJsonNode.fieldNames();
-        iterator.forEachRemaining(fieldKeys::add);
+        final Iterator<Map.Entry<String, JsonNode>> fieldIterator = fieldsJsonNode.fields();
 
+        while (fieldIterator.hasNext()) {
+            final String newField;
+            final Map.Entry<String, JsonNode> field = fieldIterator.next();
+            if (field.getValue().has("objectEncoding")) {
+                if (field.getValue().get("objectEncoding").asText().equals("flattened")) {
+                    fieldKeys.addAll(generateFlattenedFieldRegex(field));
+                } else {
+                    newField = field.getKey();
+                    fieldKeys.add(newField);
+                }
+            } else {
+                newField = field.getKey();
+                fieldKeys.add(newField);
+            }
+        }
         return fieldKeys;
     }
 
-    public Map<String, ArrayList<String>> getFlattenedFieldKeys()
+    private ArrayList<String> generateFlattenedFieldRegex(final Map.Entry<String, JsonNode> field)
     {
-        final Map<String, ArrayList<String>> flattenedFields = new HashMap<>();
-        for (final String fieldKey : getFieldKeys()) {
-            final JsonNode field = fieldsJsonNode.get(fieldKey);
-            if (field.has("objectEncoding")) {
-                if (field.get("objectEncoding").asText().equals("flattened")) {
-                    final JsonNode propertiesJsonObject = typesJsonNode.get(fieldKey.toLowerCase());
-                    final ArrayList<String> fieldKeys = new ArrayList<>();
-                    final Iterator<String> iterator = propertiesJsonObject.fieldNames();
-                    iterator.forEachRemaining(fieldKeys::add);
-                    flattenedFields.put(fieldKey, fieldKeys);
-                }
+        final ArrayList<String> flattenedFields = new ArrayList<>();
+
+        final String[] fieldType = field.getValue().get("type").asText().split("(?<=\\[)|(?=\\[)", 2);
+        final JsonNode property = typesJsonNode.get(fieldType[0]);
+        final long count = fieldType[1].chars().filter(ch -> ch == '[').count();
+
+        final Iterator<Map.Entry<String, JsonNode>> properties = property.fields();
+
+        while (properties.hasNext()) {
+            final String suffix = properties.next().getKey();
+            final StringBuilder sb = new StringBuilder();
+            sb.append("^").append("(").append(fieldType[0].toUpperCase()).append(")");
+
+            sb.append("+(_(?=\\d))");
+            for (int i = 0; i < count; i++) {
+                sb.append("+((?<=_)\\d(?=_))+((?<=\\d)_)");
             }
+            sb.append("+").append("(").append(suffix.toUpperCase()).append(")").append("$");
+
+            flattenedFields.add(sb.toString());
+            property.fields().next();
         }
         return flattenedFields;
     }

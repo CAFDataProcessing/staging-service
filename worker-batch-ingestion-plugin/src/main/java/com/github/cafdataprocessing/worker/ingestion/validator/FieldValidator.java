@@ -21,19 +21,16 @@ import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public final class FieldValidator implements FieldValidatorInterface
 {
     private final ArrayList<String> allowedFields;
-    private final Map<String, ArrayList<String>> allowedFlattenedFields;
 
     public FieldValidator(final String validationFile) throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(validationFile);
         allowedFields = adapter.getFieldKeys();
-        allowedFlattenedFields = adapter.getFlattenedFieldKeys();
     }
 
     @Override
@@ -47,7 +44,7 @@ public final class FieldValidator implements FieldValidatorInterface
 
         for (final String key : keySet) {
             try {
-                if (!(isValidField(key) || isValidFlattenedField(key))) {
+                if (!(isValidField(key))) {
                     final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
                     fieldNotAllowedFailure.failureId = "IW-001";
                     fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
@@ -72,17 +69,9 @@ public final class FieldValidator implements FieldValidatorInterface
 
     private boolean isValidField(final String fieldKey)
     {
-        return allowedFields.contains(fieldKey);
-    }
-
-    private boolean isValidFlattenedField(final String fieldKey)
-    {
-        for (final String flattenedPrefix : allowedFlattenedFields.keySet()) {
-            final ArrayList<String> flattenedSuffixes = allowedFlattenedFields.get(flattenedPrefix);
-            for (final String flattenedSuffix : flattenedSuffixes) {
-                if (fieldKey.startsWith(flattenedPrefix) && fieldKey.endsWith(flattenedSuffix)) {
-                    return true;
-                }
+        for (final String field : allowedFields) {
+            if (fieldKey.matches(field)) {
+                return true;
             }
         }
         return false;
