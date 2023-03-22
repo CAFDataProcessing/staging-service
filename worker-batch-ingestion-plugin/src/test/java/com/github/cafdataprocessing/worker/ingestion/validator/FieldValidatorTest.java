@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
-    private final static String AGENT_TEST_FILE = "validator/agentFields-test1.json";
+    private final static String AGENT_TEST_FILE = "src/test/resources/validator/agentFields-test1.json";
     private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
     private final static String INVALID_FIELD_NAME = "INVALID_FIELD_NAME";
 

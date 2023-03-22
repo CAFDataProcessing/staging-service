@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidationFileAdapterTest
 {
-    private static final String AGENT_TEST_FILE_1 = "validator/agentFields-test1.json";
+    private static final String AGENT_TEST_FILE_1 = "src/test/resources/validator/agentFields-test1.json";
 
     @Test
     public void testGetFieldKeys() throws IOException

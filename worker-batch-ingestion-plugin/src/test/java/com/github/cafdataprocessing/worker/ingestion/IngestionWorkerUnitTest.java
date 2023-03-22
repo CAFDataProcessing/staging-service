@@ -473,7 +473,7 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with validation file and single batch")
     void testFieldValidator() throws BatchDefinitionException, BatchWorkerTransientException
     {
-        final String agentTestFile = "validator/agentFields-test2.json";
+        final String agentTestFile = "src/test/resources/validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 2;
         envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
@@ -503,7 +503,7 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with validation file and single batch with existing document failures")
     void testFieldValidatorWithExistingFailures() throws BatchDefinitionException, BatchWorkerTransientException
     {
-        final String agentTestFile = "validator/agentFields-test2.json";
+        final String agentTestFile = "src/test/resources/validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 3;
         envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
