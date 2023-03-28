@@ -18,7 +18,6 @@ package com.github.cafdataprocessing.worker.ingestion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.caf.api.worker.TaskMessage;
 import com.hpe.caf.api.worker.TaskStatus;
-import com.hpe.caf.services.job.client.ApiClient;
 import com.hpe.caf.services.job.client.ApiException;
 import com.hpe.caf.services.job.client.api.JobsApi;
 import com.hpe.caf.services.job.client.model.Job;
@@ -32,9 +31,11 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -52,8 +53,6 @@ import org.junit.jupiter.api.TestInstance;
 @Slf4j
 public class BatchWorkerAcceptanceIT
 {
-
-    private final Connection conn;
     private final Channel channel;
     private final String workflow_queue;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -63,21 +62,28 @@ public class BatchWorkerAcceptanceIT
     public BatchWorkerAcceptanceIT() throws IOException, TimeoutException
     {
         workflow_queue = "worker-workflow";
+
         output_queue = System.getenv("CAF_BATCH_WORKER_ERROR_QUEUE");
         log.debug("Output queue: " + output_queue);
+
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(System.getenv("RABBITMQ_TEST_HOST"));
         factory.setPort(Integer.parseInt(System.getenv("RABBITMQ_TEST_PORT")));
-        conn = factory.newConnection();
+        factory.setUsername("guest");
+        factory.setPassword("guest");
+
+        final Connection conn = factory.newConnection();
         channel = conn.createChannel();
-        final ApiClient client = new ApiClient();
-        client.setBasePath(System.getenv("JOB_SERVICE_ADDRESS"));
-        jobsApi = new JobsApi(client);
+
+        jobsApi = new JobsApi();
+        jobsApi.getApiClient().setBasePath(System.getenv("JOB_SERVICE_ADDRESS"));
+        jobsApi.getApiClient().setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+        jobsApi.getApiClient().getDateFormat().setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Test
     @DisplayName("Check environmental variables for tests have been set")
-    void checkEnvVariablesTest() throws ApiException
+    void checkEnvVariablesTest()
     {
         log.debug("Job Service: " + System.getenv("JOB_SERVICE_ADDRESS"));
         assertThat(System.getenv("JOB_SERVICE_ADDRESS"), is(notNullValue()));
@@ -90,15 +96,17 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Check number of messages for single Subbatch")
-    void countMessagesSingleSubbatchTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void countMessagesSingleSubbatchTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant3";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final NewJob job = createNewJobs("First Job", "Single subbatch",
-                                         "subbatch:tenant3/batch3/20190328-100001-t04-json.batch", new HashMap<>());
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+        final String description = "First Job";
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "subbatch:tenant3/batch3/20190328-100001-t04-json.batch",
+                     new HashMap<>(), partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         // give time to the various apps to manage the job
@@ -128,14 +136,16 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Check number of messages for single Batch")
-    void countMessagesSingleBatchTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void countMessagesSingleBatchTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant2";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final NewJob job = createNewJobs("Second Job", "Single batch", "tenant2/batch1", new HashMap<>());
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+        final String description = "Second Job";
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant2/batch1", new HashMap<>(), partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -163,14 +173,16 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Check number of messages for multiple Batches")
-    void countMessagesMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void countMessagesMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch2|batch3", new HashMap<>());
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+        final String description = "Third Job";
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/batch1|batch2|batch3", new HashMap<>(), partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -198,14 +210,16 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Check number of messages for 937 subbatches")
-    void countMessagesManySubbatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void countMessagesManySubbatchesTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant5";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final NewJob job = createNewJobs("Last Job", "Multiple batches", "tenant5/batch-big", new HashMap<>());
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+        final String description = "Last Job";
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant5/batch-big", new HashMap<>(), partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -232,15 +246,17 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Multple batches check custom data managed")
-    void checkCustomDataMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void checkCustomDataMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant5";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch2|batch3", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/batch1|batch2|batch3", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -275,18 +291,21 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Multple batches check script managed")
-    void checkScriptMultipleBatchesTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void checkScriptMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
-        final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("graaljs:resetDocumentOnError.js",
-                                                                                                     "function onError(document, error) "
-                                                                                                     + "{ document.getField('ERROR')"
-                                                                                                     + ".add(error); }"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch2|batch3", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
+        final String description = "Third Job";
+        final Map<String, String> taskParams = createTaskMessageParams(
+            new AbstractMap.SimpleEntry<>("graaljs:resetDocumentOnError.js",
+                                          "function onError(document, error) "
+                                          + "{ document.getField('ERROR')"
+                                          + ".add(error); }"));
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/batch1|batch2|batch3", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -323,15 +342,17 @@ public class BatchWorkerAcceptanceIT
 
     @Test
     @DisplayName("Test data put in the TaskMessage and DocumentWorkerDocumentTask")
-    void checkDataTest() throws ApiException, IOException, TimeoutException, InterruptedException
+    void checkDataTest() throws ApiException, IOException, InterruptedException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch2|batch3", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/batch1|batch2|batch3", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -379,13 +400,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test batch definitions is null")
     void batchDefinitionNullTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", null, taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, null, taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -425,13 +448,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test invalid tenantId")
     void invalidTenantIdTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant:1/batch1", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant:1/batch1", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -471,13 +496,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test invalid batchId")
     void invalidBatchIdTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/bat:ch1", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/bat:ch1", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -517,14 +544,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test invalid json")
     void invalidJsonTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant4";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "subbatch:tenant4/batch8/20190314-100001-t04-json.batch",
-                                         taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "subbatch:tenant4/batch8/20190314-100001-t04-json.batch", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -564,14 +592,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test non existing batch file")
     void nonExistingFileTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant4";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "subbatch:tenant4/batch8/20190314-100001-ttt-json.batch",
-                                         taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "subbatch:tenant4/batch8/20190314-100001-ttt-json.batch", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -612,14 +641,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test non existing batch directory")
     void nonExistingDirectoryTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant4";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant4/batch10",
-                                         taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant4/batch10", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -660,14 +690,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test non existing batch directory in multibatch")
     void nonExistingDirectoryInMultiBatchTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "tenant1/batch1|batch10|batch2",
-                                         taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "tenant1/batch1|batch10|batch2", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -709,14 +740,16 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test non existing directory in subbatch")
     void nonExistingDirectoryInSubbatchTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "subbatch:tenant4/batch10/20190314-100001-t04-json.batch",
-                                         taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "subbatch:tenant4/batch10/20190314-100001-t04-json.batch",
+                     taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -757,13 +790,15 @@ public class BatchWorkerAcceptanceIT
     @DisplayName("Test tenantId not present")
     void tenantIdNotPresentTest() throws ApiException, InterruptedException, IOException
     {
+        final String partitionId = "tenant-tenant1";
         final String jobId = RandomStringUtils.randomAlphanumeric(10);
+        final String description = "Third Job";
         final Map<String, String> taskParams = createTaskMessageParams(new AbstractMap.SimpleEntry<>("customdata:GAMMA", "MIOP90"));
-        final NewJob job = createNewJobs("Third Job", "Multiple batches", "batch8|batch5", taskParams);
-        jobsApi.createOrUpdateJob(jobId, job, "");
-        final Job jobRetrieved = jobsApi.getJob(jobId, "");
 
-        assertThat(jobRetrieved.getDescription(), is(equalTo(job.getDescription())));
+        createNewJob(jobId, description, "batch8|batch5", taskParams, partitionId);
+        final Job jobRetrieved = jobsApi.getJob(partitionId, jobId, "");
+
+        assertThat(jobRetrieved.getDescription(), is(equalTo(description)));
         assertThat(jobRetrieved.getId(), is(equalTo(jobId)));
 
         Thread.sleep(30000L);
@@ -799,24 +834,30 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    private NewJob createNewJobs(final String name, final String description, final String batchDefinition,
-                                 final Map<String, String> taskMessageParams)
+    private void createNewJob(final String queueName, final String description, final String batchDefinition,
+                              final Map<String, String> taskMessageParams, final String partitionId)
+        throws ApiException
     {
         final NewJob job = new NewJob();
-        job.setName(name);
+        job.setName(queueName);
         job.setDescription(description);
+
         final WorkerAction task = new WorkerAction();
         task.setTaskPipe("ingestion-batch-in");
         task.setTaskClassifier("BatchWorker");
         task.setTaskApiVersion(1);
+
         final BatchWorkerTask taskData = new BatchWorkerTask();
         taskData.batchType = "IngestionBatchWorkerPlugin";
         taskData.batchDefinition = batchDefinition;
         taskData.targetPipe = "worker-workflow";
         taskData.taskMessageParams = taskMessageParams;
+
         task.setTaskData(taskData);
+
         job.setTask(task);
-        return job;
+
+        jobsApi.createOrUpdateJob(partitionId, queueName, job, null);
     }
 
     private int setupQueue(final String queue) throws IOException
@@ -839,7 +880,7 @@ public class BatchWorkerAcceptanceIT
     }
 
     @SafeVarargs
-    private static final Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
+    private static Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
     {
         Map<String, String> testTaskMessageParams = new HashMap<>();
         for (Map.Entry<String, String> entry : entries) {
