@@ -187,6 +187,8 @@
                         <JOB_SERVICE_ADDRESS>http://${docker.host.address}:${job-service.adminport}/job-service/v1</JOB_SERVICE_ADDRESS>
                         <RABBITMQ_TEST_HOST>${docker.host.address}</RABBITMQ_TEST_HOST>
                         <RABBITMQ_TEST_PORT>${rabbitmq.node.port}</RABBITMQ_TEST_PORT>
+                        <RABBITMQ_TEST_USERNAME>guest</RABBITMQ_TEST_USERNAME>
+                        <RABBITMQ_TEST_PASSWORD>guest</RABBITMQ_TEST_PASSWORD>
                         <CAF_BATCH_WORKER_ERROR_QUEUE>test-output</CAF_BATCH_WORKER_ERROR_QUEUE>
                     </environmentVariables>
                 </configuration>

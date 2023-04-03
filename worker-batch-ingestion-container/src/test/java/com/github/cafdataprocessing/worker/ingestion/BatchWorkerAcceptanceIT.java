@@ -69,8 +69,8 @@ public class BatchWorkerAcceptanceIT
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(System.getenv("RABBITMQ_TEST_HOST"));
         factory.setPort(Integer.parseInt(System.getenv("RABBITMQ_TEST_PORT")));
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setUsername(System.getenv("RABBITMQ_TEST_USERNAME"));
+        factory.setPassword(System.getenv("RABBITMQ_TEST_PASSWORD"));
 
         final Connection conn = factory.newConnection();
         channel = conn.createChannel();
@@ -92,6 +92,8 @@ public class BatchWorkerAcceptanceIT
         log.debug("RabbitMQ port: " + System.getenv("RABBITMQ_TEST_PORT"));
         assertThat(System.getenv("RABBITMQ_TEST_PORT"), is(notNullValue()));
         assertThat(System.getenv("CAF_BATCH_WORKER_ERROR_QUEUE"), is(notNullValue()));
+        assertThat(System.getenv("RABBITMQ_TEST_USERNAME"), is(notNullValue()));
+        assertThat(System.getenv("RABBITMQ_TEST_PASSWORD"), is(notNullValue()));
     }
 
     @Test
@@ -880,7 +882,7 @@ public class BatchWorkerAcceptanceIT
     }
 
     @SafeVarargs
-    private static Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
+    private static final Map<String, String> createTaskMessageParams(Map.Entry<String, String>... entries)
     {
         Map<String, String> testTaskMessageParams = new HashMap<>();
         for (Map.Entry<String, String> entry : entries) {
