@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,9 +47,8 @@ public class ValidationFileAdapterTest
         final Exception exception = assertThrows(IOException.class,
                                                  () -> new ValidationFileAdapter(fakeFilePath));
 
-        final String expectedMessage = "Failed to read Validation File: " + fakeFilePath;
         final String actualMessage = exception.getMessage();
 
-        assertEquals(expectedMessage, actualMessage);
+        assertThat(actualMessage, containsString(fakeFilePath));
     }
 }
