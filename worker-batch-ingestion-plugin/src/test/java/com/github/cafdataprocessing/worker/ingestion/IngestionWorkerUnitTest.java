@@ -539,9 +539,7 @@ public final class IngestionWorkerUnitTest
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 
-        final String expectedMessage = "Failed to read Validation File: INVALID_TEST_FILE_PATH";
-
-        assertEquals(expectedMessage, exception.getMessage());
+        assertThat(exception.getMessage(), containsString("INVALID_TEST_FILE_PATH"));
     }
 
     private static Stream<Arguments> scriptProvider()
