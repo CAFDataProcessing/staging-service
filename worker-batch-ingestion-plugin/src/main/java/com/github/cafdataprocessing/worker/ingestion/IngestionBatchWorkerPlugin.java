@@ -36,6 +36,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,16 +94,22 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
                                      new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
 
+        fieldValidator = createFieldValidator();
+    }
+
+    private static FieldValidatorInterface createFieldValidator()
+    {
         final String validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
-        if (StringUtils.isNotEmpty(validationFile)) {
-            try {
-                fieldValidator = new FieldValidator(validationFile);
-            } catch (final IOException ex) {
-                log.error(ex.getMessage(), ex.getCause());
-                throw new RuntimeException(ex.getMessage());
-            }
-        } else {
-            fieldValidator = NullFieldValidator.INSTANCE;
+
+        if (StringUtils.isEmpty(validationFile)) {
+            return NullFieldValidator.INSTANCE;
+        }
+
+        try {
+            return new FieldValidator(validationFile);
+        } catch (final IOException ex) {
+            log.error("Failed to read validation File: {}", validationFile, ex);
+            throw new UncheckedIOException(ex);
         }
     }
 

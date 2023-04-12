@@ -44,7 +44,7 @@ public final class FieldValidator implements FieldValidatorInterface
 
         for (final String key : keySet) {
             try {
-                if (!(isValidField(key))) {
+                if (!isValidField(key)) {
                     final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
                     fieldNotAllowedFailure.failureId = "IW-001";
                     fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";

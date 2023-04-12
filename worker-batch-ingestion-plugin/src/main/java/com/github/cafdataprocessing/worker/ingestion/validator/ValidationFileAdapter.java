@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,14 +33,12 @@ final class ValidationFileAdapter
 
     public ValidationFileAdapter(final String file) throws IOException
     {
-        try ( InputStream input = Files.newInputStream(java.nio.file.Paths.get(file))) {
+        try (final InputStream input = Files.newInputStream(Paths.get(file))) {
             final ObjectMapper mapper = new ObjectMapper();
             final JsonNode fileContents = mapper.readTree(input);
 
             this.fieldsJsonNode = fileContents.get("fields");
             this.typesJsonNode = fileContents.get("types");
-        } catch (final IOException e) {
-            throw new IOException("Failed to read Validation File: " + file);
         }
     }
 

@@ -30,6 +30,6 @@ public enum NullFieldValidator implements FieldValidatorInterface
     @Override
     public String toString()
     {
-        return "<null field validator";
+        return "<null field validator>";
     }
 }
