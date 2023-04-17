@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 final class ValidationFileAdapter
 {
