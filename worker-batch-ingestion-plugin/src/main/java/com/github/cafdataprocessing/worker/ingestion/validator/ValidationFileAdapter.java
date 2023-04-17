@@ -48,18 +48,13 @@ final class ValidationFileAdapter
         final Iterator<Map.Entry<String, JsonNode>> fieldIterator = fieldsJsonNode.fields();
 
         while (fieldIterator.hasNext()) {
-            final String newField;
             final Map.Entry<String, JsonNode> field = fieldIterator.next();
-            if (field.getValue().has("objectEncoding")) {
-                if (field.getValue().get("objectEncoding").asText().equals("flattened")) {
-                    fieldKeys.addAll(generateFlattenedFieldRegex(field));
-                } else {
-                    newField = field.getKey();
-                    fieldKeys.add(newField);
-                }
+            final JsonNode objectEncodingNode = field.getValue().get("objectEncoding");
+            if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
+                fieldKeys.addAll(generateFlattenedFieldRegex(field));
             } else {
-                newField = field.getKey();
-                fieldKeys.add(newField);
+                final String newField = field.getKey();
+                fieldKeys.add(Pattern.quote(newField));
             }
         }
         return fieldKeys;
