@@ -58,7 +58,6 @@ public final class FieldValidator implements FieldValidatorInterface
 
         if (document.subdocuments != null) {
             final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
-            document.subdocuments = new ArrayList<>();
             subDocs.replaceAll(this::validate);
 
             document.subdocuments = subDocs;

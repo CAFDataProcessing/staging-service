@@ -65,7 +65,7 @@ final class ValidationFileAdapter
     {
         final ArrayList<String> flattenedFields = new ArrayList<>();
 
-        final String[] fieldType = field.getValue().get("type").asText().split("(?<=\\[)|(?=\\[)", 2);
+        final String[] fieldType = field.getValue().get("type").asText().split("(?=\\[)", 2);
         final JsonNode property = typesJsonNode.get(fieldType[0]);
         final long count = fieldType[1].chars().filter(ch -> ch == '[').count();
 
