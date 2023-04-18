@@ -21,16 +21,19 @@ import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class FieldValidator implements FieldValidatorInterface
 {
-    private final ArrayList<String> allowedFields;
+    private final List<Pattern> allowedFieldPatterns;
 
     public FieldValidator(final String validationFile) throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(validationFile);
-        allowedFields = adapter.getFieldKeys();
+        allowedFieldPatterns = adapter.getFieldKeys().stream().map(Pattern::compile).collect(Collectors.toList());
     }
 
     @Override
@@ -68,11 +71,8 @@ public final class FieldValidator implements FieldValidatorInterface
 
     private boolean isValidField(final String fieldKey)
     {
-        for (final String field : allowedFields) {
-            if (fieldKey.matches(field)) {
-                return true;
-            }
-        }
-        return false;
+        return allowedFieldPatterns
+                .stream()
+                .anyMatch(allowedFieldPattern -> allowedFieldPattern.matcher(fieldKey).matches());
     }
 }
