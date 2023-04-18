@@ -494,6 +494,7 @@ public final class IngestionWorkerUnitTest
             final DocumentWorkerDocumentTask returnedTaskData = (DocumentWorkerDocumentTask) returnedMessage.getTaskData();
             final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
 
+            assertThat(returnedDocument.fields.size(), is(equalTo(3)));
             assertTrue(returnedDocument.fields.containsKey("OCR_0_0_NAME"));
             assertEquals(expectedDocumentFailures, returnedDocument.failures.size());
         }
