@@ -74,13 +74,13 @@ final class ValidationFileAdapter
         while (properties.hasNext()) {
             final String suffix = properties.next().getKey();
             final StringBuilder sb = new StringBuilder();
-            sb.append("^").append("(").append(fieldType[0].toUpperCase()).append(")");
+            sb.append("^").append("(").append(Pattern.quote(field.getKey())).append(")");
 
-            sb.append("+(_(?=\\d))");
+            sb.append("_");
             for (int i = 0; i < count; i++) {
-                sb.append("+((?<=_)\\d(?=_))+((?<=\\d)_)");
+                sb.append("([^_]+)_");
             }
-            sb.append("+").append("(").append(suffix.toUpperCase()).append(")").append("$");
+            sb.append("(").append(suffix.toUpperCase()).append(")").append("$");
 
             flattenedFields.add(sb.toString());
             property.fields().next();

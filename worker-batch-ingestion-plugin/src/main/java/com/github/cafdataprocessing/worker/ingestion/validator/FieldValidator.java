@@ -72,7 +72,7 @@ public final class FieldValidator implements FieldValidatorInterface
     private boolean isValidField(final String fieldKey)
     {
         return allowedFieldPatterns
-                .stream()
-                .anyMatch(allowedFieldPattern -> allowedFieldPattern.matcher(fieldKey).matches());
+            .stream()
+            .anyMatch(allowedFieldPattern -> allowedFieldPattern.matcher(fieldKey).matches());
     }
 }
