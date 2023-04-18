@@ -15,8 +15,11 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 public final class FieldValidator implements FieldValidatorInterface
 {
     private final List<Pattern> allowedFieldPatterns;
@@ -51,11 +55,18 @@ public final class FieldValidator implements FieldValidatorInterface
                     final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
                     fieldNotAllowedFailure.failureId = "IW-001";
                     fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    fieldNotAllowedFailure.failureStack = "Invalid Field Value: "
+                        + mapper.writeValueAsString(document.fields.get(key));
+
                     document.failures.add(fieldNotAllowedFailure);
                     document.fields.remove(key);
                 }
             } catch (final UnsupportedOperationException ex) {
                 throw new UnsupportedOperationException("Error while modifying immutable Collection", ex);
+            } catch (final JsonProcessingException ex) {
+                log.error("Unable to write invalid field value as string", ex);
             }
         }
 
