@@ -64,27 +64,50 @@ final class ValidationFileAdapter
     private ArrayList<String> generateFlattenedFieldRegex(final Map.Entry<String, JsonNode> field)
     {
         final ArrayList<String> flattenedFields = new ArrayList<>();
+        final ArrayList<String> stringsForField = new ArrayList<>(getStringsForField(field));
+
+        for (final String s : stringsForField) {
+            flattenedFields.add("^" + s + "$");
+        }
+
+        return flattenedFields;
+    }
+
+    private ArrayList<String> getStringsForField(final Map.Entry<String, JsonNode> field)
+    {
+        final ArrayList<String> strings = new ArrayList<>();
+        final String fieldKey = field.getKey();
+        StringBuilder sb = new StringBuilder(fieldKey);
 
         final String[] fieldType = field.getValue().get("type").asText().split("(?=\\[)", 2);
-        final JsonNode property = typesJsonNode.get(fieldType[0]);
+        final StringBuilder flatChars = new StringBuilder();
         final long count = fieldType[1].chars().filter(ch -> ch == '[').count();
 
-        final Iterator<Map.Entry<String, JsonNode>> properties = property.fields();
-
-        while (properties.hasNext()) {
-            final String suffix = properties.next().getKey();
-            final StringBuilder sb = new StringBuilder();
-            sb.append("^").append("(").append(Pattern.quote(field.getKey())).append(")");
-
-            sb.append("_");
-            for (int i = 0; i < count; i++) {
-                sb.append("([^_]+)_");
-            }
-            sb.append("(").append(suffix.toUpperCase()).append(")").append("$");
-
-            flattenedFields.add(sb.toString());
-            property.fields().next();
+        sb.append("_");
+        for (int i = 0; i < count; i++) {
+            flatChars.append("([^_]+)_");
         }
-        return flattenedFields;
+        sb.append(flatChars);
+
+        final JsonNode node = typesJsonNode.get(fieldKey.toLowerCase());
+
+        final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> property = fields.next();
+
+            final JsonNode objectEncodingNode = property.getValue().get("objectEncoding");
+            if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
+                for (final String s : getStringsForField(property)) {
+                    strings.add(sb + s);
+                }
+            } else {
+                sb.append(property.getKey());
+                strings.add(sb.toString());
+                sb = new StringBuilder(fieldKey);
+                sb.append("_").append(flatChars);
+            }
+        }
+        return strings;
     }
 }
