@@ -19,12 +19,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
+import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -60,11 +63,22 @@ public final class FieldValidator implements FieldValidatorInterface
                     fieldNotAllowedFailure.failureStack = "Invalid Field Value: "
                         + mapper.writeValueAsString(document.fields.get(key));
 
-                    document.failures.add(fieldNotAllowedFailure);
-                    document.fields.remove(key);
+                    try {
+                        document.failures.add(fieldNotAllowedFailure);
+                    } catch (UnsupportedOperationException ex) {
+                        List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
+                        writableFailureList.add(fieldNotAllowedFailure);
+                        document.failures = new ArrayList<>(writableFailureList);
+                    }
+
+                    try {
+                        document.fields.remove(key);
+                    } catch (UnsupportedOperationException ex) {
+                        Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
+                        writableFields.remove(key);
+                        document.fields = new HashMap<>(writableFields);
+                    }
                 }
-            } catch (final UnsupportedOperationException ex) {
-                throw new UnsupportedOperationException("Error while modifying immutable Collection", ex);
             } catch (final JsonProcessingException ex) {
                 log.error("Unable to write invalid field value as string", ex);
             }

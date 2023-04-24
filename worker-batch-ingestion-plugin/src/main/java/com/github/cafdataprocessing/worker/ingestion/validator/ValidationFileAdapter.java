@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -89,7 +90,7 @@ final class ValidationFileAdapter
         }
         sb.append(flatChars);
 
-        final JsonNode node = typesJsonNode.get(fieldKey.toLowerCase());
+        final JsonNode node = typesJsonNode.get(fieldKey.toLowerCase(Locale.ROOT));
 
         final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
 

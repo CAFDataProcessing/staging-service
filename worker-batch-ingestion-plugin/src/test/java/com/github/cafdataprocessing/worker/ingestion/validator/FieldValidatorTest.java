@@ -126,6 +126,9 @@ public class FieldValidatorTest
     @Test
     public void testFieldValidatorAgentFieldsWithImmutableListOfFailures() throws IOException
     {
+        final int expectedFields = 1;
+        final int expectedDocumentFailures = 1;
+
         final List<String> fieldNames = Arrays.asList("ACCOUNTS", INVALID_FIELD_NAME);
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
@@ -133,16 +136,18 @@ public class FieldValidatorTest
         document.failures = Collections.unmodifiableList(new ArrayList<>());
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        agentFieldValidator.validate(document);
 
-        final Exception exception = assertThrows(UnsupportedOperationException.class,
-                                                 () -> agentFieldValidator.validate(document));
-
-        assertEquals("Error while modifying immutable Collection", exception.getMessage());
+        assertEquals(expectedFields, document.fields.size());
+        assertEquals(expectedDocumentFailures, document.failures.size());
     }
 
     @Test
     public void testFieldValidatorAgentFieldsWithImmutableMapOfFields() throws IOException
     {
+        final int expectedFields = 1;
+        final int expectedDocumentFailures = 1;
+
         final List<String> fieldNames = Arrays.asList("ACCOUNTS", INVALID_FIELD_NAME);
         DocumentWorkerDocument document = createDocument(createDocumentFields(fieldNames));
 
@@ -150,11 +155,10 @@ public class FieldValidatorTest
         document.fields = Collections.unmodifiableMap(createDocumentFields(fieldNames));
 
         final FieldValidator agentFieldValidator = new FieldValidator(AGENT_TEST_FILE);
+        agentFieldValidator.validate(document);
 
-        final Exception exception = assertThrows(UnsupportedOperationException.class,
-                                                 () -> agentFieldValidator.validate(document));
-
-        assertEquals("Error while modifying immutable Collection", exception.getMessage());
+        assertEquals(expectedFields, document.fields.size());
+        assertEquals(expectedDocumentFailures, document.failures.size());
     }
 
     private Map<String, List<DocumentWorkerFieldValue>> createDocumentFields(final List<String> fieldNames)
