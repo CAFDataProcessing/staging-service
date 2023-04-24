@@ -46,49 +46,51 @@ public final class FieldValidator implements FieldValidatorInterface
     @Override
     public DocumentWorkerDocument validate(final DocumentWorkerDocument document)
     {
-        final Set<String> keySet = new HashSet<>(document.fields.keySet());
+        if (document.fields != null) {
+            final Set<String> keySet = new HashSet<>(document.fields.keySet());
 
-        if (document.failures == null) {
-            document.failures = new ArrayList<>();
-        }
-
-        for (final String key : keySet) {
-            try {
-                if (!isValidField(key)) {
-                    final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
-                    fieldNotAllowedFailure.failureId = "IW-001";
-                    fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    fieldNotAllowedFailure.failureStack = "Invalid Field Value: "
-                        + mapper.writeValueAsString(document.fields.get(key));
-
-                    try {
-                        document.failures.add(fieldNotAllowedFailure);
-                    } catch (UnsupportedOperationException ex) {
-                        List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
-                        writableFailureList.add(fieldNotAllowedFailure);
-                        document.failures = new ArrayList<>(writableFailureList);
-                    }
-
-                    try {
-                        document.fields.remove(key);
-                    } catch (UnsupportedOperationException ex) {
-                        Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
-                        writableFields.remove(key);
-                        document.fields = new HashMap<>(writableFields);
-                    }
-                }
-            } catch (final JsonProcessingException ex) {
-                log.error("Unable to write invalid field value as string", ex);
+            if (document.failures == null) {
+                document.failures = new ArrayList<>();
             }
-        }
 
-        if (document.subdocuments != null) {
-            final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
-            subDocs.replaceAll(this::validate);
+            for (final String key : keySet) {
+                try {
+                    if (!isValidField(key)) {
+                        final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
+                        fieldNotAllowedFailure.failureId = "IW-001";
+                        fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
 
-            document.subdocuments = subDocs;
+                        ObjectMapper mapper = new ObjectMapper();
+                        fieldNotAllowedFailure.failureStack = "Invalid Field Value: "
+                            + mapper.writeValueAsString(document.fields.get(key));
+
+                        try {
+                            document.failures.add(fieldNotAllowedFailure);
+                        } catch (UnsupportedOperationException ex) {
+                            List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
+                            writableFailureList.add(fieldNotAllowedFailure);
+                            document.failures = new ArrayList<>(writableFailureList);
+                        }
+
+                        try {
+                            document.fields.remove(key);
+                        } catch (UnsupportedOperationException ex) {
+                            Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
+                            writableFields.remove(key);
+                            document.fields = new HashMap<>(writableFields);
+                        }
+                    }
+                } catch (final JsonProcessingException ex) {
+                    log.error("Unable to write invalid field value as string", ex);
+                }
+            }
+
+            if (document.subdocuments != null) {
+                final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
+                subDocs.replaceAll(this::validate);
+
+                document.subdocuments = subDocs;
+            }
         }
 
         return document;
