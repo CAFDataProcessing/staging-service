@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 final class ValidationFileAdapter
 {
@@ -54,27 +53,36 @@ final class ValidationFileAdapter
     private List<String> getFieldKeyRegExs()
     {
         final ArrayList<String> fieldKeyRegExs = new ArrayList<>();
-        final Iterator<Map.Entry<String, JsonNode>> fieldIterator = fieldsJsonNode.fields();
+        addRegExsToList(fieldKeyRegExs, "^", fieldsJsonNode, "$");
 
-        while (fieldIterator.hasNext()) {
-            final Map.Entry<String, JsonNode> field = fieldIterator.next();
-            final JsonNode objectEncodingNode = field.getValue().get("objectEncoding");
-            if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
-                addRegExsToList(fieldKeyRegExs, "", field);
-            } else {
-                final String newField = field.getKey();
-                fieldKeyRegExs.add(Pattern.quote(newField));
-            }
-        }
-
-        return fieldKeyRegExs.stream().map(s -> "^" + s + "$").collect(Collectors.toList());
+        return fieldKeyRegExs;
     }
 
-    private void addRegExsToList(final ArrayList<String> fieldKeyRegExs, final String prefix, final Map.Entry<String, JsonNode> field)
+    private void addRegExsToList(final ArrayList<String> fieldKeyRegExs, final String prefix, final JsonNode node, final String suffix)
     {
-        final String fieldKey = field.getKey();
+        final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> field = fields.next();
+            final JsonNode objectEncodingNode = field.getValue().get("objectEncoding");
+            if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
+                addRegExsToList(fieldKeyRegExs, prefix, field, suffix);
+            } else {
+                final String fieldName = field.getKey();
+                fieldKeyRegExs.add(prefix + Pattern.quote(fieldName) + suffix);
+            }
+        }
+    }
+
+    private void addRegExsToList(
+        final ArrayList<String> fieldKeyRegExs,
+        final String prefix,
+        final Map.Entry<String, JsonNode> field,
+        final String suffix
+    )
+    {
+        final String fieldName = field.getKey();
         final StringBuilder sb = new StringBuilder(prefix);
-        sb.append(Pattern.quote(fieldKey));
+        sb.append(Pattern.quote(fieldName));
 
         final String[] fieldType = field.getValue().get("type").asText().split("(?=\\[)", 2);
         final long count = fieldType[1].chars().filter(ch -> ch == '[').count();
@@ -84,20 +92,8 @@ final class ValidationFileAdapter
             sb.append("[^_]+_");
         }
 
-        final String nextLevelPrefix = sb.toString();
-
         final JsonNode node = typesJsonNode.get(fieldType[0]);
 
-        final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-        while (fields.hasNext()) {
-            final Map.Entry<String, JsonNode> property = fields.next();
-
-            final JsonNode objectEncodingNode = property.getValue().get("objectEncoding");
-            if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
-                addRegExsToList(fieldKeyRegExs, nextLevelPrefix, property);
-            } else {
-                fieldKeyRegExs.add(nextLevelPrefix + Pattern.quote(property.getKey()));
-            }
-        }
+        addRegExsToList(fieldKeyRegExs, sb.toString(), node, suffix);
     }
 }
