@@ -15,15 +15,13 @@
  */
 package com.github.cafdataprocessing.worker.ingestion.validator;
 
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.List;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 public class ValidationFileAdapterTest
 {
@@ -33,7 +31,7 @@ public class ValidationFileAdapterTest
     public void testGetFieldKeys() throws IOException
     {
         final int expectedNumberOfFields = 14;
-        final List<String> fieldKeys = ValidationFileAdapter.getFieldKeyRegExs(AGENT_TEST_FILE_1);
+        final List<?> fieldKeys = ValidationFileAdapter.getFieldNamePatterns(AGENT_TEST_FILE_1);
 
         assertEquals(expectedNumberOfFields, fieldKeys.size());
     }
@@ -43,7 +41,7 @@ public class ValidationFileAdapterTest
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
         final Exception exception = assertThrows(IOException.class,
-                                                 () -> ValidationFileAdapter.getFieldKeyRegExs(fakeFilePath));
+                                                 () -> ValidationFileAdapter.getFieldNamePatterns(fakeFilePath));
 
         final String actualMessage = exception.getMessage();
 

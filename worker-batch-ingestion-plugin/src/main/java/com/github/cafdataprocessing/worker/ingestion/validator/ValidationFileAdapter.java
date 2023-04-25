@@ -17,7 +17,6 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -27,16 +26,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 final class ValidationFileAdapter
 {
     private final JsonNode fieldsJsonNode;
     private final JsonNode typesJsonNode;
 
-    public static List<String> getFieldKeyRegExs(final String file) throws IOException
+    public static List<Pattern> getFieldNamePatterns(final String file) throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(file);
-        return adapter.getFieldKeyRegExs();
+        return adapter.getFieldKeyRegExs().stream().map(Pattern::compile).collect(Collectors.toList());
     }
 
     private ValidationFileAdapter(final String file) throws IOException
@@ -58,7 +58,12 @@ final class ValidationFileAdapter
         return fieldKeyRegExs;
     }
 
-    private void addRegExsToList(final ArrayList<String> fieldKeyRegExs, final String prefix, final JsonNode node, final String suffix)
+    private void addRegExsToList(
+        final ArrayList<String> fieldKeyRegExs,
+        final String prefix,
+        final JsonNode node,
+        final String suffix
+    )
     {
         final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
         while (fields.hasNext()) {

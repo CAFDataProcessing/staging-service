@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFailure;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +27,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class FieldValidator implements FieldValidatorInterface
@@ -40,8 +40,7 @@ public final class FieldValidator implements FieldValidatorInterface
 
     public FieldValidator(final String validationFile) throws IOException
     {
-        allowedFieldPatterns = ValidationFileAdapter.getFieldKeyRegExs(validationFile)
-            .stream().map(Pattern::compile).collect(Collectors.toList());
+        allowedFieldPatterns = ValidationFileAdapter.getFieldNamePatterns(validationFile);
     }
 
     @Override
@@ -55,31 +54,27 @@ public final class FieldValidator implements FieldValidatorInterface
             }
 
             for (final String key : keySet) {
-                try {
-                    if (!isValidField(key)) {
-                        final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
-                        fieldNotAllowedFailure.failureId = "IW-001";
-                        fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent.  Value sent: "
-                            + mapper.writeValueAsString(document.fields.get(key));
+                if (!isValidField(key)) {
+                    final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
+                    fieldNotAllowedFailure.failureId = "IW-001";
+                    fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent.  Value sent: "
+                        + tryGetFieldValue(document, key);
 
-                        try {
-                            document.failures.add(fieldNotAllowedFailure);
-                        } catch (final UnsupportedOperationException ex) {
-                            final List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
-                            writableFailureList.add(fieldNotAllowedFailure);
-                            document.failures = writableFailureList;
-                        }
-
-                        try {
-                            document.fields.remove(key);
-                        } catch (final UnsupportedOperationException ex) {
-                            final Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
-                            writableFields.remove(key);
-                            document.fields = writableFields;
-                        }
+                    try {
+                        document.failures.add(fieldNotAllowedFailure);
+                    } catch (final UnsupportedOperationException ex) {
+                        final List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
+                        writableFailureList.add(fieldNotAllowedFailure);
+                        document.failures = writableFailureList;
                     }
-                } catch (final JsonProcessingException ex) {
-                    log.error("Unable to write invalid field value as string", ex);
+
+                    try {
+                        document.fields.remove(key);
+                    } catch (final UnsupportedOperationException ex) {
+                        final Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
+                        writableFields.remove(key);
+                        document.fields = writableFields;
+                    }
                 }
             }
         }
@@ -99,5 +94,15 @@ public final class FieldValidator implements FieldValidatorInterface
         return allowedFieldPatterns
             .stream()
             .anyMatch(allowedFieldPattern -> allowedFieldPattern.matcher(fieldKey).matches());
+    }
+
+    private String tryGetFieldValue(final DocumentWorkerDocument document, final String key)
+    {
+        try {
+            return mapper.writeValueAsString(document.fields.get(key));
+        } catch (final JsonProcessingException ex) {
+            log.error("Unable to write invalid field value as string", ex);
+            return "<Failed to get value>";
+        }
     }
 }
