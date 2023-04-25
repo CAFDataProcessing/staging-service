@@ -27,15 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldValidatorTest
 {
     private final static String AGENT_TEST_FILE = "src/test/resources/validator/agentFields-test1.json";
-    private final static String AGENT_FAILURE_MESSAGE_SUFFIX = " is not allowed to be set by the agent";
     private final static String INVALID_FIELD_NAME = "INVALID_FIELD_NAME";
 
     @Test
@@ -52,8 +52,7 @@ public class FieldValidatorTest
         assertEquals(expectedFields, cleanDoc.fields.size());
         assertFalse(document.fields.containsKey("INVALID_FIELD"));
         assertEquals("IW-001", cleanDoc.failures.get(0).failureId);
-        assertEquals(INVALID_FIELD_NAME + AGENT_FAILURE_MESSAGE_SUFFIX,
-                     cleanDoc.failures.get(0).failureMessage);
+        assertThat(cleanDoc.failures.get(0).failureMessage, containsString(INVALID_FIELD_NAME));
     }
 
     @Test

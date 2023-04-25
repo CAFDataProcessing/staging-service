@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public final class FieldValidator implements FieldValidatorInterface
 {
     private final List<Pattern> allowedFieldPatterns;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public FieldValidator(final String validationFile) throws IOException
     {
@@ -58,39 +59,36 @@ public final class FieldValidator implements FieldValidatorInterface
                     if (!isValidField(key)) {
                         final DocumentWorkerFailure fieldNotAllowedFailure = new DocumentWorkerFailure();
                         fieldNotAllowedFailure.failureId = "IW-001";
-                        fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent";
-
-                        ObjectMapper mapper = new ObjectMapper();
-                        fieldNotAllowedFailure.failureStack = "Invalid Field Value: "
+                        fieldNotAllowedFailure.failureMessage = key + " is not allowed to be set by the agent.  Value sent: "
                             + mapper.writeValueAsString(document.fields.get(key));
 
                         try {
                             document.failures.add(fieldNotAllowedFailure);
-                        } catch (UnsupportedOperationException ex) {
-                            List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
+                        } catch (final UnsupportedOperationException ex) {
+                            final List<DocumentWorkerFailure> writableFailureList = new ArrayList<>(document.failures);
                             writableFailureList.add(fieldNotAllowedFailure);
-                            document.failures = new ArrayList<>(writableFailureList);
+                            document.failures = writableFailureList;
                         }
 
                         try {
                             document.fields.remove(key);
-                        } catch (UnsupportedOperationException ex) {
-                            Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
+                        } catch (final UnsupportedOperationException ex) {
+                            final Map<String, List<DocumentWorkerFieldValue>> writableFields = new HashMap<>(document.fields);
                             writableFields.remove(key);
-                            document.fields = new HashMap<>(writableFields);
+                            document.fields = writableFields;
                         }
                     }
                 } catch (final JsonProcessingException ex) {
                     log.error("Unable to write invalid field value as string", ex);
                 }
             }
+        }
 
-            if (document.subdocuments != null) {
-                final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
-                subDocs.replaceAll(this::validate);
+        if (document.subdocuments != null) {
+            final ArrayList<DocumentWorkerDocument> subDocs = new ArrayList<>(document.subdocuments);
+            subDocs.replaceAll(this::validate);
 
-                document.subdocuments = subDocs;
-            }
+            document.subdocuments = subDocs;
         }
 
         return document;
