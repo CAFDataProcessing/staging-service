@@ -33,9 +33,7 @@ public class ValidationFileAdapterTest
     public void testGetFieldKeys() throws IOException
     {
         final int expectedNumberOfFields = 14;
-
-        final ValidationFileAdapter adapter = new ValidationFileAdapter(AGENT_TEST_FILE_1);
-        final ArrayList<String> fieldKeys = adapter.getFieldKeys();
+        final ArrayList<String> fieldKeys = ValidationFileAdapter.getFieldKeys(AGENT_TEST_FILE_1);
 
         assertEquals(expectedNumberOfFields, fieldKeys.size());
     }
@@ -45,7 +43,7 @@ public class ValidationFileAdapterTest
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
         final Exception exception = assertThrows(IOException.class,
-                                                 () -> new ValidationFileAdapter(fakeFilePath));
+                                                 () -> ValidationFileAdapter.getFieldKeys(fakeFilePath));
 
         final String actualMessage = exception.getMessage();
 

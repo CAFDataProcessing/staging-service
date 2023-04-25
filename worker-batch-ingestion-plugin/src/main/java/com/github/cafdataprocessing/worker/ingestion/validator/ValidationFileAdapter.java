@@ -33,7 +33,13 @@ final class ValidationFileAdapter
     private final JsonNode fieldsJsonNode;
     private final JsonNode typesJsonNode;
 
-    public ValidationFileAdapter(final String file) throws IOException
+    public static ArrayList<String> getFieldKeys(final String file) throws IOException
+    {
+        final ValidationFileAdapter adapter = new ValidationFileAdapter(file);
+        return adapter.getFieldKeys();
+    }
+
+    private ValidationFileAdapter(final String file) throws IOException
     {
         try (final InputStream input = Files.newInputStream(Paths.get(file))) {
             final ObjectMapper mapper = new ObjectMapper();
@@ -44,7 +50,7 @@ final class ValidationFileAdapter
         }
     }
 
-    public ArrayList<String> getFieldKeys()
+    private ArrayList<String> getFieldKeys()
     {
         final ArrayList<String> fieldKeys = new ArrayList<>();
         final Iterator<Map.Entry<String, JsonNode>> fieldIterator = fieldsJsonNode.fields();
