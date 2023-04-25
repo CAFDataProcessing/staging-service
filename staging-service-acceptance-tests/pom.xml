@@ -202,6 +202,7 @@
                     <logDate>default</logDate>
                     <autoPull>on</autoPull>
                     <skipPush>true</skipPush>
+                    <containerNamePattern>%a-%t</containerNamePattern>
                     <images>
                         <image>
                             <alias>staging-service-tests</alias>
