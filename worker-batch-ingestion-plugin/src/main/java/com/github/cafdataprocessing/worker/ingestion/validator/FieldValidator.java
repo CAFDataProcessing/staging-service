@@ -40,7 +40,7 @@ public final class FieldValidator implements FieldValidatorInterface
 
     public FieldValidator(final String validationFile) throws IOException
     {
-        allowedFieldPatterns = ValidationFileAdapter.getFieldKeys(validationFile)
+        allowedFieldPatterns = ValidationFileAdapter.getFieldKeyRegExs(validationFile)
             .stream().map(Pattern::compile).collect(Collectors.toList());
     }
 

@@ -24,19 +24,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 final class ValidationFileAdapter
 {
     private final JsonNode fieldsJsonNode;
     private final JsonNode typesJsonNode;
 
-    public static ArrayList<String> getFieldKeys(final String file) throws IOException
+    public static List<String> getFieldKeyRegExs(final String file) throws IOException
     {
         final ValidationFileAdapter adapter = new ValidationFileAdapter(file);
-        return adapter.getFieldKeys();
+        return adapter.getFieldKeyRegExs();
     }
 
     private ValidationFileAdapter(final String file) throws IOException
@@ -50,71 +51,53 @@ final class ValidationFileAdapter
         }
     }
 
-    private ArrayList<String> getFieldKeys()
+    private List<String> getFieldKeyRegExs()
     {
-        final ArrayList<String> fieldKeys = new ArrayList<>();
+        final ArrayList<String> fieldKeyRegExs = new ArrayList<>();
         final Iterator<Map.Entry<String, JsonNode>> fieldIterator = fieldsJsonNode.fields();
 
         while (fieldIterator.hasNext()) {
             final Map.Entry<String, JsonNode> field = fieldIterator.next();
             final JsonNode objectEncodingNode = field.getValue().get("objectEncoding");
             if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
-                fieldKeys.addAll(generateFlattenedFieldRegex(field));
+                addRegExsToList(fieldKeyRegExs, "", field);
             } else {
                 final String newField = field.getKey();
-                fieldKeys.add(Pattern.quote(newField));
+                fieldKeyRegExs.add(Pattern.quote(newField));
             }
         }
-        return fieldKeys;
+
+        return fieldKeyRegExs.stream().map(s -> "^" + s + "$").collect(Collectors.toList());
     }
 
-    private ArrayList<String> generateFlattenedFieldRegex(final Map.Entry<String, JsonNode> field)
+    private void addRegExsToList(final ArrayList<String> fieldKeyRegExs, final String prefix, final Map.Entry<String, JsonNode> field)
     {
-        final ArrayList<String> flattenedFields = new ArrayList<>();
-        final ArrayList<String> stringsForField = new ArrayList<>(getStringsForField(field));
-
-        for (final String s : stringsForField) {
-            flattenedFields.add("^" + s + "$");
-        }
-
-        return flattenedFields;
-    }
-
-    private ArrayList<String> getStringsForField(final Map.Entry<String, JsonNode> field)
-    {
-        final ArrayList<String> strings = new ArrayList<>();
         final String fieldKey = field.getKey();
-        StringBuilder sb = new StringBuilder(fieldKey);
+        final StringBuilder sb = new StringBuilder(prefix);
+        sb.append(Pattern.quote(fieldKey));
 
         final String[] fieldType = field.getValue().get("type").asText().split("(?=\\[)", 2);
-        final StringBuilder flatChars = new StringBuilder();
         final long count = fieldType[1].chars().filter(ch -> ch == '[').count();
 
         sb.append("_");
         for (int i = 0; i < count; i++) {
-            flatChars.append("([^_]+)_");
+            sb.append("[^_]+_");
         }
-        sb.append(flatChars);
 
-        final JsonNode node = typesJsonNode.get(fieldKey.toLowerCase(Locale.ROOT));
+        final String nextLevelPrefix = sb.toString();
+
+        final JsonNode node = typesJsonNode.get(fieldType[0]);
 
         final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> property = fields.next();
 
             final JsonNode objectEncodingNode = property.getValue().get("objectEncoding");
             if (objectEncodingNode != null && objectEncodingNode.asText().equals("flattened")) {
-                for (final String s : getStringsForField(property)) {
-                    strings.add(sb + s);
-                }
+                addRegExsToList(fieldKeyRegExs, nextLevelPrefix, property);
             } else {
-                sb.append(property.getKey());
-                strings.add(sb.toString());
-                sb = new StringBuilder(fieldKey);
-                sb.append("_").append(flatChars);
+                fieldKeyRegExs.add(nextLevelPrefix + Pattern.quote(property.getKey()));
             }
         }
-        return strings;
     }
 }
