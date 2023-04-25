@@ -23,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
-public class ValidationFileAdapterTest
+final class ValidationFileAdapterTest
 {
     private static final String AGENT_TEST_FILE_1 = "src/test/resources/validator/agentFields-test1.json";
 
     @Test
-    public void testGetFieldKeys() throws IOException
+    void testGetFieldKeys() throws IOException
     {
         final int expectedNumberOfFields = 14;
         final List<?> fieldKeys = ValidationFileAdapter.getFieldNamePatterns(AGENT_TEST_FILE_1);
@@ -37,7 +37,7 @@ public class ValidationFileAdapterTest
     }
 
     @Test
-    public void getFileContentsTestAdapterException()
+    void getFileContentsTestAdapterException()
     {
         final String fakeFilePath = "FAKE_FILE_PATH";
         final Exception exception = assertThrows(IOException.class,

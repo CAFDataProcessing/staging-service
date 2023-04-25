@@ -17,8 +17,6 @@ package com.github.cafdataprocessing.worker.ingestion.validator;
 
 import com.hpe.caf.worker.document.DocumentWorkerDocument;
 import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,20 +24,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
-public class FieldValidatorTest
+final class FieldValidatorTest
 {
     private final static String AGENT_TEST_FILE = "src/test/resources/validator/agentFields-test1.json";
     private final static String INVALID_FIELD_NAME = "INVALID_FIELD_NAME";
 
     @Test
-    public void testFieldValidatorAgentFields() throws IOException
+    void testFieldValidatorAgentFields() throws IOException
     {
         final int expectedFields = 2;
 
@@ -56,7 +54,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorFlattenedAgentFieldsMetadataFiles() throws IOException
+    void testFieldValidatorFlattenedAgentFieldsMetadataFiles() throws IOException
     {
         final int expectedFields = 3;
         final String fieldName = "METADATA_FILES_0_CONTENT";
@@ -72,7 +70,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorFlattenedAgentFieldsOcr() throws IOException
+    void testFieldValidatorFlattenedAgentFieldsOcr() throws IOException
     {
         final int expectedFields = 3;
         final String fieldName = "OCR_3_5_CONFIDENCE";
@@ -88,7 +86,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorMultipleInvalidFields() throws IOException
+    void testFieldValidatorMultipleInvalidFields() throws IOException
     {
         final int expectedFields = 1;
         final int expectedDocumentFailures = 2;
@@ -104,7 +102,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorAgentFieldsWithSubDocument() throws IOException
+    void testFieldValidatorAgentFieldsWithSubDocument() throws IOException
     {
         final int expectedSubDocFields = 1;
 
@@ -123,7 +121,7 @@ public class FieldValidatorTest
     }
 
     @Test
-    public void testFieldValidatorAgentFieldsWithImmutableListOfFailures() throws IOException
+    void testFieldValidatorAgentFieldsWithImmutableListOfFailures() throws IOException
     {
         final int expectedFields = 1;
         final int expectedDocumentFailures = 1;

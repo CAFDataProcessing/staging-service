@@ -525,7 +525,7 @@ public final class IngestionWorkerUnitTest
             final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
 
             assertThat(returnedDocument.subdocuments.size(), is(equalTo(1)));
-            assertEquals(2, returnedDocument.subdocuments.get(0).fields.size());
+            assertThat(returnedDocument.subdocuments.get(0).fields.size(), is(equalTo(2)));
         }
     }
 
@@ -556,7 +556,7 @@ public final class IngestionWorkerUnitTest
             final DocumentWorkerDocumentTask returnedTaskData = (DocumentWorkerDocumentTask) returnedMessage.getTaskData();
             final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
 
-            assertEquals(expectedDocumentFailures, returnedDocument.failures.size());
+            assertThat(returnedDocument.failures.size(), is(equalTo(expectedDocumentFailures)));
         }
     }
 
@@ -564,8 +564,8 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with invalid validation file")
     void testFieldValidatorInvalidFile()
     {
-        EnvironmentVariables envVars = new EnvironmentVariables();
-        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
+        final EnvironmentVariables localEnvVars = new EnvironmentVariables();
+        localEnvVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 
