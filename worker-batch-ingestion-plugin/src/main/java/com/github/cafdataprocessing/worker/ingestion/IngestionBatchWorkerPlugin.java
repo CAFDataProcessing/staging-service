@@ -23,6 +23,9 @@ import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathPro
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
 import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
+import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
+import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidatorInterface;
+import com.github.cafdataprocessing.worker.ingestion.validator.NullFieldValidator;
 import com.hpe.caf.worker.batch.BatchDefinitionException;
 import com.hpe.caf.worker.batch.BatchWorkerPlugin;
 import com.hpe.caf.worker.batch.BatchWorkerServices;
@@ -33,6 +36,7 @@ import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import com.hpe.caf.worker.document.DocumentWorkerScript;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,6 +68,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 {
     private final ObjectMapper mapper;
     private final BatchPathProvider fileSystemProvider;
+    private final FieldValidatorInterface fieldValidator;
 
     public IngestionBatchWorkerPlugin()
     {
@@ -88,6 +93,24 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         simpleModule.addDeserializer(DocumentWorkerDocument.class,
                                      new DocumentWorkerDocumentDeserializer(totalSubdocumentLimit.get()));
         mapper.registerModule(simpleModule);
+
+        fieldValidator = createFieldValidator();
+    }
+
+    private static FieldValidatorInterface createFieldValidator()
+    {
+        final String validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
+
+        if (StringUtils.isEmpty(validationFile)) {
+            return NullFieldValidator.INSTANCE;
+        }
+
+        try {
+            return new FieldValidator(validationFile);
+        } catch (final IOException ex) {
+            log.error("Failed to read validation File: {}", validationFile, ex);
+            throw new UncheckedIOException(ex);
+        }
     }
 
     @Override
@@ -227,6 +250,9 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
         throws IOException, BatchDefinitionException
     {
         final DocumentWorkerDocumentTask document = mapper.readValue(line, DocumentWorkerDocumentTask.class);
+
+        document.document = fieldValidator.validate(document.document);
+
         final Map<String, String> customData = populateCustomData(taskMessageParams);
         if (!customData.isEmpty()) {
             document.customData = customData;
