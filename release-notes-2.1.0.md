@@ -8,7 +8,9 @@ ${version-number}
 
 - US585006: Added a new GET `batchStatus` endpoint for getting the upload status of a specified batch.
 
-- US618160: Validation added to ingestion worker to ensure only expected fields from the agent are included.
+- US618160: Validation feature added to ingestion worker.
+  - The `CAF_VALIDATION_BATCH_WORKER_VALIDATION_FILE` environment variable can be used to provide a file that contains validation rules.
+  - Unexpected fields are ignored and result in a failure being added to the document.
 
 #### Bug Fixes
 - US656030: Updated to latest version of the Worker Document Framework.
