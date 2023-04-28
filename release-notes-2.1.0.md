@@ -8,8 +8,11 @@ ${version-number}
 
 - US585006: Added a new GET `batchStatus` endpoint for getting the upload status of a specified batch.
 
+- US618160: Validation added to ingestion worker to ensure only expected fields from the agent are included.
+
 #### Bug Fixes
-- US656030: Fixed ClassCastExceptions in document validator.
+- US656030: Updated to latest version of the Worker Document Framework.
+  - This version includes a fix for a concurrency issue in the DocumentValidator where ClassCastException was being thrown when creating a com.worldturner.medeia.schema.validation.SchemaValidator.
 
 #### Known Issues
 - None
