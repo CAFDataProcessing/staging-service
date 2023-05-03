@@ -63,7 +63,7 @@ public final class IngestionWorkerUnitTest
     public void clearEnvironmentVariables()
     {
         envVars = new EnvironmentVariables();
-        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", null);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", null);
     }
 
     @Test
@@ -476,7 +476,7 @@ public final class IngestionWorkerUnitTest
         final String agentTestFile = "src/test/resources/validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 2;
-        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", agentTestFile);
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
@@ -506,7 +506,7 @@ public final class IngestionWorkerUnitTest
     {
         final String agentTestFile = "src/test/resources/validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
-        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", agentTestFile);
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
@@ -536,7 +536,7 @@ public final class IngestionWorkerUnitTest
         final String agentTestFile = "src/test/resources/validator/agentFields-test2.json";
         final List<TaskMessage> constructedMessages = new ArrayList<>();
         final int expectedDocumentFailures = 3;
-        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", agentTestFile);
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", agentTestFile);
 
         final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
         testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
@@ -565,7 +565,7 @@ public final class IngestionWorkerUnitTest
     void testFieldValidatorInvalidFile()
     {
         final EnvironmentVariables localEnvVars = new EnvironmentVariables();
-        localEnvVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE", "INVALID_TEST_FILE_PATH");
+        localEnvVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", "INVALID_TEST_FILE_PATH");
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 

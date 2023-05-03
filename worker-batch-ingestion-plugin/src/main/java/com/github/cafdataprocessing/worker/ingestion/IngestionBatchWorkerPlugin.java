@@ -99,7 +99,7 @@ public final class IngestionBatchWorkerPlugin implements BatchWorkerPlugin
 
     private static FieldValidatorInterface createFieldValidator()
     {
-        final String validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE");
+        final String validationFile = System.getenv("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH");
 
         if (StringUtils.isEmpty(validationFile)) {
             return NullFieldValidator.INSTANCE;
