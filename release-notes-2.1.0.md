@@ -10,7 +10,7 @@ ${version-number}
 
 - US618160: Validation feature added to the Ingestion Worker.
 
-  - The `CAF_INGESTION_BATCH_WORKER_VALIDATION_FILE` environment variable can be used to provide a file that contains validation rules.
+  - The `CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH` environment variable can be used to provide a file that contains validation rules.
   - Unexpected fields are ignored and result in a failure being added to the document.
 
 #### Bug Fixes
