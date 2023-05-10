@@ -117,7 +117,7 @@ public class FileSystemDao implements BatchDao
                 batchDirectoryNames = batchDirectoryNames.limit(limit);
             }
 
-            return batchDirectoryNames.sorted().collect(Collectors.toList());
+            return batchDirectoryNames.collect(Collectors.toList());
         } catch (IOException ex) {
             throw new StagingException(ex);
         }
