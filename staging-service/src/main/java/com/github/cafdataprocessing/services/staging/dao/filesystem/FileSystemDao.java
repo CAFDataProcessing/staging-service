@@ -103,7 +103,7 @@ public class FileSystemDao implements BatchDao
             = Files.walk(batchesPath, 1, FileVisitOption.FOLLOW_LINKS).skip(1)) {
 
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
-                filter(File::isDirectory).map(File::getName);
+                filter(File::isDirectory).map(File::getName).sorted();
 
             if (startsWith != null) {
                 batchDirectoryNames = batchDirectoryNames.filter(f -> f.startsWith(startsWith));
