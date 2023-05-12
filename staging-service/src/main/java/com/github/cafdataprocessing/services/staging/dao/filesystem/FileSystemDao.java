@@ -105,8 +105,6 @@ public class FileSystemDao implements BatchDao
             Stream<String> batchDirectoryNames = pathStream.map(Path::toFile).
                 filter(File::isDirectory).map(File::getName);
 
-            batchDirectoryNames = batchDirectoryNames.sorted();
-
             if (startsWith != null) {
                 batchDirectoryNames = batchDirectoryNames.filter(f -> f.startsWith(startsWith));
             }
@@ -114,6 +112,8 @@ public class FileSystemDao implements BatchDao
             if (from != null) {
                 batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from.getValue()) >= 0);
             }
+
+            batchDirectoryNames = batchDirectoryNames.sorted();
 
             if (limit != null) {
                 batchDirectoryNames = batchDirectoryNames.limit(limit);
