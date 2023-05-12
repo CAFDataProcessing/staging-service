@@ -113,11 +113,13 @@ public class FileSystemDao implements BatchDao
                 batchDirectoryNames = batchDirectoryNames.filter(f -> f.compareTo(from.getValue()) >= 0);
             }
 
+            batchDirectoryNames = batchDirectoryNames.sorted();
+
             if (limit != null) {
                 batchDirectoryNames = batchDirectoryNames.limit(limit);
             }
 
-            return batchDirectoryNames.sorted().collect(Collectors.toList());
+            return batchDirectoryNames.collect(Collectors.toList());
         } catch (IOException ex) {
             throw new StagingException(ex);
         }
