@@ -123,14 +123,7 @@
         <dependency>
             <groupId>com.github.jobservice</groupId>
             <artifactId>job-service-client2</artifactId>
-            <version>5.0.0-121</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.squareup.okio</groupId>
-                    <artifactId>okio</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.squareup.okio</groupId>
