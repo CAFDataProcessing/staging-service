@@ -48,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
+            <artifactId>okio-jvm</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
