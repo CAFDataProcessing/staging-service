@@ -24,12 +24,12 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>staging-service-aggregator</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>2.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.github.cafdataprocessing</groupId>
     <artifactId>worker-batch-ingestion-plugin</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.2.0-SNAPSHOT</version>
 
     <name>worker-batch-ingestion-plugin</name>
 
