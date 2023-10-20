@@ -39,14 +39,13 @@
     <parent>
         <groupId>com.github.cafapi</groupId>
         <artifactId>caf-common-parent</artifactId>
-        <version>2.3.0-212</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
     
     <inceptionYear>2019</inceptionYear>
 
     <properties>
         <copyrightYear>2023</copyrightYear>
-        <copyrightNotice>Copyright ${project.inceptionYear}-${copyrightYear} Open Text.</copyrightNotice>
         <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
@@ -54,8 +53,6 @@
         <springVersion>5.3.19</springVersion>
         <springBootVersion>2.6.7</springBootVersion>
         <okhttp-version>2.7.5</okhttp-version>
-        <enforceBannedDependencies>true</enforceBannedDependencies>
-        <enforceCorrectDependencies>true</enforceCorrectDependencies>
         <fasterxmlVersion>2.12.5</fasterxmlVersion>
         <springDataVersion>2.0.9.RELEASE</springDataVersion>
         <caf.worker-batch-framework.version>3.6.1-176</caf.worker-batch-framework.version>
