@@ -37,7 +37,6 @@
     <properties>
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.failsafe.version>3.0.0</maven.failsafe.version>
         <test.data>${project.basedir}/test-data/input</test.data>
 
         <jobServiceDatabaseName>jobservice</jobServiceDatabaseName>
@@ -156,8 +155,8 @@
             </plugin>
             <!-- Plugin for running integration tests in the integration-test phase -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven.failsafe.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -557,7 +556,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${maven.failsafe.version}</version>
                         <configuration>
                             <skipTests>true</skipTests>
                         </configuration>
