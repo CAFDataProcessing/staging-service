@@ -351,15 +351,18 @@
 
     <build>
         <plugins>
-            <!-- Exclude the intentionally invalid json files when checking license headers -->
+            <!-- Exclude the batch files when checking license headers -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <excludes combine.children="append">
-                        <exclude>**/*.notjson</exclude>
-                        <exclude>**/*.batch</exclude>
-                    </excludes>
+                    <licenseSets>
+                        <licenseSet>
+                            <excludes combine.children="append">
+                                <exclude>**/*.batch</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
                 </configuration>
             </plugin>
             <plugin>
