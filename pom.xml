@@ -50,8 +50,6 @@
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
-        <springVersion>5.3.19</springVersion>
-        <springBootVersion>2.6.7</springBootVersion>
         <okhttp-version>2.7.5</okhttp-version>
         <fasterxmlVersion>2.12.5</fasterxmlVersion>
         <springDataVersion>2.0.9.RELEASE</springDataVersion>
@@ -262,77 +260,77 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jcl</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>${springVersion}</version>
+                <version>6.0.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test-autoconfigure</artifactId>
-                <version>${springBootVersion}</version>
+                <version>3.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.threeten</groupId>

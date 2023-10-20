@@ -97,8 +97,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.14</version>
-                <!--Using 2.2.3 for client generation for compatibility reasons-->
+                <version>3.0.48</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.cafdataprocessing</groupId>
