@@ -149,12 +149,6 @@
                 <groupId>com.squareup.okhttp</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp-version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.squareup.okio</groupId>
-                        <artifactId>okio</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
