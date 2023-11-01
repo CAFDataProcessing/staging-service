@@ -1,1 +1,1 @@
-SEPG_BUILD_ENV_IMAGE=cafapi/buildenv-jdk17:1.4.1
+SEPG_BUILD_ENV_IMAGE=cafapi/buildenv-jdk17:1.4.2
