@@ -1,21 +1,13 @@
-# Staging Service Client
+# Staging Service Internal Client
 
-This project is a Java library to communicate with the [Staging Service](../staging-service). It allows callers to upload batches, get batches and delete batches. 
+This project is a Java library used internally for testing the [Staging Service](../staging-service). It allows callers to upload batches, get batches and delete batches.
 
 ## Usage
 
-This project builds a Java library that can be used to make calls to the Staging Service. The library should take a dependency on `staging-service-client` using the following Maven coordinates:
-
-    <dependency>
-        <groupId>com.github.cafdataprocessing</groupId>
-        <artifactId>staging-service-internal-client</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-The [integration tests](../staging-service-acceptance-tests) show how the staging-service-client can be used.
+This project builds a Java library that can be used to make calls to the Staging Service.  It is used by the [acceptance tests](../staging-service-acceptance-tests) project.
 
 #### getStatus(String tenantId) returns StagingStatusResponse
-Returns status information about the staging service. A client should use this to check that the service is functional before uploading a large batch.
+Returns status information about the staging service. Checks that the service is functional before uploading a large batch.  
 - **tenantId**: Tenant identifier (should match the following regex: `^[a-z0-9,.()\-+_!]{0,127}[a-z0-9,()\-+_!]$`)
 
 #### createOrReplaceBatch(String tenantId, String batchId, Stream<MultiPart> uploadData)
