@@ -30,8 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
@@ -79,19 +79,19 @@ public class FileSystemDaoTest
     {
 
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        when(f1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("hello.txt");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f2, f1);
 
@@ -108,19 +108,19 @@ public class FileSystemDaoTest
     public void saveFilesWindowsPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        when(f1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("C:\\test\\hello.pdf");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f2, f1);
 
@@ -137,19 +137,19 @@ public class FileSystemDaoTest
     public void saveFilesLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        when(f1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("/mnt/c/test/hello");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f2, f1);
 
@@ -166,19 +166,19 @@ public class FileSystemDaoTest
     public void saveInvalidLinuxPathTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
+        when(f1.getInputStream()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("../../mnt/c/test/hello");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f2, f1);
 
@@ -195,19 +195,19 @@ public class FileSystemDaoTest
     public void saveFilesWrongOrderNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
+        when(f1.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f1, f2);
 
@@ -224,38 +224,38 @@ public class FileSystemDaoTest
     public void saveFilesWrongOrderMixedNegativeTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream jsonDocOk = mock(FileItemStream.class);
+        FileItemInput jsonDocOk = mock(FileItemInput.class);
         when(jsonDocOk.getContentType()).thenReturn("application/document+json");
         when(jsonDocOk.getFieldName()).thenReturn("jsonDocument.json");
         when(jsonDocOk.isFormField()).thenReturn(true);
-        when(jsonDocOk.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
+        when(jsonDocOk.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toFile()));
 
-        FileItemStream localRefOneOk = mock(FileItemStream.class);
+        FileItemInput localRefOneOk = mock(FileItemInput.class);
         when(localRefOneOk.getContentType()).thenReturn("application/text");
         when(localRefOneOk.getFieldName()).thenReturn("A_Christmas_Carol1.txt");
         when(localRefOneOk.isFormField()).thenReturn(true);
-        when(localRefOneOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(localRefOneOk.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemStream localRefTwoOk = mock(FileItemStream.class);
+        FileItemInput localRefTwoOk = mock(FileItemInput.class);
         when(localRefTwoOk.getContentType()).thenReturn("application/text");
         when(localRefTwoOk.getFieldName()).thenReturn("A_Christmas_Carol2.txt");
         when(localRefTwoOk.isFormField()).thenReturn(true);
-        when(localRefTwoOk.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(localRefTwoOk.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemStream jsonDocNotOk = mock(FileItemStream.class);
+        FileItemInput jsonDocNotOk = mock(FileItemInput.class);
         when(jsonDocNotOk.getContentType()).thenReturn("application/document+json");
         when(jsonDocNotOk.getFieldName()).thenReturn("jsonDocument.json");
         when(jsonDocNotOk.isFormField()).thenReturn(true);
-        when(jsonDocNotOk.openStream()).thenReturn(new FileInputStream(
+        when(jsonDocNotOk.getInputStream()).thenReturn(new FileInputStream(
             Paths.get("src", "test", "resources", "batch1MissingLocalRef.json").toFile()));
 
-        FileItemStream localRefThreeTooLate = mock(FileItemStream.class);
+        FileItemInput localRefThreeTooLate = mock(FileItemInput.class);
         when(localRefThreeTooLate.getContentType()).thenReturn("application/text");
         when(localRefThreeTooLate.getFieldName()).thenReturn("hello-hello.txt");
         when(localRefThreeTooLate.isFormField()).thenReturn(true);
-        when(localRefThreeTooLate.openStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
+        when(localRefThreeTooLate.getInputStream()).thenReturn(new ByteArrayInputStream("Hello hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, true, true, true, false);
         when(fileItemIterator.next()).thenReturn(localRefOneOk, localRefTwoOk, jsonDocOk, jsonDocNotOk, localRefThreeTooLate);
 
@@ -272,19 +272,19 @@ public class FileSystemDaoTest
     public void missingLocalRefFileTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("batch1.json");
         when(f1.isFormField()).thenReturn(true);
-        when(f1.openStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toString()));
+        when(f1.getInputStream()).thenReturn(new FileInputStream(Paths.get("src", "test", "resources", "batch1.json").toString()));
 
-        FileItemStream f2 = mock(FileItemStream.class);
+        FileItemInput f2 = mock(FileItemInput.class);
         when(f2.getContentType()).thenReturn("application/text");
         when(f2.getFieldName()).thenReturn("hello.txt");
         when(f2.isFormField()).thenReturn(true);
-        when(f2.openStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
+        when(f2.getInputStream()).thenReturn(new ByteArrayInputStream("Hello".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, true, false);
         when(fileItemIterator.next()).thenReturn(f1, f2);
 
@@ -302,14 +302,14 @@ public class FileSystemDaoTest
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
 
-        FileItemStream f1 = mock(FileItemStream.class);
+        FileItemInput f1 = mock(FileItemInput.class);
         when(f1.getContentType()).thenReturn("application/document+json");
         when(f1.getFieldName()).thenReturn("jsonDocument.json");
         when(f1.isFormField()).thenReturn(true);
         // Invalid json
-        when(f1.openStream()).thenReturn(new ByteArrayInputStream("{\"abc\": \"lll\",}".getBytes()));
+        when(f1.getInputStream()).thenReturn(new ByteArrayInputStream("{\"abc\": \"lll\",}".getBytes()));
 
-        FileItemIterator fileItemIterator = mock(FileItemIterator.class);
+        FileItemInputIterator fileItemIterator = mock(FileItemInputIterator.class);
         when(fileItemIterator.hasNext()).thenReturn(true, false);
         when(fileItemIterator.next()).thenReturn(f1);
 
@@ -438,7 +438,7 @@ public class FileSystemDaoTest
         Files.createDirectories(Paths.get(inProgressDirectoryName, "/test-batch-inprogress"));
         Files.createDirectories(Paths.get(completedDirectoryName, "/test-batch-completed"));
         final BatchStatusResponse response = fileSystemDao.getBatchStatus(tenantId, batchIdCompleted);
-        assertTrue(response.getBatchStatus().isBatchComplete());
+        assertTrue(response.getBatchStatus().getBatchComplete());
     }
 
     private String getTempBaseBatchDir() throws Exception

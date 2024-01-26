@@ -17,9 +17,9 @@ package com.github.cafdataprocessing.services.staging;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-public final class HealthcheckInterceptor extends HandlerInterceptorAdapter
+public final class HealthcheckInterceptor implements HandlerInterceptor
 {
     private final int adminPort;
 

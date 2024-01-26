@@ -15,17 +15,17 @@
  */
 package com.github.cafdataprocessing.services.staging.client;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.MultipartBuilder;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.internal.Util;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
@@ -42,7 +42,7 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
     public void createOrReplaceBatch(final String tenantId, final String batchId, final Stream<MultiPart> uploadData)
         throws ApiException
     {
-        final MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.MIXED);
+        final MultipartBody.Builder mpBuilder = new MultipartBody.Builder().setType(MultipartBody.MIXED);
         final Iterator<MultiPart> uploadDataIterator = uploadData.iterator();
         while (uploadDataIterator.hasNext()) {
             final MultiPart fileToStage = uploadDataIterator.next();
@@ -101,9 +101,21 @@ public class StagingApi extends com.github.cafdataprocessing.services.staging.cl
                 source = Okio.source(inputStreamSupplier.get());
                 sink.writeAll(source);
             } finally {
-                Util.closeQuietly(source);
+                closeQuietly(source);
             }
         }
     }
 
+    /**
+     * Closes {@code closeable}, ignoring any checked exceptions. Does nothing if {@code closeable} is null.
+     */
+    private static void closeQuietly(final Closeable closeable)
+    {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (final IOException ex) {
+            }
+        }
+    }
 }

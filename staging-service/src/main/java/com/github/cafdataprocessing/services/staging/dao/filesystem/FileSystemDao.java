@@ -42,9 +42,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -142,7 +141,7 @@ public class FileSystemDao implements BatchDao
     }
 
     @Override
-    public List<String> saveFiles(final TenantId tenantId, BatchId batchId, FileItemIterator fileItemIterator)
+    public List<String> saveFiles(final TenantId tenantId, final BatchId batchId, final FileItemInputIterator fileItemIterator)
         throws StagingException, InvalidBatchException, IncompleteBatchException
     {
 
@@ -153,33 +152,33 @@ public class FileSystemDao implements BatchDao
         try (final SubBatchWriter subBatchWriter = new SubBatchWriter(inProgressBatchFolderPath.toFile(), subbatchSize)) {
             while (true) {
 
-                final FileItemStream fileItemStream;
+                final FileItemInput fileItemInput;
                 try {
                     LOGGER.debug("Retrieving next part...");
                     if (!fileItemIterator.hasNext()) {
                         LOGGER.debug("No further parts.");
                         break;
                     }
-                    fileItemStream = fileItemIterator.next();
-                } catch (FileUploadException | IOException ex) {
+                    fileItemInput = fileItemIterator.next();
+                } catch (final IOException ex) {
                     throw new IncompleteBatchException(ex);
                 }
 
-                if (!fileItemStream.isFormField()) {
+                if (!fileItemInput.isFormField()) {
                     LOGGER.error("A form field is required.");
                     throw new InvalidBatchException("A form field is required.");
                 }
 
-                final String filename = fileItemStream.getFieldName();
+                final String filename = fileItemInput.getFieldName();
                 if (filename == null || filename.trim().length() == 0) {
                     LOGGER.error("The form field name must be present and contain the filename.");
                     throw new InvalidBatchException("The form field name must be present and contain the filename.");
                 }
-                final String contentType = fileItemStream.getContentType();
+                final String contentType = fileItemInput.getContentType();
                 if (contentType.equalsIgnoreCase(DOCUMENT_JSON_CONTENT)) {
                     LOGGER.debug("Part type: document; field name: {}", filename);
                     subBatchWriter
-                        .writeDocumentFile(fileItemStream::openStream,
+                        .writeDocumentFile(fileItemInput::getInputStream,
                                            storageRefFolderPath.toString(),
                                            inProgressBatchFolderPath.resolve(CONTENT_FILES).toString(),
                                            fieldValueSizeThreshold, binaryFilesUploaded);
@@ -191,7 +190,7 @@ public class FileSystemDao implements BatchDao
                         ? UUID.randomUUID().toString() : UUID.randomUUID().toString() + "." + fileExtension;
                     final File targetFile = inProgressBatchFolderPath.resolve(CONTENT_FILES).resolve(targetFileName).toFile();
                     LOGGER.debug("Reading loose file...");
-                    try (final InputStream inStream = fileItemStream.openStream()) {
+                    try (final InputStream inStream = fileItemInput.getInputStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile);
                         LOGGER.debug("Loose file written to {}", targetFile);
                         fileNames.add(targetFileName);

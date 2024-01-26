@@ -24,31 +24,10 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>staging-service-aggregator</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.github.cafdataprocessing</groupId>
     <artifactId>worker-batch-ingestion-plugin</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
-
-    <name>worker-batch-ingestion-plugin</name>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.github.jobservice</groupId>
-                <artifactId>worker-batch-framework</artifactId>
-                <version>3.6.1-176</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.cafdataprocessing</groupId>
-                <artifactId>worker-document-shared</artifactId>
-                <version>6.0.0-1308</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -58,7 +37,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.8.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -83,7 +61,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -104,36 +81,36 @@
         <dependency>
             <groupId>com.github.jobservice</groupId>
             <artifactId>document-message-builder</artifactId>
-            <version>2.1.1-7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.webcompere</groupId>
+            <artifactId>system-stubs-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.webcompere</groupId>
+            <artifactId>system-stubs-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

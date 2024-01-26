@@ -26,12 +26,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 
 public interface BatchDao
 {
 
-    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
+    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemInputIterator fileItemIterator)
         throws IncompleteBatchException, InvalidBatchException, StagingException;
 
     List<String> getBatches(TenantId tenantId, @Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,

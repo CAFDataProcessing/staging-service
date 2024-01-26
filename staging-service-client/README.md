@@ -8,7 +8,7 @@ This project builds a Java library that can be used to make calls to the Staging
 
     <dependency>
         <groupId>com.github.cafdataprocessing</groupId>
-        <artifactId>staging-service-client</artifactId>
+        <artifactId>staging-service-internal-client</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </dependency>
 

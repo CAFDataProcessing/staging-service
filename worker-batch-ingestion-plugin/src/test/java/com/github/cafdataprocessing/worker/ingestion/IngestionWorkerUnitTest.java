@@ -36,7 +36,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -46,10 +45,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @Slf4j
+@ExtendWith(SystemStubsExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @DisplayName("Unit tests for the IngestionBatchWorkerPlugin")
 public final class IngestionWorkerUnitTest
@@ -57,12 +61,13 @@ public final class IngestionWorkerUnitTest
     private BatchWorkerServices testWorkerServices;
     private String taskMessageType;
     private Map<String, String> testTaskMessageParams;
+
+    @SystemStub
     private EnvironmentVariables envVars;
 
     @BeforeEach
     public void clearEnvironmentVariables()
     {
-        envVars = new EnvironmentVariables();
         envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", null);
     }
 
@@ -74,8 +79,7 @@ public final class IngestionWorkerUnitTest
         assertThat(plugin, is(notNullValue()));
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test multiple batch ids successfully proccessed with custom data")
     void testMultiBatchIdsWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -104,8 +108,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test multiple batch ids successfully processed without custom data")
     void testMultiBatchIdsWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -132,8 +135,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test single batch id successfully processed with custom data")
     void testSingleBatchIdWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -162,8 +164,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test single batch id successfully processed without custom data")
     void testSingleBatchIdWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -190,8 +191,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test subbatch successfully processed with custom data")
     void testSubbatchWithCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -220,8 +220,7 @@ public final class IngestionWorkerUnitTest
         }
     }
 
-    @Test
-    @RepeatedTest(19)
+    @RepeatedTest(20)
     @DisplayName("Test subbatch successfully processed without custom data")
     void testSubbatchWithoutCustomData() throws JsonProcessingException, BatchDefinitionException, BatchWorkerTransientException
     {
@@ -564,8 +563,7 @@ public final class IngestionWorkerUnitTest
     @DisplayName("Test validator with invalid validation file")
     void testFieldValidatorInvalidFile()
     {
-        final EnvironmentVariables localEnvVars = new EnvironmentVariables();
-        localEnvVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", "INVALID_TEST_FILE_PATH");
+        envVars.set("CAF_INGESTION_BATCH_WORKER_VALIDATION_FILEPATH", "INVALID_TEST_FILE_PATH");
 
         final Exception exception = assertThrows(RuntimeException.class, IngestionBatchWorkerPlugin::new);
 

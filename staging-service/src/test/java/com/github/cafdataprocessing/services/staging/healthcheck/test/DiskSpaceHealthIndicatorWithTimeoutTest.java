@@ -70,7 +70,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -87,7 +87,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
         assertNotNull(response);
-        assertEquals(503, response.getStatusCodeValue());
+        assertEquals(503, response.getStatusCode().value());
     }
 
 }

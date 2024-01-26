@@ -19,7 +19,7 @@ import com.github.cafdataprocessing.services.staging.BatchId;
 import com.github.cafdataprocessing.services.staging.TenantId;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload2.core.ProgressListener;
 
 public final class BatchProgressListener implements ProgressListener, AutoCloseable
 {

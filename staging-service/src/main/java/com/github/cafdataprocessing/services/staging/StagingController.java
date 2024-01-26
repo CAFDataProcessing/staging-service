@@ -22,16 +22,11 @@ import com.github.cafdataprocessing.services.staging.models.BatchList;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import com.github.cafdataprocessing.services.staging.swagger.api.StagingApi;
-import io.swagger.annotations.ApiParam;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import java.io.IOException;
 import java.util.List;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
+import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +37,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -79,12 +71,8 @@ public class StagingController implements StagingApi
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 
-    public ResponseEntity<Void> createOrReplaceBatch(
-        @ApiParam(value = "Identifies the tenant making the request.", required = true)
-        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
-        @Size(min = 1) @ApiParam(value = "Identifies the batch.", required = true)
-        @PathVariable("batchId") String batchId,
-        HttpServletRequest request)
+    @Override
+    public ResponseEntity<Void> createOrReplaceBatch(final String X_TENANT_ID, final String batchId)
     {
         final TenantId tenantId;
         final BatchId batchIdObj;
@@ -100,12 +88,12 @@ public class StagingController implements StagingApi
         }
 
         try (final BatchProgressListener batchProgressListener = new BatchProgressListener(tenantId, batchIdObj)) {
-            final ServletFileUpload fileUpload = new ServletFileUpload();
+            final JakartaServletFileUpload fileUpload = new JakartaServletFileUpload();
             fileUpload.setProgressListener(batchProgressListener);
-            final FileItemIterator fileItemIterator;
+            final FileItemInputIterator fileItemIterator;
             try {
                 fileItemIterator = fileUpload.getItemIterator(request);
-            } catch (final FileUploadException | IOException ex) {
+            } catch (final IOException ex) {
                 LOGGER.error("Error getting FileItemIterator", ex);
                 throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
             }
@@ -123,12 +111,8 @@ public class StagingController implements StagingApi
         }
     }
 
-    public ResponseEntity<Void> deleteBatch(
-        @ApiParam(value = "Identifies the tenant making the request.", required = true)
-        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
-        @Size(min = 1)
-        @ApiParam(value = "Identifies the batch.", required = true)
-        @PathVariable("batchId") String batchId)
+    @Override
+    public ResponseEntity<Void> deleteBatch(final String X_TENANT_ID, final String batchId)
     {
         LOGGER.debug("Deleting batch : {}", batchId);
         try {
@@ -150,11 +134,7 @@ public class StagingController implements StagingApi
     }
 
     @Override
-    public ResponseEntity<BatchStatusResponse> getBatchStatus(
-        @ApiParam(value = "Identifies the tenant making the request.", required = true)
-        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
-        @ApiParam(value = "Identifies the batch.", required = true)
-        @RequestParam("batchId") String batchId)
+    public ResponseEntity<BatchStatusResponse> getBatchStatus(final String X_TENANT_ID, final String batchId)
     {
         try {
             final BatchStatusResponse statusResponse = batchDao.getBatchStatus(new TenantId(X_TENANT_ID), new BatchId(batchId));
@@ -177,16 +157,13 @@ public class StagingController implements StagingApi
         }
     }
 
+    @Override
     public ResponseEntity<BatchList> getBatches(
-        @ApiParam(value = "Identifies the tenant making the request.", required = true)
-        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID,
-        @Size(min = 1, max = 256)
-        @ApiParam(value = "Specifies the prefix for batch identifier to fetch batches whose identifiers start with the specified value.")
-        @Valid @RequestParam(value = "startsWith", required = false) String startsWith,
-        @Size(min = 1, max = 256) @ApiParam(value = "Specifies the identifier to fetch batches that follow it alphabetically.")
-        @Valid @RequestParam(value = "from", required = false) String from,
-        @Min(1) @ApiParam(value = "Specifies the number of results to return (defaults to 25 if not specified).", allowableValues = "")
-        @Valid @RequestParam(value = "limit", required = false) Integer limit)
+        final String X_TENANT_ID,
+        final String startsWith,
+        final String from,
+        final Integer limit
+    )
     {
 
         LOGGER.debug("Fetching batches starting with : {}", startsWith);
@@ -214,10 +191,7 @@ public class StagingController implements StagingApi
     }
 
     @Override
-    public ResponseEntity<StatusResponse> getStatus(
-        @ApiParam(value = "Identifies the tenant making the request.", required = true)
-        @RequestHeader(value = "X-TENANT-ID", required = true) String X_TENANT_ID
-    )
+    public ResponseEntity<StatusResponse> getStatus(final String X_TENANT_ID)
     {
         final StatusResponse status = new StatusResponse();
 

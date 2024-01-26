@@ -18,11 +18,11 @@ package com.github.cafdataprocessing.worker.ingestion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.caf.api.worker.TaskMessage;
 import com.hpe.caf.api.worker.TaskStatus;
-import com.hpe.caf.services.job.client.ApiException;
-import com.hpe.caf.services.job.client.api.JobsApi;
-import com.hpe.caf.services.job.client.model.Job;
-import com.hpe.caf.services.job.client.model.NewJob;
-import com.hpe.caf.services.job.client.model.WorkerAction;
+import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.api.JobsApi;
+import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.client.ApiException;
+import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.Job;
+import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.NewJob;
+import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.WorkerAction;
 import com.hpe.caf.worker.batch.BatchWorkerTask;
 import com.hpe.caf.worker.batch.QueueConsumer;
 import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
@@ -44,14 +44,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
-@DisplayName("IT for IngestionBatchWorkerPlugin")
 @Slf4j
-public class BatchWorkerAcceptanceIT
+public class BatchWorkerAcceptanceTesting
 {
     private final Channel channel;
     private final String workflow_queue;
@@ -59,7 +54,7 @@ public class BatchWorkerAcceptanceIT
     private final JobsApi jobsApi;
     private final String output_queue;
 
-    public BatchWorkerAcceptanceIT() throws IOException, TimeoutException
+    public BatchWorkerAcceptanceTesting() throws IOException, TimeoutException
     {
         workflow_queue = "worker-workflow";
 
@@ -81,8 +76,6 @@ public class BatchWorkerAcceptanceIT
         jobsApi.getApiClient().getDateFormat().setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    @Test
-    @DisplayName("Check environmental variables for tests have been set")
     void checkEnvVariablesTest()
     {
         log.debug("Job Service: " + System.getenv("JOB_SERVICE_ADDRESS"));
@@ -96,8 +89,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(System.getenv("RABBITMQ_TEST_PASSWORD"), is(notNullValue()));
     }
 
-    @Test
-    @DisplayName("Check number of messages for single Subbatch")
     void countMessagesSingleSubbatchTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant3";
@@ -136,8 +127,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Check number of messages for single Batch")
     void countMessagesSingleBatchTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant2";
@@ -173,8 +162,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(10)));
     }
 
-    @Test
-    @DisplayName("Check number of messages for multiple Batches")
     void countMessagesMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant1";
@@ -210,8 +197,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
-    @DisplayName("Check number of messages for 937 subbatches")
     void countMessagesManySubbatchesTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant5";
@@ -246,8 +231,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(937)));
     }
 
-    @Test
-    @DisplayName("Multple batches check custom data managed")
     void checkCustomDataMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant5";
@@ -291,8 +274,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
-    @DisplayName("Multple batches check script managed")
     void checkScriptMultipleBatchesTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant1";
@@ -342,8 +323,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
-    @DisplayName("Test data put in the TaskMessage and DocumentWorkerDocumentTask")
     void checkDataTest() throws ApiException, IOException, InterruptedException
     {
         final String partitionId = "tenant-tenant1";
@@ -398,8 +377,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(35)));
     }
 
-    @Test
-    @DisplayName("Test batch definitions is null")
     void batchDefinitionNullTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -446,8 +423,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test invalid tenantId")
     void invalidTenantIdTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -494,8 +469,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test invalid batchId")
     void invalidBatchIdTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -542,8 +515,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test invalid json")
     void invalidJsonTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant4";
@@ -590,8 +561,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test non existing batch file")
     void nonExistingFileTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant4";
@@ -639,8 +608,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test non existing batch directory")
     void nonExistingDirectoryTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant4";
@@ -688,8 +655,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test non existing batch directory in multibatch")
     void nonExistingDirectoryInMultiBatchTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -738,8 +703,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test non existing directory in subbatch")
     void nonExistingDirectoryInSubbatchTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -788,8 +751,6 @@ public class BatchWorkerAcceptanceIT
         assertThat(messageCount, is(equalTo(1)));
     }
 
-    @Test
-    @DisplayName("Test tenantId not present")
     void tenantIdNotPresentTest() throws ApiException, InterruptedException, IOException
     {
         final String partitionId = "tenant-tenant1";
@@ -878,7 +839,6 @@ public class BatchWorkerAcceptanceIT
         if (consumerTag != null) {
             channel.basicCancel(consumerTag);
         }
-        channel.queueDelete(queue);
     }
 
     @SafeVarargs
