@@ -42,11 +42,8 @@ management:
     diskspace:
       path: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
       threshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:536870912}
-# Spring does not support streaming multipart request bodies, so we must use commons-fileupload instead. To prevent Spring from reading
-# the request body we do two things:
-#
-# 1) Set `spring.servlet.multipart.enabled=false` in the application.yaml
-# 2) Modify the generated swagger sources to change the `@Valid @RequestBody Object` param to `HttpServletRequest`
+# Spring does not support streaming multipart request bodies, so we must use commons-fileupload2 instead. To prevent Spring from reading
+# the request body we are setting `spring.servlet.multipart.enabled=false` in the application.yaml
 #
 # See: https://stackoverflow.com/questions/32782026/springboot-large-streaming-file-upload-using-apache-commons-fileupload
 #      https://stackoverflow.com/questions/37870989/spring-how-to-stream-large-multipart-file-uploads-to-database-without-storing
