@@ -23,6 +23,9 @@ import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 import java.io.File;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +47,7 @@ import org.springframework.web.util.UrlPathHelper;
 @SpringBootApplication
 @EnableScheduling
 @CAFSwaggerUI("com.github.cafdataprocessing.services.staging.contract")
-@ComponentScan(basePackages = {"io.swagger", "com.github.cafdataprocessing.services.staging"})
+@ComponentScan(basePackages = {"com.github.cafdataprocessing.services.staging"})
 @EnableConfigurationProperties(StagingProperties.class)
 public class StagingApplication implements WebMvcConfigurer
 {
@@ -94,10 +97,22 @@ public class StagingApplication implements WebMvcConfigurer
         connector.setScheme("https");
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
-        connector.setProperty("keystoreFile", keyStorePath + File.separator + keyStore);
-        connector.setProperty("keystorePass", keyStorePassword);
-        connector.setProperty("keyAlias", keyAlias);
+        connector.addSslHostConfig(createSSLHostConfig());
         return connector;
+    }
+
+    private SSLHostConfig createSSLHostConfig() {
+        final SSLHostConfig sslHostConfig = new SSLHostConfig();
+        sslHostConfig.addCertificate(createSSLHostConfigCertificate(sslHostConfig));
+        return sslHostConfig;
+    }
+
+    private SSLHostConfigCertificate createSSLHostConfigCertificate(final SSLHostConfig sslHostConfig) {
+        final SSLHostConfigCertificate sslCertConfig = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
+        sslCertConfig.setCertificateKeystoreFile(keyStorePath + File.separator + keyStore);
+        sslCertConfig.setCertificateKeystorePassword(keyStorePassword);
+        sslCertConfig.setCertificateKeyAlias(keyAlias);
+        return sslCertConfig;
     }
 
     private boolean validateConnectorParameters()
@@ -120,7 +135,7 @@ public class StagingApplication implements WebMvcConfigurer
     @Override
     public void configureContentNegotiation(final ContentNegotiationConfigurer configurer)
     {
-        configurer.favorPathExtension(true)
+        configurer
             .ignoreAcceptHeader(true)
             .useRegisteredExtensionsOnly(false)
             .defaultContentType(MediaType.APPLICATION_JSON, MediaType.ALL);

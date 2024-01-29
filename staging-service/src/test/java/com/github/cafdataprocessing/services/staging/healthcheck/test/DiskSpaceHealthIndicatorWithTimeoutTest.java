@@ -19,8 +19,8 @@ import com.github.cafdataprocessing.services.staging.StagingController;
 import com.github.cafdataprocessing.services.staging.StagingProperties;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.Path;
-import javax.servlet.http.HttpServletRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -87,7 +87,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
         assertNotNull(response);
-        assertEquals(503, response.getStatusCodeValue());
+        assertEquals(503, response.getStatusCode().value());
     }
 
 }

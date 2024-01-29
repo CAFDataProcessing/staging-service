@@ -19,87 +19,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
         <groupId>com.github.cafdataprocessing</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>staging-service-client</artifactId>
+    <artifactId>staging-service-internal-client</artifactId>
 
-    <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>okhttp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>logging-interceptor</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-jvm</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threetenbp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.gsonfire</groupId>
             <artifactId>gson-fire</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <id>copy-templates</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/templates</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.github.cafapi</groupId>
-                                    <artifactId>swagger-client-templates</artifactId>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>io.swagger.codegen.v3</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.14</version>
-                <!--Using 2.2.3 for client generation for compatibility reasons-->
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.cafdataprocessing</groupId>
@@ -114,20 +80,24 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <!-- https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin#general-configuration-parameters -->
                             <inputSpec>/com/github/cafdataprocessing/services/staging/contract/swagger.yaml</inputSpec>
-                            <language>java</language>
-                            <output>${project.build.directory}/swagger-codegen</output>
-                            <addCompileSourceRoot>false</addCompileSourceRoot>
-                            <modelPackage>com.github.cafdataprocessing.services.staging.client</modelPackage>
+                            <generatorName>java</generatorName>
+                            <output>${project.build.directory}/openapi-codegen</output>
                             <apiPackage>com.github.cafdataprocessing.services.staging.client.internal</apiPackage>
+                            <modelPackage>com.github.cafdataprocessing.services.staging.client</modelPackage>
                             <invokerPackage>com.github.cafdataprocessing.services.staging.client</invokerPackage>
-                            <templateDirectory>${project.build.directory}/templates/3.x</templateDirectory>
                             <modelNamePrefix>Staging</modelNamePrefix>
                             <configOptions>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <artifactVersion>${project.version}</artifactVersion>
+                                <!-- https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md#config-options -->
+                                <openApiNullable>false</openApiNullable>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
                         </configuration>
                     </execution>
                 </executions>
@@ -135,19 +105,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>copy-swagger-codegen-files</id>
-                        <phase>generate-sources</phase>
+                        <id>copy-openapi-codegen-files</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/swagger</outputDirectory>
+                            <outputDirectory>${project.build.directory}/openapi</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/swagger-codegen/src/main/java</directory>
+                                    <directory>${project.build.directory}/openapi-codegen/src/main/java</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -157,17 +126,16 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>add_sources</id>
-                        <phase>generate-sources</phase>
+                        <id>add-openapi-codegen-sources</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/swagger</source>
+                                <source>${project.build.directory}/openapi</source>
                             </sources>
                         </configuration>
                     </execution>

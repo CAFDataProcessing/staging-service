@@ -22,7 +22,7 @@
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
         <groupId>com.github.cafdataprocessing</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -30,6 +30,11 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.github.cafapi</groupId>
             <artifactId>swagger-ui-annotation</artifactId>
@@ -46,10 +51,6 @@
         <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>staging-service-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -77,8 +78,12 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-fileupload2-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-fileupload2-jakarta-servlet5</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -87,14 +92,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.joschi.jackson</groupId>
-            <artifactId>jackson-datatype-threetenbp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
@@ -148,13 +145,8 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threetenbp</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>staging-service-contract</artifactId>
-            <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -181,9 +173,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>io.swagger.codegen.v3</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.cafdataprocessing</groupId>
@@ -198,76 +189,30 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <!-- https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin#general-configuration-parameters -->
                             <inputSpec>/com/github/cafdataprocessing/services/staging/contract/swagger.yaml</inputSpec>
-                            <language>spring</language>
-                            <output>${project.build.directory}/swagger-codegen</output>
-                            <addCompileSourceRoot>false</addCompileSourceRoot>
-                            <modelPackage>com.github.cafdataprocessing.services.staging.models</modelPackage>
+                            <generatorName>spring</generatorName>
+                            <output>${project.build.directory}/openapi-codegen</output>
                             <apiPackage>com.github.cafdataprocessing.services.staging.swagger.api</apiPackage>
-                            <ignoreFileOverride>${project.basedir}/src/main/swagger-config/.swagger-codegen-ignore</ignoreFileOverride>
+                            <modelPackage>com.github.cafdataprocessing.services.staging.models</modelPackage>
+                            <invokerPackage>com.github.cafdataprocessing.services.staging.swagger</invokerPackage>
                             <configOptions>
+                                <!-- https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/spring.md#config-options -->
+                                <documentationProvider>source</documentationProvider>
                                 <interfaceOnly>true</interfaceOnly>
+                                <openApiNullable>false</openApiNullable>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <useTags>true</useTags>
                             </configOptions>
                             <typeMappings>
-                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
+                                <typeMapping>OffsetDateTime=Instant</typeMapping>
                             </typeMappings>
                             <importMappings>
                                 <importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping>
                             </importMappings>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>modify-swagger</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>targetDir</name>
-                                    <value>${project.build.directory}</value>
-                                </property>
-                            </properties>
-                            <scripts>
-                                <!--
-                                     Spring does not support streaming multipart request bodies, so we must use commons-fileupload
-                                     instead. To prevent Spring from reading the request body we do two things:
-
-                                    1) Set `spring.servlet.multipart.enabled=false` in the application.yaml
-                                    2) Modify the generated swagger sources to change the `@Valid @RequestBody Object` param to
-                                      `HttpServletRequest`
-
-                                    See: https://stackoverflow.com/questions/32782026/springboot-large-streaming-file-upload-using-apache-commons-fileupload
-                                         https://stackoverflow.com/questions/37870989/spring-how-to-stream-large-multipart-file-uploads-to-database-without-storing
-                                -->
-                                <script><![CDATA[
-                                    def fileToModify = new File(targetDir +
-                                        "/swagger-codegen/src/main/java/com/github/cafdataprocessing/services/staging/swagger/api/StagingApi.java")
-
-                                    def fileToModifyText = fileToModify.text
-                                    if (fileToModifyText == null) {
-                                        throw Exception();
-                                    }
-
-                                    def fileToModifyTextFirstUpdate = fileToModifyText.replaceAll(
-                                        'import org.springframework.web.bind.annotation.RequestBody',
-                                        'import javax.servlet.http.HttpServletRequest')
-
-                                    def fileToModifyTextSecondUpdate = fileToModifyTextFirstUpdate.replaceAll(
-                                        '@Valid @RequestBody Object body',
-                                        'HttpServletRequest request')
-
-                                    fileToModify.write(fileToModifyTextSecondUpdate)
-                                ]]></script>
-                            </scripts>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
                         </configuration>
                     </execution>
                 </executions>
@@ -275,24 +220,19 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>copy-swagger-codegen-files</id>
-                        <phase>generate-sources</phase>
+                        <id>copy-openapi-codegen-files</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/swagger-codegen-src</outputDirectory>
+                            <outputDirectory>${project.build.directory}/openapi-codegen-src</outputDirectory>
                             <resources>
                                 <resource>
-                                    <targetPath>swagger-gen</targetPath>
-                                    <directory>${project.build.directory}/swagger-codegen/src/gen/java</directory>
-                                </resource>
-                                <resource>
-                                    <targetPath>swagger-main</targetPath>
-                                    <directory>${project.build.directory}/swagger-codegen/src/main/java</directory>
+                                    <targetPath>openapi</targetPath>
+                                    <directory>${project.build.directory}/openapi-codegen/src/main/java</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -302,17 +242,16 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <id>add-openapi-codegen-files</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/swagger-codegen-src/swagger-gen</source>
-                                <source>${project.build.directory}/swagger-codegen-src/swagger-main</source>
+                                <source>${project.build.directory}/openapi-codegen-src/openapi</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -321,7 +260,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.0.3.RELEASE</version>
                 <executions>
                     <execution>
                         <goals>
@@ -329,7 +267,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
 

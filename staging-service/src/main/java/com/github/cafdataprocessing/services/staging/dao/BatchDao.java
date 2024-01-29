@@ -22,16 +22,16 @@ import com.github.cafdataprocessing.services.staging.exceptions.IncompleteBatchE
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchException;
 import com.github.cafdataprocessing.services.staging.exceptions.StagingException;
 import com.github.cafdataprocessing.services.staging.models.BatchStatusResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 
 public interface BatchDao
 {
 
-    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemIterator fileItemIterator)
+    List<String> saveFiles(TenantId tenantId, @Size(min = 1) BatchId batchId, FileItemInputIterator fileItemIterator)
         throws IncompleteBatchException, InvalidBatchException, StagingException;
 
     List<String> getBatches(TenantId tenantId, @Size(min = 1, max = 256) @Valid String startsWith, @Size(min = 1, max = 256) @Valid BatchId from,

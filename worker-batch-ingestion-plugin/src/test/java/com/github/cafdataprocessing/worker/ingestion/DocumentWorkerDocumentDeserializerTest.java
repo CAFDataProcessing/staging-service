@@ -15,6 +15,7 @@
  */
 package com.github.cafdataprocessing.worker.ingestion;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -41,6 +42,7 @@ class DocumentWorkerDocumentDeserializerTest
     public void before()
     {
         objectMapper = new ObjectMapper();
+        objectMapper.enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
         final SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(DocumentWorkerDocument.class, new DocumentWorkerDocumentDeserializer(100));
         objectMapper.registerModule(simpleModule);

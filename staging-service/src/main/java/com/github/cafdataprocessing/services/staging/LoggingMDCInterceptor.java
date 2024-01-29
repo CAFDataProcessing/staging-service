@@ -15,14 +15,14 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-public final class LoggingMDCInterceptor extends HandlerInterceptorAdapter
+public final class LoggingMDCInterceptor implements HandlerInterceptor
 {
 
     private static final String TENANT_HEADER = "X-TENANT-ID";
