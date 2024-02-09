@@ -94,7 +94,7 @@ public class StagingController implements StagingApi
             try {
                 fileItemIterator = fileUpload.getItemIterator(request);
             } catch (final IOException ex) {
-                LOGGER.warn("Error getting FileItemIterator: {}", ex.getMessage());
+                LOGGER.error("Error getting FileItemIterator", ex);
                 throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
             }
             try {
@@ -185,7 +185,7 @@ public class StagingController implements StagingApi
             LOGGER.warn("Invalid batchId {}", ex.getMessage());
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final StagingException ex) {
-            LOGGER.warn("Error in getBatches {}", ex.getMessage());
+            LOGGER.error("Error in getBatches ", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
