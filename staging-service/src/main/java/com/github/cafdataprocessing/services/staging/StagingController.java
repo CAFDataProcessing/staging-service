@@ -149,10 +149,10 @@ public class StagingController implements StagingApi
             LOGGER.warn("Batch {} not found", batchId);
             throw new WebMvcHandledRuntimeException(HttpStatus.NOT_FOUND, ex.getMessage());
         } catch (final StagingException ex) {
-            LOGGER.warn("Internal server error: {}", ex.getMessage());
+            LOGGER.error("Internal server error", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         } catch (final InterruptedException ex) {
-            LOGGER.warn("Service Unavailable: {}", ex.getMessage());
+            LOGGER.error("Service Unavailable", ex);
             throw new WebMvcHandledRuntimeException(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
         }
     }
