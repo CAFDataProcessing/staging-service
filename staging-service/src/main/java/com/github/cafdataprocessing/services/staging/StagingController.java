@@ -182,7 +182,7 @@ public class StagingController implements StagingApi
             LOGGER.warn("Invalid X-TENANT-ID {}", X_TENANT_ID);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final InvalidBatchIdException ex) {
-            LOGGER.warn("Invalid batchId {}", ex.getMessage());
+            LOGGER.warn("Invalid batchId {}", from);
             throw new WebMvcHandledRuntimeException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (final StagingException ex) {
             LOGGER.error("Error in getBatches ", ex);
