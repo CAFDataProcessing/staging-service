@@ -43,6 +43,7 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
             MDC.put("tenantId", tenant);
         }
 
+        LOGGER.info("Request Method: {}", request.getMethod());
         LOGGER.info("Request URL: {}", request.getRequestURL());
         LOGGER.info("Request Headers: {}", getRequestHeaders(request));
         //LOGGER.info("Request Body: {}", getRequestBody(request));
