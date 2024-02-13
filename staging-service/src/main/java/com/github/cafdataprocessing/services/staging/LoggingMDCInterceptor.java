@@ -17,6 +17,7 @@ package com.github.cafdataprocessing.services.staging;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 public final class LoggingMDCInterceptor implements HandlerInterceptor
 {
@@ -38,6 +40,9 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
     {
+        // Wrap the request to allow reading the body multiple times
+        ContentCachingRequestWrapper wrapper = new ContentCachingRequestWrapper(request);
+
         final String tenant = request.getHeader(TENANT_HEADER);
         if (StringUtils.isNotEmpty(tenant)) {
             MDC.put("tenantId", tenant);
@@ -45,7 +50,7 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
 
         LOGGER.info("Request URL: {}", request.getRequestURL());
         LOGGER.info("Request Headers: {}", getRequestHeaders(request));
-        LOGGER.info("Request Body: {}", getRequestBody(request));
+        //LOGGER.info("Request Body: {}", getRequestBody(request));
 
         return true;
     }
@@ -65,12 +70,13 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
         return headers.toString();
     }
 
-    private String getRequestBody(HttpServletRequest request) {
-        try (BufferedReader reader = request.getReader()) {
-            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
+    private String getRequestBody(ContentCachingRequestWrapper request) {
+        byte[] requestBody = request.getContentAsByteArray();
+        try {
+            return new String(requestBody, 0, requestBody.length, request.getCharacterEncoding());
+        } catch (UnsupportedEncodingException e) {
             LOGGER.error("Error reading request body", e);
-            return "Error reading request body";
+            return "Error reading request body " + e.getMessage();
         }
     }
 }
