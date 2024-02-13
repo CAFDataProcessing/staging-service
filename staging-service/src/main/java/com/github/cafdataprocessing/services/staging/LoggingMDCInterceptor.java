@@ -50,7 +50,7 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
 
         LOGGER.info("Request URL: {}", request.getRequestURL());
         LOGGER.info("Request Headers: {}", getRequestHeaders(request));
-        //LOGGER.info("Request Body: {}", getRequestBody(request));
+        LOGGER.info("Request Body: {}", getRequestBody(request));
 
         return true;
     }
