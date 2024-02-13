@@ -15,9 +15,15 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.stream.Collectors;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,6 +33,8 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
 
     private static final String TENANT_HEADER = "X-TENANT-ID";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StagingController.class);
+
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
     {
@@ -34,6 +42,11 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
         if (StringUtils.isNotEmpty(tenant)) {
             MDC.put("tenantId", tenant);
         }
+
+        LOGGER.info("Request URL: {}", request.getRequestURL());
+        LOGGER.info("Request Headers: {}", getRequestHeaders(request));
+        //LOGGER.info("Request Body: {}", getRequestBody(request));
+
         return true;
     }
 
@@ -42,5 +55,22 @@ public final class LoggingMDCInterceptor implements HandlerInterceptor
                            final ModelAndView modelAndView)
     {
         MDC.remove(TENANT_HEADER);
+    }
+
+    private String getRequestHeaders(HttpServletRequest request) {
+        StringBuilder headers = new StringBuilder();
+        request.getHeaderNames().asIterator().forEachRemaining(headerName ->
+                headers.append(headerName).append(": ").append(request.getHeader(headerName)).append(", ")
+        );
+        return headers.toString();
+    }
+
+    private String getRequestBody(HttpServletRequest request) {
+        try (BufferedReader reader = request.getReader()) {
+            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            LOGGER.error("Error reading request body", e);
+            return "Error reading request body";
+        }
     }
 }
