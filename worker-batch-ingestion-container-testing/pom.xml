@@ -144,7 +144,7 @@
                     <dependency>
                         <groupId>com.github.jobservice</groupId>
                         <artifactId>job-service-contract</artifactId>
-                        <version>7.0.0-SNAPSHOT</version>
+                        <version>7.0.0-334</version>
                     </dependency>
                 </dependencies>
                 <executions>
