@@ -31,10 +31,10 @@
         <module>staging-service</module>
         <module>staging-service-container</module>
         <module>staging-service-internal-client</module>
-        <module>staging-service-acceptance-tests</module>
         <module>worker-batch-ingestion-plugin</module>
         <module>worker-batch-ingestion-container</module>
         <module>worker-batch-ingestion-container-testing</module>
+        <module>staging-service-acceptance-tests</module>
     </modules>
 
     <parent>
