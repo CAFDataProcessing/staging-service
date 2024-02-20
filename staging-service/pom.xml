@@ -22,7 +22,7 @@
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
         <groupId>com.github.cafdataprocessing</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-1050</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
