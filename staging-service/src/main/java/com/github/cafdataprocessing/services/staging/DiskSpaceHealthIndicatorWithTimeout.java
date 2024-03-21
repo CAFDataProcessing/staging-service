@@ -53,11 +53,7 @@ final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
             return null;
         });
         try {
-            long startTime = System.currentTimeMillis();
             healthcheckFuture.get(healthcheckTimeoutSeconds, TimeUnit.SECONDS);
-            long endTime = System.currentTimeMillis();
-            long elapsedTime = endTime - startTime;
-            LOGGER.error("RORY TEST disk space check elapsed time: " + elapsedTime + " milliseconds");
         } catch (final TimeoutException e) {
             healthcheckFuture.cancel(true);
             builder.down().withDetail(

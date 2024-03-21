@@ -74,8 +74,6 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
 
     private synchronized void doWriteCheck(final Health.Builder builder) throws IOException
     {
-        long startTime = System.currentTimeMillis();
-
         Path created = null;
 
         try {
@@ -109,9 +107,5 @@ final class DiskAccessHealthIndicatorWithTimeout extends AbstractHealthIndicator
                 Files.deleteIfExists(created);
             }
         }
-
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        LOGGER.error("RORY TEST disk access check elapsed time: " + elapsedTime + " milliseconds");
     }
 }
