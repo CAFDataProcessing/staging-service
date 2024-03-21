@@ -38,10 +38,13 @@ management:
       show-details: ALWAYS
     info:
       enabled: false
+  # Disabling the disk space healthcheck as the service going unhealthy prevents batches from being deleted (which frees up space).
+  # The disk space is still checked in the /status endpoint.
+  # Note, removing the health.diskspace entry from this yaml does not disable the healthcheck, it must be explicitly disabled by
+  # setting health.diskspace.enabled=false
   health:
     diskspace:
-      path: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
-      threshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:536870912}
+      enabled: false
 # Spring does not support streaming multipart request bodies, so we must use commons-fileupload2 instead. To prevent Spring from reading
 # the request body we are setting `spring.servlet.multipart.enabled=false` in the application.yaml
 #
@@ -63,6 +66,8 @@ staging:
     fileCleanUpInterval: ${CAF_STAGING_SERVICE_FILE_CLEAN_UP_INTERVAL:86400000}
     skipFileCleanUp: ${CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP:false}
     healthcheckTimeoutSeconds: ${CAF_STAGING_SERVICE_HEALTHCHECK_TIMEOUT_SECONDS:10}
+    diskSpaceCheckPath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
+    diskSpaceCheckThreshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:536870912}
 logging:
   level:
     ROOT: ${CAF_LOG_LEVEL:WARN}
