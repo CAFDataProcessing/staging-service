@@ -30,7 +30,6 @@ import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.context.annotation.DependsOn;
@@ -57,17 +56,16 @@ public class StagingController implements StagingApi
     public StagingController(
         final BatchDao fileSystemDao,
         final HttpServletRequest request,
-        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties,
         final StagingProperties stagingProperties)
     {
         this.batchDao = fileSystemDao;
         this.request = request;
         this.diskSpaceHealthIndicatorWithTimeout = new DiskSpaceHealthIndicatorWithTimeout(
-            diskSpaceHealthIndicatorProperties.getPath(),
-            diskSpaceHealthIndicatorProperties.getThreshold(),
+            stagingProperties.getDiskSpaceCheckPath(),
+            stagingProperties.getDiskSpaceCheckThreshold(),
             stagingProperties.getHealthcheckTimeoutSeconds());
         this.diskAccessHealthIndicatorWithTimeout = new DiskAccessHealthIndicatorWithTimeout(
-            diskSpaceHealthIndicatorProperties.getPath().toPath(),
+            stagingProperties.getDiskSpaceCheckPath().toPath(),
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 

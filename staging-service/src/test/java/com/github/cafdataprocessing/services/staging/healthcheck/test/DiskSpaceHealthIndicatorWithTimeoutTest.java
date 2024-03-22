@@ -28,7 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.unit.DataSize;
 
@@ -39,7 +38,6 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     private BatchDao fileSystemDao;
     private HttpServletRequest request;
     private StagingProperties stagingProperties;
-    private DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties;
 
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
@@ -50,10 +48,9 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
         fileSystemDao = Mockito.mock(BatchDao.class);
         request = Mockito.mock(HttpServletRequest.class);
 
-        diskSpaceHealthIndicatorProperties = new DiskSpaceHealthIndicatorProperties();
-        diskSpaceHealthIndicatorProperties.setPath(folder.getRoot());
-        diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
-
+        stagingProperties = new StagingProperties();
+        stagingProperties.setDiskSpaceCheckPath(folder.getRoot());
+        stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
         stagingProperties = new StagingProperties();
         stagingProperties.setHealthcheckTimeoutSeconds(60);
     }
@@ -61,11 +58,10 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     @Test
     public void healthCheckTest()
     {
-        diskSpaceHealthIndicatorProperties.setPath(folder.getRoot());
-        diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
+        stagingProperties.setDiskSpaceCheckPath(folder.getRoot());
+        stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
         controller = new StagingController(fileSystemDao,
                                            request,
-                                           diskSpaceHealthIndicatorProperties,
                                            stagingProperties);
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");
@@ -78,11 +74,10 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     {
         final Path file = folder.getRoot().toPath().resolve("/test");
 
-        diskSpaceHealthIndicatorProperties.setPath(file.toFile());
-        diskSpaceHealthIndicatorProperties.setThreshold(DataSize.ofMegabytes(1L));
+        stagingProperties.setDiskSpaceCheckPath(file.toFile());
+        stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
         controller = new StagingController(fileSystemDao,
                                            request,
-                                           diskSpaceHealthIndicatorProperties,
                                            stagingProperties);
 
         final ResponseEntity<StatusResponse> response = controller.getStatus("test-tenant");

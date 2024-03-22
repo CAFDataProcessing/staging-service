@@ -15,7 +15,10 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import java.io.File;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 @ConfigurationProperties(prefix = "staging")
 public class StagingProperties
@@ -29,6 +32,8 @@ public class StagingProperties
     private long fileCleanUpInterval;
     private boolean skipFileCleanUp;
     private int healthcheckTimeoutSeconds;
+    private File diskSpaceCheckPath;
+    private DataSize diskSpaceCheckThreshold;
 
     public String getBasePath()
     {
@@ -108,5 +113,25 @@ public class StagingProperties
     public void setHealthcheckTimeoutSeconds(final int healthcheckTimeoutSeconds)
     {
         this.healthcheckTimeoutSeconds = healthcheckTimeoutSeconds;
+    }
+
+    public File getDiskSpaceCheckPath()
+    {
+        return diskSpaceCheckPath;
+    }
+
+    public void setDiskSpaceCheckPath(final File diskSpaceCheckPath)
+    {
+        this.diskSpaceCheckPath = diskSpaceCheckPath;
+    }
+
+    public DataSize getDiskSpaceCheckThreshold()
+    {
+        return diskSpaceCheckThreshold;
+    }
+
+    public void setDiskSpaceCheckThreshold(final DataSize diskSpaceCheckThreshold)
+    {
+        this.diskSpaceCheckThreshold = diskSpaceCheckThreshold;
     }
 }

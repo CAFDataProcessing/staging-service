@@ -15,7 +15,6 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import org.springframework.boot.actuate.autoconfigure.system.DiskSpaceHealthIndicatorProperties;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +24,10 @@ public class DiskAccessHealthIndicatorConfiguration
 {
     @Bean
     public AbstractHealthIndicator diskAccessHealthIndicator(
-        final DiskSpaceHealthIndicatorProperties diskSpaceHealthIndicatorProperties,
         final StagingProperties stagingProperties)
     {
         return new DiskAccessHealthIndicatorWithTimeout(
-            diskSpaceHealthIndicatorProperties.getPath().toPath(),
+            stagingProperties.getDiskSpaceCheckPath().toPath(),
             stagingProperties.getHealthcheckTimeoutSeconds());
     }
 }
