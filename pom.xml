@@ -432,12 +432,12 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>logging-interceptor</artifactId>
-                <version>5.0.0-alpha.12</version>
+                <version>5.0.0-alpha.14</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-jvm</artifactId>
-                <version>5.0.0-alpha.12</version>
+                <artifactId>okhttp</artifactId>
+                <version>5.0.0-alpha.14</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
