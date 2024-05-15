@@ -32,12 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StagingServiceLinuxIT
 {
@@ -53,7 +52,7 @@ public class StagingServiceLinuxIT
         stagingApi.setApiClient(apiClient);
     }
 
-    @Before
+    @BeforeEach
     public void linuxOnly()
     {
         assumeTrue(SystemUtils.IS_OS_LINUX);
@@ -112,7 +111,7 @@ public class StagingServiceLinuxIT
         final String batchId = "test-batch1";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+        assertEquals(1, response.getEntries().size(), "uploadDocumentsToBatchTest, 1 batch uploaded");
     }
 
     @Test

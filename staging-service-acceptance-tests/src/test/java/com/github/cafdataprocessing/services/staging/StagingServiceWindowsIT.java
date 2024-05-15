@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StagingServiceWindowsIT
 {
@@ -51,7 +51,7 @@ public class StagingServiceWindowsIT
         stagingApi.setApiClient(apiClient);
     }
 
-    @Before
+    @BeforeEach
     public void windowsOnly()
     {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
@@ -110,7 +110,7 @@ public class StagingServiceWindowsIT
         final String batchId = "test-batch1";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+        assertEquals(1, response.getEntries().size(), "uploadDocumentsToBatchTest, 1 batch uploaded");
     }
 
     private void stageMultiParts(final String tenantId, final String batchId, final String[] contentFiles, final String[] documentFiles)

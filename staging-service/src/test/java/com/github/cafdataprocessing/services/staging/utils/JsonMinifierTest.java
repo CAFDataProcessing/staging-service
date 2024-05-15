@@ -16,15 +16,18 @@
 package com.github.cafdataprocessing.services.staging.utils;
 
 import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Test;
 
 public final class JsonMinifierTest
 {
@@ -50,7 +53,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyJsonTest");
     }
 
     @Test
@@ -76,7 +79,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyNoRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyNoRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyNoRefJsonTest");
     }
 
     @Test
@@ -102,7 +105,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, new HashMap<>());
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyUTFEncodingOnlyJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyUTFEncodingOnlyJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyUTFEncodingOnlyJsonTest");
     }
 
     @Test
@@ -132,7 +135,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyStorageRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyStorageRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyStorageRefJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -173,7 +176,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyLocalRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyLocalRefJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -210,7 +213,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyLocalRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyLocalRefJsonTest");
     }
 
     @Test
@@ -233,7 +236,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifySimpleDocJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifySimpleDocJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifySimpleDocJsonTest");
     }
 
     @Test
@@ -267,7 +270,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, new HashMap<>());
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyBase64EncodingJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyBase64EncodingJsonTest", minifiedJson.contains("base64"));
+        assertTrue(minifiedJson.contains("base64"), "minifyBase64EncodingJsonTest");
     }
 
     @Test
@@ -280,7 +283,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyArrayFieldJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyArrayFieldJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "minifyArrayFieldJsonTest");
     }
 
     @Test
@@ -293,7 +296,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyNestedDocJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyNestedDocJsonTest", minifiedJson.contains("subdocuments"));
+        assertTrue(minifiedJson.contains("subdocuments"), "minifyNestedDocJsonTest");
     }
 
     @Test
@@ -320,7 +323,7 @@ public final class JsonMinifierTest
                                                inprogressContentFolderPath, fieldValueSizeThreshold, null);
             fail("validateAndMinifyInvalidJsonTest failed: Validation done incorectly");
         } catch (final InvalidDocumentException e) {
-            assertTrue("validateAndMinifyInvalidJsonTest", e.getMessage() != null);
+            assertNotNull(e.getMessage(), "validateAndMinifyInvalidJsonTest");
         }
     }
 
@@ -342,7 +345,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyJsonTest");
     }
 
     @Test
@@ -368,7 +371,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyNoRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyNoRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyNoRefJsonTest");
     }
 
     @Test
@@ -394,7 +397,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyUTFEncodingOnlyJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyUTFEncodingOnlyJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyUTFEncodingOnlyJsonTest");
     }
 
     @Test
@@ -424,7 +427,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyStorageRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyStorageRefJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyStorageRefJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -465,7 +468,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyLocalRefJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyLocalRefJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyLocalRefJsonTest");
     }
 
     @Test
@@ -488,7 +491,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifySimpleDocJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifySimpleDocJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifySimpleDocJsonTest");
     }
 
     @Test
@@ -522,7 +525,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyBase64EncodingJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyBase64EncodingJsonTest", minifiedJson.contains("base64"));
+        assertTrue(minifiedJson.contains("base64"), "validateAndMinifyBase64EncodingJsonTest");
     }
 
     @Test
@@ -535,7 +538,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyArrayFieldJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyArrayFieldJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyArrayFieldJsonTest");
     }
 
     @Test
@@ -548,7 +551,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyNestedDocJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyNestedDocJsonTest", minifiedJson.contains("subdocuments"));
+        assertTrue(minifiedJson.contains("subdocuments"), "validateAndMinifyNestedDocJsonTest");
     }
 
     @Test
@@ -575,7 +578,7 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, null);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyNoRefMultiValueJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyNoRefMultiValueJsonTest", !minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
+        assertFalse(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyNoRefMultiValueJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -610,8 +613,8 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("validateAndMinifyLocalRefMultiValueJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"));
-        assertTrue("validateAndMinifyLocalRefMultiValueJsonTest", minifiedJson.contains("\"PUBLISHER\":[{\"data\":\"Chapman and Hall\"}"));
+        assertTrue(minifiedJson.contains("/etc/store/batches/acme-com/completed/test_batch/files"), "validateAndMinifyLocalRefMultiValueJsonTest");
+        assertTrue(minifiedJson.contains("\"PUBLISHER\":[{\"data\":\"Chapman and Hall\"}"), "validateAndMinifyLocalRefMultiValueJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -632,7 +635,8 @@ public final class JsonMinifierTest
                                 inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyLargeDataJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyLargeDataJsonTest", minifiedJson.contains("\"SUBJECT\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"));
+        assertTrue(minifiedJson.contains("\"SUBJECT\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"),
+                "minifyLargeDataJsonTest");
     }
 
     @SuppressWarnings("serial")
@@ -653,7 +657,8 @@ public final class JsonMinifierTest
                                            inprogressContentFolderPath, fieldValueSizeThreshold, map);
         final String minifiedJson = outStream.toString("UTF-8");
         System.out.println("minifyLargeBase64DataJsonTest : Minified Json : " + minifiedJson);
-        assertTrue("minifyLargeBase64DataJsonTest", minifiedJson.contains("\"COVER_PIC\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files"));
-        assertTrue("minifyLargeBase64DataJsonTest", minifiedJson.contains(".bin"));
+        assertTrue(minifiedJson.contains("\"COVER_PIC\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files"),
+                "minifyLargeBase64DataJsonTest");
+        assertTrue(minifiedJson.contains(".bin"), "minifyLargeBase64DataJsonTest");
     }
 }
