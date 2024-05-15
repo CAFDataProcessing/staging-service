@@ -108,7 +108,7 @@
                             <alias>staging-service</alias>
                             <name>${dockerSettingsServiceOrg}staging-service${dockerProjectVersion}</name>
                             <build>
-                                <from>${dockerHubPublic}/cafapi/opensuse-jre17:4</from>
+                                <from>${projectDockerRegistry}/cafapi/opensuse-jre17</from>
                                 <healthCheck>
                                     <cmd>curl -f http://localhost:8081/healthcheck || exit 1</cmd>
                                 </healthCheck>

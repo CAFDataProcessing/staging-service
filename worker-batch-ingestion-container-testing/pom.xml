@@ -290,7 +290,7 @@
                             <alias>webdav</alias>
                             <name>${project.artifactId}-test-webdav:${project.version}</name>
                             <build>
-                                <from>${dockerHubPublic}/cloudesire/webdav</from>
+                                <from>${projectDockerRegistry}/cloudesire/webdav</from>
                                 <assembly>
                                     <basedir>/</basedir>
                                     <inline>
@@ -331,7 +331,7 @@
                         <!-- Run the RabbitMQ image. -->
                         <image>
                             <alias>rabbitmq</alias>
-                            <name>${dockerHubPublic}/library/rabbitmq:3-management</name>
+                            <name>${projectDockerRegistry}/library/rabbitmq</name>
                             <run>
                                 <ports>
                                     <port>${rabbitmq.ctrl.port}:15672</port>
@@ -353,7 +353,7 @@
                         <!-- Job Service and DB -->
                         <image>
                             <alias>postgres</alias>
-                            <name>${dockerHubPublic}/library/postgres:14</name>
+                            <name>${projectDockerRegistry}/library/postgres</name>
                             <run>
                                 <env>
                                     <POSTGRES_DB>${jobServiceDatabaseName}</POSTGRES_DB>
@@ -375,7 +375,7 @@
                         </image>
                         <image>
                             <alias>job-service</alias>
-                            <name>${dockerHubPublic}/jobservice/job-service:5</name>
+                            <name>${projectDockerRegistry}/jobservice/job-service</name>
                             <run>
                                 <ports>
                                     <port>${job-service.adminport}:8080</port>
@@ -411,7 +411,7 @@
                         <!-- Run the Job Service Scheduled Executor -->
                         <image>
                             <alias>job-service-scheduled-executor</alias>
-                            <name>${dockerHubPublic}/jobservice/job-service-scheduled-executor:6</name>
+                            <name>${projectDockerRegistry}/jobservice/job-service-scheduled-executor</name>
                             <run>
                                 <ports>
                                     <port>${scheduler-worker.adminport}:8081</port>

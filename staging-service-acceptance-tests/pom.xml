@@ -203,7 +203,7 @@
                             <alias>keystore</alias>
                             <name>${project.artifactId}-keystore:${project.version}</name>
                             <build>
-                                <from>${dockerHubPublic}/cafapi/opensuse-jre11:4</from>
+                                <from>${projectDockerRegistry}/cafapi/opensuse-jre11</from>
                                 <runCmds>
                                     <runCmd>mkdir /test-keystore</runCmd>
                                     <runCmd>$JRE_HOME/bin/keytool -genkey -noprompt -alias staging -dname "CN=myname, OU=myorganisational.unit, O=myorganisation, L=mycity, S=myprovince, C=GB" -keystore /test-keystore/staging.keystore -storepass changeit -keypass changeit -keyalg RSA</runCmd>
