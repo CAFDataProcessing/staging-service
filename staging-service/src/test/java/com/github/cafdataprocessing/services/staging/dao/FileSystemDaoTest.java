@@ -299,6 +299,7 @@ public class FileSystemDaoTest
     }
 
     @Test
+    @SuppressWarnings("ThrowableResultIgnored")
     public void saveInvalidJsonTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -318,6 +319,7 @@ public class FileSystemDaoTest
     }
 
     @Test
+    @SuppressWarnings("ThrowableResultIgnored")
     public void putFilesInvalidBatchIdTest() throws Exception
     {
         Assertions.assertThrows(InvalidBatchIdException.class,() -> new BatchId("../../MyBadBatchId"));
