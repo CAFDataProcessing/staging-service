@@ -50,6 +50,7 @@
         <dockerHubOrganization>cafdataprocessing</dockerHubOrganization>
         <dockerSettingsServiceOrg>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}</dockerSettingsServiceOrg>
         <dockerProjectVersion>${dockerVersionSeperator}${project.version}</dockerProjectVersion>
+        <projectDockerRegistry>staging-service-${project.version}.project-registries.local</projectDockerRegistry>
     </properties>
 
     <dependencyManagement>
@@ -162,7 +163,7 @@
             <dependency>
                 <groupId>com.github.cafapi</groupId>
                 <artifactId>caf-api</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi</groupId>
@@ -172,32 +173,32 @@
             <dependency>
                 <groupId>com.github.cafapi.cipher</groupId>
                 <artifactId>cipher-null</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.codec</groupId>
                 <artifactId>codec-json</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.config</groupId>
                 <artifactId>config-caf</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.config</groupId>
                 <artifactId>config-decoder</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.config</groupId>
                 <artifactId>config-file</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.config</groupId>
                 <artifactId>config-system</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.correlation</groupId>
@@ -212,7 +213,7 @@
             <dependency>
                 <groupId>com.github.cafapi.decoder</groupId>
                 <artifactId>decoder-js</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.logging</groupId>
@@ -232,22 +233,22 @@
             <dependency>
                 <groupId>com.github.cafapi.util</groupId>
                 <artifactId>util-moduleloader</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.util</groupId>
                 <artifactId>util-naming</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.util</groupId>
                 <artifactId>util-process-identifier</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi.util</groupId>
                 <artifactId>util-ref</artifactId>
-                <version>3.0.0-549</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
@@ -277,17 +278,17 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-schema</artifactId>
-                <version>6.0.0-1308</version>
+                <version>6.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-shared</artifactId>
-                <version>6.0.0-1308</version>
+                <version>6.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing</groupId>
                 <artifactId>worker-document-validator</artifactId>
-                <version>6.0.0-1308</version>
+                <version>6.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice</groupId>
@@ -317,52 +318,52 @@
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>util-rabbitmq</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-api</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-caf</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-configs</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-core</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-default-configs</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-queue-rabbit</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-store-fs</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-store-http</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
                 <artifactId>worker-tracking-report</artifactId>
-                <version>8.0.1-1211</version>
+                <version>8.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework.testing</groupId>
@@ -1205,7 +1206,60 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.cafapi.plugins.docker.versions</groupId>
+                    <artifactId>docker-versions-maven-plugin</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>com.github.cafapi.plugins.docker.versions</groupId>
+                <artifactId>docker-versions-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <imageManagement>
+                        <image>
+                            <repository>${dockerHubPublic}/cafapi/opensuse-jre11</repository>
+                            <tag>4.0.0</tag>
+                            <digest>sha256:03c2b7fe78f3db1831a492ca341266eca7efb92f1f4968939308b9d038aba97c</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/cafapi/opensuse-jre17</repository>
+                            <tag>4.0.0</tag>
+                            <digest>sha256:c0065ce7db226f864099ffd52371ebcf580c944a772f24fc0cb69ccacd9e6059</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/cloudesire/webdav</repository>
+                            <tag>latest</tag>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/jobservice/job-service</repository>
+                            <tag>5.0</tag>
+                            <digest>sha256:bc0090bdbba5701563f3576dca16a14453291bf84d33485a42cdadccd7e8d1e3</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/jobservice/job-service-scheduled-executor</repository>
+                            <tag>6.2.2</tag>
+                            <digest>sha256:1f02e12dbbc318b1ec026840d0b1db4dcffcce4418115bc1d590940347785237</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/library/postgres</repository>
+                            <tag>14.12-alpine3.19</tag>
+                            <digest>sha256:f95a8cb8411aac06dd98ea44d6a810476d1b07358858f6d81177264b6eb5e9dd</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/library/rabbitmq</repository>
+                            <tag>3.13.2-management</tag>
+                            <latestTag>management</latestTag>
+                            <digest>sha256:eee9afbc17c32424ba6309dfd2d9efc9b9b1863ffe231b3d2be2815758b0d649</digest>
+                        </image>
+                    </imageManagement>
+                </configuration>
+            </plugin>
             <!-- Exclude the batch files when checking license headers -->
             <plugin>
                 <groupId>com.mycila</groupId>
