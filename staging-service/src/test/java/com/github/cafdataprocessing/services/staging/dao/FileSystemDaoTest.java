@@ -34,12 +34,13 @@ import org.apache.commons.fileupload2.core.FileItemInput;
 import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class FileSystemDaoTest
     private FileSystemDao fileSystemDao;
     final int fieldValueSizeThreshold = 8192; // 8KB
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         tenantId = new TenantId(TEST_TENANT_ID);
@@ -65,7 +66,7 @@ public class FileSystemDaoTest
         this.fileSystemDao = new FileSystemDao(baseDirName, 250, storageDirName, fieldValueSizeThreshold, 36000000, true);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException
     {
         final File baseDir = new File(baseDirName);
@@ -99,8 +100,8 @@ public class FileSystemDaoTest
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         files.remove(f1.getFieldName());
-        assertTrue(files.size() == 1);
-        assertTrue(FilenameUtils.getExtension(files.get(0)).equals("txt"));
+        assertEquals(1, files.size());
+        assertEquals("txt", FilenameUtils.getExtension(files.get(0)));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
@@ -128,8 +129,8 @@ public class FileSystemDaoTest
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         files.remove(f1.getFieldName());
-        assertTrue(files.size() == 1);
-        assertTrue(FilenameUtils.getExtension(files.get(0)).equals("pdf"));
+        assertEquals(1, files.size());
+        assertEquals("pdf", FilenameUtils.getExtension(files.get(0)));
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
 
@@ -157,7 +158,7 @@ public class FileSystemDaoTest
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         files.remove(f1.getFieldName());
-        assertTrue(files.size() == 1);
+        assertEquals(1, files.size());
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
@@ -186,7 +187,7 @@ public class FileSystemDaoTest
         assertEquals(2, files.size());
         assertTrue(files.contains(f1.getFieldName()));
         files.remove(f1.getFieldName());
-        assertTrue(files.size() == 1);
+        assertEquals(1, files.size());
         assertTrue(FilenameUtils.getExtension(files.get(0)).isEmpty());
         assertTrue(isUUIDvalid(FilenameUtils.getBaseName(files.get(0))));
     }
@@ -298,6 +299,7 @@ public class FileSystemDaoTest
     }
 
     @Test
+    @SuppressWarnings("ThrowableResultIgnored")
     public void saveInvalidJsonTest() throws Exception
     {
         final BatchId batchId = new BatchId(UUID.randomUUID().toString());
@@ -313,18 +315,14 @@ public class FileSystemDaoTest
         when(fileItemIterator.hasNext()).thenReturn(true, false);
         when(fileItemIterator.next()).thenReturn(f1);
 
-        try {
-            fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator);
-            fail("Incorrectly uploaded invalid batch");
-        } catch (final InvalidBatchException e) {
-            assertTrue("Expected InvalidBatchException thrown", true);
-        }
+        Assertions.assertThrows(InvalidBatchException.class, () -> fileSystemDao.saveFiles(tenantId, batchId, fileItemIterator));
     }
 
-    @Test(expected = InvalidBatchIdException.class)
+    @Test
+    @SuppressWarnings("ThrowableResultIgnored")
     public void putFilesInvalidBatchIdTest() throws Exception
     {
-        new BatchId("../../MyBadBatchId");
+        Assertions.assertThrows(InvalidBatchIdException.class,() -> new BatchId("../../MyBadBatchId"));
     }
 
     @Test
@@ -344,7 +342,7 @@ public class FileSystemDaoTest
         FileUtils.writeStringToFile(f2, "def", "UTF8");
 
         final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
-        assertTrue("getFilesTest : " + fileNames, fileNames.size() == 1);
+        assertEquals(1, fileNames.size(), "getFilesTest : " + fileNames);
     }
 
     @Test
@@ -362,7 +360,7 @@ public class FileSystemDaoTest
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
-        assertTrue("getFilesInvalidFromTest : " + fileNames, fileNames.size() == 1);
+        assertEquals(1, fileNames.size(), "getFilesInvalidFromTest : " + fileNames);
     }
 
     @Test
@@ -385,7 +383,7 @@ public class FileSystemDaoTest
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         final List<String> fileNames = fileSystemDao.getBatches(tenantId, startsWith, new BatchId(from), limit);
-        assertTrue("getFilesPaginateFromTest : " + fileNames, fileNames.size() == 2);
+        assertEquals(2, fileNames.size(), "getFilesPaginateFromTest : " + fileNames);
     }
 
     @Test
@@ -406,7 +404,7 @@ public class FileSystemDaoTest
         FileUtils.writeStringToFile(f1, "abc", "UTF8");
         FileUtils.writeStringToFile(f2, "def", "UTF8");
         final List<String> fileNames = fileSystemDao.getBatches(tenantId, null, null, 25);
-        assertTrue("getFilesPaginate : " + fileNames, fileNames.size() == 7);
+        assertEquals(7, fileNames.size(), "getFilesPaginate : " + fileNames);
     }
 
     @Test

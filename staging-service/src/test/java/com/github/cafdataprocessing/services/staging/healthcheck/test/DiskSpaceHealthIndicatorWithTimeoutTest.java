@@ -20,13 +20,15 @@ import com.github.cafdataprocessing.services.staging.StagingProperties;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.models.StatusResponse;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.File;
 import java.nio.file.Path;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.unit.DataSize;
@@ -39,17 +41,17 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     private HttpServletRequest request;
     private StagingProperties stagingProperties;
 
-    @Rule
-    public final TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         fileSystemDao = Mockito.mock(BatchDao.class);
         request = Mockito.mock(HttpServletRequest.class);
 
         stagingProperties = new StagingProperties();
-        stagingProperties.setDiskSpaceCheckPath(folder.getRoot());
+        stagingProperties.setDiskSpaceCheckPath(folder);
         stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
         stagingProperties = new StagingProperties();
         stagingProperties.setHealthcheckTimeoutSeconds(60);
@@ -58,7 +60,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     @Test
     public void healthCheckTest()
     {
-        stagingProperties.setDiskSpaceCheckPath(folder.getRoot());
+        stagingProperties.setDiskSpaceCheckPath(folder);
         stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
         controller = new StagingController(fileSystemDao,
                                            request,
@@ -72,7 +74,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     @Test
     public void healthCheckTestReadOnly()
     {
-        final Path file = folder.getRoot().toPath().resolve("/test");
+        final Path file = folder.toPath().resolve("/test");
 
         stagingProperties.setDiskSpaceCheckPath(file.toFile());
         stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));
