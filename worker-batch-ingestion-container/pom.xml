@@ -164,7 +164,7 @@
                             <alias>worker-ingestion</alias>
                             <name>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}worker-ingestion${dockerProjectVersion}</name>
                             <build>
-                                <from>${dockerHubPublic}/cafapi/opensuse-jre17:1</from>
+                                <from>${dockerHubPublic}/cafapi/opensuse-jre17:4</from>
                                 <!-- The entry point will be the worker.sh executable. -->
                                 <cmd>/maven/worker.sh</cmd>
                                 <assembly>
