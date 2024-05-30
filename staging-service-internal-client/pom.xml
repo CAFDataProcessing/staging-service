@@ -24,7 +24,7 @@
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
         <groupId>com.github.cafdataprocessing</groupId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2-3</version>
     </parent>
 
     <artifactId>staging-service-internal-client</artifactId>

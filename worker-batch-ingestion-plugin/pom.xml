@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.github.cafdataprocessing</groupId>
         <artifactId>staging-service-aggregator</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.2-3</version>
     </parent>
 
     <artifactId>worker-batch-ingestion-plugin</artifactId>
