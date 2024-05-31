@@ -229,6 +229,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <docker.host.address>${docker.host.address}</docker.host.address>
+                        <worker.restport>${worker.restport}</worker.restport>
                         <worker.adminport>${worker.adminport}</worker.adminport>
                         <rabbitmq.node.port>${rabbitmq.node.port}</rabbitmq.node.port>
                         <rabbitmq.ctrl.port>${rabbitmq.ctrl.port}</rabbitmq.ctrl.port>
@@ -290,7 +291,7 @@
                             <alias>webdav</alias>
                             <name>${project.artifactId}-test-webdav:${project.version}</name>
                             <build>
-                                <from>${dockerHubPublic}/cloudesire/webdav</from>
+                                <from>${projectDockerRegistry}/cloudesire/webdav</from>
                                 <assembly>
                                     <basedir>/</basedir>
                                     <inline>
@@ -331,7 +332,7 @@
                         <!-- Run the RabbitMQ image. -->
                         <image>
                             <alias>rabbitmq</alias>
-                            <name>${dockerHubPublic}/library/rabbitmq:3-management</name>
+                            <name>${projectDockerRegistry}/library/rabbitmq</name>
                             <run>
                                 <ports>
                                     <port>${rabbitmq.ctrl.port}:15672</port>
@@ -353,7 +354,7 @@
                         <!-- Job Service and DB -->
                         <image>
                             <alias>postgres</alias>
-                            <name>${dockerHubPublic}/library/postgres:14</name>
+                            <name>${projectDockerRegistry}/library/postgres</name>
                             <run>
                                 <env>
                                     <POSTGRES_DB>${jobServiceDatabaseName}</POSTGRES_DB>
@@ -375,7 +376,7 @@
                         </image>
                         <image>
                             <alias>job-service</alias>
-                            <name>${dockerHubPublic}/jobservice/job-service:5</name>
+                            <name>${projectDockerRegistry}/jobservice/job-service</name>
                             <run>
                                 <ports>
                                     <port>${job-service.adminport}:8080</port>
@@ -411,7 +412,7 @@
                         <!-- Run the Job Service Scheduled Executor -->
                         <image>
                             <alias>job-service-scheduled-executor</alias>
-                            <name>${dockerHubPublic}/jobservice/job-service-scheduled-executor:6</name>
+                            <name>${projectDockerRegistry}/jobservice/job-service-scheduled-executor</name>
                             <run>
                                 <ports>
                                     <port>${scheduler-worker.adminport}:8081</port>
@@ -455,6 +456,7 @@
                             <name>${dockerImagePrefix}${dockerHubOrganization}${dockerOrgSeperator}worker-ingestion${dockerProjectVersion}</name>
                             <run>
                                 <ports>
+                                    <port>${worker.restport}:8080</port>
                                     <port>${worker.adminport}:8081</port>
                                 </ports>
                                 <env>
@@ -482,7 +484,7 @@
                                 </log>
                                 <wait>
                                     <http>
-                                        <url>http://${docker.host.address}:${worker.adminport}/healthcheck</url>
+                                        <url>http://${docker.host.address}:${worker.restport}/health-check?type=READY</url>
                                     </http>
                                     <time>120000</time>
                                     <shutdown>500</shutdown>
@@ -504,6 +506,7 @@
                 <rabbitmq.ctrl.port>15672</rabbitmq.ctrl.port>
                 <rabbitmq.node.port>5672</rabbitmq.node.port>
                 <webdav.apache.port>8080</webdav.apache.port>
+                <worker.restport>8082</worker.restport>
                 <worker.adminport>8081</worker.adminport>
                 <job-service.adminport>28003</job-service.adminport>
                 <postgres.port>25432</postgres.port>

@@ -30,8 +30,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
 
 public class StagingServiceIT
 {
@@ -57,7 +59,7 @@ public class StagingServiceIT
         final String batchId = "test-batch1";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertTrue("uploadDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+        assertEquals(1, response.getEntries().size(), "uploadDocumentsToBatchTest, 1 batch uploaded");
     }
 
     @Test
@@ -69,9 +71,9 @@ public class StagingServiceIT
         final String batchId = "test-batch8";
         stageMultiParts(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchStatusResponse batchStatus = stagingApi.getBatchStatus(tenantId, batchId);
-        assertTrue("Batch completed successfully", batchStatus.getBatchStatus().getBatchComplete());
+        assertTrue(batchStatus.getBatchStatus().getBatchComplete(), "Batch completed successfully");
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertEquals("uploadDocumentsToBatchTest, 1 batch uploaded", 1, response.getEntries().size());
+        assertEquals(1, response.getEntries().size(), "uploadDocumentsToBatchTest, 1 batch uploaded");
     }
 
     @Test
@@ -114,7 +116,7 @@ public class StagingServiceIT
         final String[] documentFiles = new String[]{"batch1.json", "batch2.json", "batch3.json", "batch4.json", "batch5.json", "batch6.json"};
         stageMultiPartStreams(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
-        assertTrue("uploadMultipleDocumentsToBatchTest, 1 batch uploaded", response.getEntries().size() == 1);
+        assertEquals(1, response.getEntries().size(), "uploadMultipleDocumentsToBatchTest, 1 batch uploaded");
     }
 
     @Test
@@ -208,7 +210,7 @@ public class StagingServiceIT
             stageMultiParts("tenant/test-batch-invalid-json", "test-batch-invalid-json", contentFiles, documentFiles);
             fail("uploadBatchToInvalidTenantTest - Expected ApiException");
         } catch (ApiException ex) {
-            assertEquals("uploadBatchToInvalidTenantTest", 400, ex.getCode());
+            assertEquals(400, ex.getCode(), "uploadBatchToInvalidTenantTest");
         }
     }
 
@@ -233,19 +235,19 @@ public class StagingServiceIT
         stageMultiParts(tenantId2, batchId23, contentFiles, documentFiles);
 
         StagingBatchList response = stagingApi.getBatches(tenantId1, null, null, 10);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, 1 batch in tenant1", response.getEntries().size() == 1);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, found t1-test-batch1 in tenant1", response.getEntries().contains(batchId1));
+        assertEquals(1, response.getEntries().size(), "uploadDocumentsToMultipleTenantsTest, 1 batch in tenant1");
+        assertTrue(response.getEntries().contains(batchId1), "uploadDocumentsToMultipleTenantsTest, found t1-test-batch1 in tenant1");
 
         response = stagingApi.getBatches(tenantId1, "t2", null, 10);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, no such batches in tenant1", response.getEntries().size() == 0);
+        assertEquals(0, response.getEntries().size(), "uploadDocumentsToMultipleTenantsTest, no such batches in tenant1");
 
         response = stagingApi.getBatches(tenantId2, null, null, 10);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, 3 batches in tenant2", response.getEntries().size() == 3);
+        assertEquals(3, response.getEntries().size(), "uploadDocumentsToMultipleTenantsTest, 3 batches in tenant2");
 
         response = stagingApi.getBatches(tenantId2, "t2", "t2-test-batch22", 10);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, returning 2 batches in tenant2", response.getEntries().size() == 2);
-        assertTrue("uploadDocumentsToMultipleTenantsTest, found t2-test-batch22 in tenant2", response.getEntries().contains(batchId22));
-        assertTrue("uploadDocumentsToMultipleTenantsTest, found t2-test-batch23 in tenant2", response.getEntries().contains(batchId23));
+        assertEquals(2, response.getEntries().size(), "uploadDocumentsToMultipleTenantsTest, returning 2 batches in tenant2");
+        assertTrue(response.getEntries().contains(batchId22), "uploadDocumentsToMultipleTenantsTest, found t2-test-batch22 in tenant2");
+        assertTrue(response.getEntries().contains(batchId23), "uploadDocumentsToMultipleTenantsTest, found t2-test-batch23 in tenant2");
     }
 
     @Test
@@ -257,7 +259,7 @@ public class StagingServiceIT
         final String[] documentFiles = new String[]{"batch1.json"};
         stageMultiPartStreams(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList listResponse = stagingApi.getBatches(tenantId, "abc", "abc", 10);
-        assertTrue("getBatchesTest, 1 batch listed", listResponse.getEntries().size() == 1);
+        assertEquals(1, listResponse.getEntries().size(), "getBatchesTest, 1 batch listed");
     }
 
     @Test
@@ -269,7 +271,7 @@ public class StagingServiceIT
         final String[] documentFiles = new String[]{"batch1.json"};
         stageMultiPartStreams(tenantId, batchId, contentFiles, documentFiles);
         final StagingBatchList listResponse = stagingApi.getBatches(tenantId, "abc", "abc", 10);
-        assertTrue("getNoMatchingBatchesInTenantTest, 0 batches listed", listResponse.getEntries().size() == 0);
+        assertEquals(0, listResponse.getEntries().size(), "getNoMatchingBatchesInTenantTest, 0 batches listed");
     }
 
     @Test
@@ -277,7 +279,7 @@ public class StagingServiceIT
     {
         final String tenantId = "tenant-no-such-tenant";
         final StagingBatchList listResponse = stagingApi.getBatches(tenantId, "abc", "abc", 10);
-        assertTrue("getNoSuchTenantTest, 0 batches listed", listResponse.getEntries().size() == 0);
+        assertEquals(0, listResponse.getEntries().size(), "getNoSuchTenantTest, 0 batches listed");
     }
 
     @Test
@@ -288,7 +290,7 @@ public class StagingServiceIT
             stagingApi.getBatches(tenantId, "abc", "abc", 10);
             fail("getInvalidTenantTest - Expected ApiException");
         } catch (ApiException ex) {
-            assertEquals("getInvalidTenantTest", 400, ex.getCode());
+            assertEquals(400, ex.getCode(), "getInvalidTenantTest");
         }
     }
 
@@ -304,7 +306,7 @@ public class StagingServiceIT
         try {
             stagingApi.deleteBatch(tenantId, batchId);
             final StagingBatchList listResponse = stagingApi.getBatches(tenantId, "del-test", "del-test", 10);
-            assertTrue("deleteBatchTest, 0 batchs listed", listResponse.getEntries().size() == 0);
+            assertEquals(0, listResponse.getEntries().size(), "deleteBatchTest, 0 batchs listed");
         } catch (ApiException ex) {
             fail("deleteBatchTest failed");
         }
@@ -319,7 +321,7 @@ public class StagingServiceIT
             stagingApi.deleteBatch(tenantId, batchId);
             fail("deleteInvalidTenantBatchTest-Expected ApiException");
         } catch (ApiException ex) {
-            assertEquals("deleteInvalidTenantBatchTest", 400, ex.getCode());
+            assertEquals(400, ex.getCode(), "deleteInvalidTenantBatchTest");
         }
     }
 
@@ -337,7 +339,7 @@ public class StagingServiceIT
             stagingApi.deleteBatch(tenantId, delBatchId);
             fail("deleteNonExistingBatchTest - Expected ApiException");
         } catch (ApiException ex) {
-            assertEquals("deleteNonExistingBatchTest", 404, ex.getCode());
+            assertEquals(404, ex.getCode(), "deleteNonExistingBatchTest");
         }
     }
 
@@ -351,7 +353,7 @@ public class StagingServiceIT
             stagingApi.deleteBatch(tenantId, batchId);
             fail("delete-nonexisting-tenant-batch-test - Expected ApiException");
         } catch (ApiException ex) {
-            assertEquals("delete-nonexisting-tenant-batch-test", 404, ex.getCode());
+            assertEquals(404, ex.getCode(), "delete-nonexisting-tenant-batch-test");
         }
     }
 
