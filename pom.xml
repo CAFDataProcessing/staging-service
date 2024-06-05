@@ -734,7 +734,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.43.0</version>
+                <version>3.44.0</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -1196,7 +1196,7 @@
                 <plugin>
                     <groupId>com.github.cafapi.plugins.docker.versions</groupId>
                     <artifactId>docker-versions-maven-plugin</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0-29</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1233,14 +1233,14 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/library/postgres</repository>
-                            <tag>bookworm</tag>
+                            <tag>16.3</tag>
                             <digest>sha256:1bf73ccae25238fa555100080042f0b2f9be08eb757e200fe6afc1fc413a1b3c</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/library/rabbitmq</repository>
-                            <tag>3.13.2-management</tag>
+                            <tag>3.13.3-management</tag>
                             <latestTag>management</latestTag>
-                            <digest>sha256:eee9afbc17c32424ba6309dfd2d9efc9b9b1863ffe231b3d2be2815758b0d649</digest>
+                            <digest>sha256:f4e56b7d7bea1213e51004e4e5ae01b6217e2ca6d62713d7e3cf41de0d6a01db</digest>
                         </image>
                     </imageManagement>
                 </configuration>
