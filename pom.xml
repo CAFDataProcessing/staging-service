@@ -593,22 +593,22 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-commons</artifactId>
-                <version>1.13.0</version>
+                <version>1.13.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.13.0</version>
+                <version>1.13.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-jakarta9</artifactId>
-                <version>1.13.0</version>
+                <version>1.13.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
-                <version>1.13.0</version>
+                <version>1.13.1</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.activation</groupId>
