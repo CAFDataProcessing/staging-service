@@ -1,5 +1,3 @@
-!not-ready-for-release!
-
 #### Version Number
 ${version-number}
 
@@ -12,3 +10,4 @@ ${version-number}
     for more details.
 
 #### Known Issues
+- None
