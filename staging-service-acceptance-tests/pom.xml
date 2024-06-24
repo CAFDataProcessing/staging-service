@@ -192,7 +192,7 @@
                                 </log>
                                 <wait>
                                     <http>
-                                        <url>http://${docker.host.address}:${staging.ports.api.admin}/healthcheck</url>
+                                        <url>http://${docker.host.address}:${staging.ports.api.admin}/healthcheck/readiness</url>
                                     </http>
                                     <time>120000</time>
                                     <shutdown>500</shutdown>

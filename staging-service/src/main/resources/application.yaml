@@ -20,6 +20,11 @@ server:
 https:
   port: 8443
 management:
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
   server:
     port: 8081
   endpoints:
@@ -36,6 +41,14 @@ management:
   endpoint:
     health:
       show-details: ALWAYS
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState,
+        readiness:
+          # Including liveness checks here as readiness is a superset of liveness
+          include: livenessState,diskAccess,readinessState,ping
     info:
       enabled: false
   # Disabling the disk space healthcheck as the service going unhealthy prevents batches from being deleted (which frees up space).
