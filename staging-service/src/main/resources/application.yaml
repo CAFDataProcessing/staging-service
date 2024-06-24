@@ -45,7 +45,7 @@ management:
         enabled: true
       group:
         liveness:
-          include: livenessState,
+          include: livenessState
         readiness:
           # Including liveness checks here as readiness is a superset of liveness
           include: livenessState,diskAccess,readinessState,ping
