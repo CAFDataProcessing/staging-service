@@ -20,11 +20,6 @@ server:
 https:
   port: 8443
 management:
-  health:
-    livenessState:
-      enabled: true
-    readinessState:
-      enabled: true
   server:
     port: 8081
   endpoints:
@@ -58,6 +53,10 @@ management:
   health:
     diskspace:
       enabled: false
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
 # Spring does not support streaming multipart request bodies, so we must use commons-fileupload2 instead. To prevent Spring from reading
 # the request body we are setting `spring.servlet.multipart.enabled=false` in the application.yaml
 #
