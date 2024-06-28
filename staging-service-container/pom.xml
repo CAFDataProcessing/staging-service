@@ -110,7 +110,7 @@
                             <build>
                                 <from>${projectDockerRegistry}/cafapi/opensuse-jre17</from>
                                 <healthCheck>
-                                    <cmd>curl -f http://localhost:8081/healthcheck || exit 1</cmd>
+                                    <cmd>curl -f http://localhost:8081/healthcheck/readiness || exit 1</cmd>
                                 </healthCheck>
                                 <env>
                                     <VERSION>${project.version}</VERSION>
