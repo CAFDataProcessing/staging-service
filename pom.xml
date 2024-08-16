@@ -1208,11 +1208,6 @@
                 <configuration>
                     <imageManagement>
                         <image>
-                            <repository>${dockerHubPublic}/cafapi/opensuse-jre11</repository>
-                            <tag>4.1.0</tag>
-                            <digest>sha256:986576a3d9be44555724e9766a8c097bca4eb303f1d1e3536763f14020776a5f</digest>
-                        </image>
-                        <image>
                             <targetRepository>cafapi/oraclelinux-jre21</targetRepository>
                             <repository>${dockerHubPublic}/cafapi/prereleases</repository>
                             <tag>oraclelinux-jre21-1.0.0-SNAPSHOT</tag>
