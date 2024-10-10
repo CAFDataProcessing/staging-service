@@ -50,4 +50,6 @@ then
 fi
 
 cd /maven
-exec java $CAF_SERVICE_JAVA_OPTS -jar staging-service-${VERSION}.jar
+exec java $CAF_SERVICE_JAVA_OPTS \
+  -cp "*" \
+  com.github.cafdataprocessing.services.staging.StagingApplication

@@ -132,11 +132,8 @@
                                         </fileSets>
                                         <dependencySets>
                                             <dependencySet>
-                                                <includes>
-                                                    <include>com.github.cafdataprocessing:staging-service</include>
-                                                </includes>
-                                                <unpack>false</unpack>
                                                 <useProjectArtifact>false</useProjectArtifact>
+                                                <scope>runtime</scope>
                                             </dependencySet>
                                         </dependencySets>
                                     </inline>

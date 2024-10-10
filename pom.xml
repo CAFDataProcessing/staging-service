@@ -1277,11 +1277,6 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>7.2.0</version>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.3</version>
-            </plugin>
         </plugins>
     </build>
 
