@@ -468,67 +468,67 @@
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-configuration</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-core</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-health</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-jackson</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-jersey</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-jetty</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-lifecycle</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-logging</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-metrics</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-request-logging</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-servlets</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-util</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-validation</artifactId>
-                <version>4.0.9</version>
+                <version>4.0.10</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.logback</groupId>
@@ -986,32 +986,32 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>5.11.2</version>
+                <version>5.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.11.2</version>
+                <version>5.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.11.2</version>
+                <version>5.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.11.2</version>
+                <version>5.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.platform</groupId>
                 <artifactId>junit-platform-commons</artifactId>
-                <version>1.11.2</version>
+                <version>1.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.platform</groupId>
                 <artifactId>junit-platform-engine</artifactId>
-                <version>1.11.2</version>
+                <version>1.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet.mimepull</groupId>
