@@ -49,6 +49,14 @@
             <artifactId>caf-correlation-spring</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.cafapi.util</groupId>
+            <artifactId>util-secret</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cafapi.util.spring</groupId>
+            <artifactId>caf-propertysource-spring</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.cafdataprocessing</groupId>
             <artifactId>staging-service-shared</artifactId>
         </dependency>

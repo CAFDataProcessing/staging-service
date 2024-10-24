@@ -17,10 +17,15 @@ package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafapi.CAFSwaggerUI;
 import com.github.cafapi.correlation.spring.CorrelationIdInterceptor;
+import com.github.cafapi.util.spring.propertysource.CafConfigEnvironmentListener;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
+import com.hpe.caf.secret.SecretUtil;
+
 import java.io.File;
+import java.io.IOException;
+
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -62,14 +67,21 @@ public class StagingApplication implements WebMvcConfigurer
     private final String keyAlias = System.getenv("SSL_CERT_ALIAS");
     private final String keyStore = System.getenv("SSL_KEYSTORE");
     private final String keyStorePath = System.getenv("SSL_KEYSTORE_PATH");
-    private final String keyStorePassword = System.getenv("SSL_KEYSTORE_PASSWORD");
+    private final String keyStorePassword;
+
+    public StagingApplication() throws IOException
+    {
+        this.keyStorePassword = SecretUtil.getSecret("SSL_KEYSTORE_PASSWORD");
+    }
 
     public static void main(String[] args)
     {
         //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
-        SpringApplication.run(StagingApplication.class, args);
+        final SpringApplication application = new SpringApplication(StagingApplication.class);
+        application.addListeners(new CafConfigEnvironmentListener());
+        application.run(args);
     }
 
     @Override
