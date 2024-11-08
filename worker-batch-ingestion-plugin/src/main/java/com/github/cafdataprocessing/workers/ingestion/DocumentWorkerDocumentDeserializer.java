@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.workers.ingestion;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,9 +21,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerFailure;
-import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFailure;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldValue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;

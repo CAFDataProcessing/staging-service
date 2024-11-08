@@ -22,12 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.cafdataprocessing</groupId>
+        <groupId>com.github.cafdataprocessing.services.staging</groupId>
         <artifactId>staging-service-aggregator</artifactId>
         <version>3.3.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.github.cafdataprocessing</groupId>
+    <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
     <artifactId>worker-batch-ingestion-container</artifactId>
     <packaging>pom</packaging>
 
@@ -40,7 +40,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.cafapi</groupId>
+            <groupId>com.github.cafapi.common</groupId>
             <artifactId>caf-api</artifactId>
         </dependency>
         <dependency>
@@ -48,23 +48,23 @@
             <artifactId>caf-logging-logback</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafapi.codec</groupId>
+            <groupId>com.github.cafapi.common</groupId>
             <artifactId>codec-json</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafapi.config</groupId>
+            <groupId>com.github.cafapi.common</groupId>
             <artifactId>config-file</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafapi.decoder</groupId>
+            <groupId>com.github.cafapi.common</groupId>
             <artifactId>decoder-js</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.jobservice</groupId>
+            <groupId>com.github.jobservice.workers.batch</groupId>
             <artifactId>worker-batch</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
             <artifactId>worker-batch-ingestion-plugin</artifactId>
         </dependency>
         <dependency>

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.workers.ingestion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hpe.caf.api.worker.TaskMessage;
-import com.hpe.caf.api.worker.TaskStatus;
-import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.api.JobsApi;
-import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.client.ApiException;
-import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.Job;
-import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.NewJob;
-import com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model.WorkerAction;
-import com.hpe.caf.worker.batch.BatchWorkerTask;
-import com.hpe.caf.worker.batch.QueueConsumer;
-import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocumentTask;
+import com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.api.JobsApi;
+import com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.model.NewJob;
+import com.github.jobservice.workers.batch.BatchWorkerTask;
+import com.github.jobservice.workers.batch.QueueConsumer;
+import com.github.workerframework.api.TaskMessage;
+import com.github.workerframework.api.TaskStatus;
+import com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.client.ApiException;
+import com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.model.Job;
+import com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.model.WorkerAction;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;

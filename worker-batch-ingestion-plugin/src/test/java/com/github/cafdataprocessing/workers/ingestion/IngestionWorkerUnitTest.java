@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.workers.ingestion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerConstants;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocumentTask;
+import com.github.jobservice.workers.batch.BatchDefinitionException;
+import com.github.jobservice.workers.batch.BatchWorkerServices;
+import com.github.jobservice.workers.batch.BatchWorkerTransientException;
 import com.hpe.caf.messagebuilder.TaskMessage;
-import com.hpe.caf.worker.batch.BatchDefinitionException;
-import com.hpe.caf.worker.batch.BatchWorkerServices;
-import com.hpe.caf.worker.batch.BatchWorkerTransientException;
-import com.hpe.caf.worker.document.DocumentWorkerConstants;
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
