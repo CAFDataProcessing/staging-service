@@ -68,7 +68,7 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
-                        <groupId>com.github.cafdataprocessing</groupId>
+                        <groupId>com.github.cafdataprocessing.services.staging</groupId>
                         <artifactId>staging-service-contract</artifactId>
                         <version>${project.version}</version>
                     </dependency>
