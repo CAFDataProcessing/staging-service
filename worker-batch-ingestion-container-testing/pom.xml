@@ -159,9 +159,11 @@
                             <inputSpec>/com/hpe/caf/services/job/swagger.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.build.directory}/openapi-codegen/job-service</output>
-                            <apiPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.api</apiPackage>
-                            <modelPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model</modelPackage>
-                            <invokerPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.client</invokerPackage>
+                            <apiPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.api</apiPackage>
+                            <modelPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service
+                                .model</modelPackage>
+                            <invokerPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service
+                                .client</invokerPackage>
                             <configOptions>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)</additionalModelTypeAnnotations>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>
