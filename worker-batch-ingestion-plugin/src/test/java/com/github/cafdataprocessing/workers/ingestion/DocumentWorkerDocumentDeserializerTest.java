@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.workers.ingestion;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
-import com.hpe.caf.worker.document.DocumentWorkerFailure;
-import com.hpe.caf.worker.document.DocumentWorkerFieldEncoding;
-import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocumentTask;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFailure;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldEncoding;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldValue;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.*;

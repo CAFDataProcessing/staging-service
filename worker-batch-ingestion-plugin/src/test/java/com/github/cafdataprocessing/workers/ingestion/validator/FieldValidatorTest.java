@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion.validator;
+package com.github.cafdataprocessing.workers.ingestion.validator;
 
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +22,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldValue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion.validator;
+package com.github.cafdataprocessing.workers.ingestion.validator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerFailure;
-import com.hpe.caf.worker.document.DocumentWorkerFieldValue;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFailure;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldValue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 

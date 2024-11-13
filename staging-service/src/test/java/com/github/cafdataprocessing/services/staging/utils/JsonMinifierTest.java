@@ -15,7 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging.utils;
 
-import com.microfocus.caf.worker.document.schema.validator.InvalidDocumentException;
+import com.github.cafdataprocessing.workers.document.schema.validator.InvalidDocumentException;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

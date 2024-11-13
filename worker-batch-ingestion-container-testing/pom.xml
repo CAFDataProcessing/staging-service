@@ -20,13 +20,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <version>3.3.0-SNAPSHOT</version>
 
     <parent>
-        <groupId>com.github.cafdataprocessing</groupId>
+        <groupId>com.github.cafdataprocessing.services.staging</groupId>
         <artifactId>staging-service-aggregator</artifactId>
         <version>3.3.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
     <artifactId>worker-batch-ingestion-container-testing</artifactId>
 
     <properties>
@@ -59,15 +61,15 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.workers.document</groupId>
             <artifactId>worker-document-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.jobservice</groupId>
+            <groupId>com.github.jobservice.workers.batch</groupId>
             <artifactId>worker-batch-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.jobservice</groupId>
+            <groupId>com.github.jobservice.workers.batch</groupId>
             <artifactId>worker-batch-testing</artifactId>
         </dependency>
         <dependency>
@@ -157,9 +159,9 @@
                             <inputSpec>/com/hpe/caf/services/job/swagger.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.build.directory}/openapi-codegen/job-service</output>
-                            <apiPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.api</apiPackage>
-                            <modelPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.model</modelPackage>
-                            <invokerPackage>com.github.cafdataprocessing.worker.ingestion.testing.restclients.job_service.client</invokerPackage>
+                            <apiPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.api</apiPackage>
+                            <modelPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.model</modelPackage>
+                            <invokerPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.client</invokerPackage>
                             <configOptions>
                                 <additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)</additionalModelTypeAnnotations>
                                 <disallowAdditionalPropertiesIfNotPresent>false</disallowAdditionalPropertiesIfNotPresent>

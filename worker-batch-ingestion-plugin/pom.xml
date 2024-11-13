@@ -22,11 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.cafdataprocessing</groupId>
+        <groupId>com.github.cafdataprocessing.services.staging</groupId>
         <artifactId>staging-service-aggregator</artifactId>
         <version>3.3.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
     <artifactId>worker-batch-ingestion-plugin</artifactId>
 
     <dependencies>
@@ -51,11 +52,11 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.services.staging</groupId>
             <artifactId>staging-service-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.workers.document</groupId>
             <artifactId>worker-document-shared</artifactId>
         </dependency>
         <dependency>
@@ -64,7 +65,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.jobservice</groupId>
+            <groupId>com.github.jobservice.workers.batch</groupId>
             <artifactId>worker-batch-extensibility</artifactId>
             <scope>provided</scope>
         </dependency>

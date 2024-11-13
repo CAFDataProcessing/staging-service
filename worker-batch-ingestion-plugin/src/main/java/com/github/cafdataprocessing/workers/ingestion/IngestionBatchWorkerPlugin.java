@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.cafdataprocessing.worker.ingestion;
+package com.github.cafdataprocessing.workers.ingestion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -22,18 +22,18 @@ import com.github.cafdataprocessing.services.staging.TenantId;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.BatchPathProvider;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidBatchIdException;
 import com.github.cafdataprocessing.services.staging.exceptions.InvalidTenantIdException;
-import com.github.cafdataprocessing.worker.ingestion.models.Subbatch;
-import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidator;
-import com.github.cafdataprocessing.worker.ingestion.validator.FieldValidatorInterface;
-import com.github.cafdataprocessing.worker.ingestion.validator.NullFieldValidator;
-import com.hpe.caf.worker.batch.BatchDefinitionException;
-import com.hpe.caf.worker.batch.BatchWorkerPlugin;
-import com.hpe.caf.worker.batch.BatchWorkerServices;
-import com.hpe.caf.worker.batch.BatchWorkerTransientException;
-import com.hpe.caf.worker.document.DocumentWorkerConstants;
-import com.hpe.caf.worker.document.DocumentWorkerDocument;
-import com.hpe.caf.worker.document.DocumentWorkerDocumentTask;
-import com.hpe.caf.worker.document.DocumentWorkerScript;
+import com.github.cafdataprocessing.workers.ingestion.models.Subbatch;
+import com.github.cafdataprocessing.workers.ingestion.validator.FieldValidator;
+import com.github.cafdataprocessing.workers.ingestion.validator.FieldValidatorInterface;
+import com.github.cafdataprocessing.workers.ingestion.validator.NullFieldValidator;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerConstants;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocumentTask;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerScript;
+import com.github.jobservice.workers.batch.BatchDefinitionException;
+import com.github.jobservice.workers.batch.BatchWorkerPlugin;
+import com.github.jobservice.workers.batch.BatchWorkerServices;
+import com.github.jobservice.workers.batch.BatchWorkerTransientException;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;

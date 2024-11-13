@@ -16,12 +16,12 @@
 package com.github.cafdataprocessing.services.staging;
 
 import com.github.cafapi.CAFSwaggerUI;
+import com.github.cafapi.common.util.secret.SecretUtil;
 import com.github.cafapi.correlation.spring.CorrelationIdInterceptor;
 import com.github.cafapi.util.spring.propertysource.CafConfigEnvironmentListener;
 import com.github.cafdataprocessing.services.staging.dao.BatchDao;
 import com.github.cafdataprocessing.services.staging.dao.filesystem.FileSystemDao;
 import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
-import com.hpe.caf.secret.SecretUtil;
 
 import java.io.File;
 import java.io.IOException;

@@ -21,7 +21,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
-        <groupId>com.github.cafdataprocessing</groupId>
+        <groupId>com.github.cafdataprocessing.services.staging</groupId>
         <version>3.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -49,7 +49,7 @@
             <artifactId>caf-correlation-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafapi.util</groupId>
+            <groupId>com.github.cafapi.common</groupId>
             <artifactId>util-secret</artifactId>
         </dependency>
         <dependency>
@@ -57,7 +57,7 @@
             <artifactId>caf-propertysource-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.services.staging</groupId>
             <artifactId>staging-service-shared</artifactId>
         </dependency>
         <dependency>
@@ -149,12 +149,12 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.services.staging</groupId>
             <artifactId>staging-service-contract</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.cafdataprocessing</groupId>
+            <groupId>com.github.cafdataprocessing.workers.document</groupId>
             <artifactId>worker-document-validator</artifactId>
         </dependency>
         <dependency>
@@ -181,7 +181,7 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <dependencies>
                     <dependency>
-                        <groupId>com.github.cafdataprocessing</groupId>
+                        <groupId>com.github.cafdataprocessing.services.staging</groupId>
                         <artifactId>staging-service-contract</artifactId>
                         <version>${project.version}</version>
                     </dependency>
