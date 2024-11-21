@@ -1230,13 +1230,13 @@
                     <imageManagement>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/opensuse-jre11</repository>
-                            <tag>4.2.1</tag>
-                            <digest>sha256:7c286d11ae228194628cb1d950229f78815cc25e52344c7870d6566e738a16da</digest>
+                            <tag>4.2.2</tag>
+                            <digest>sha256:c7a482989a6c24ab0ce7934adc3f93a15dc1c509256010387838f18a16417432</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre21</repository>
-                            <tag>1.1.1</tag>
-                            <digest>sha256:0b0656c185dd3ed99bc2d30e14bdca22e489ecf2860da03352be77a03e780409</digest>
+                            <tag>1.1.2</tag>
+                            <digest>sha256:1665922e758fe9a1d27aec29ac633663cb76ccb4ba504face735acd926766ed6</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
