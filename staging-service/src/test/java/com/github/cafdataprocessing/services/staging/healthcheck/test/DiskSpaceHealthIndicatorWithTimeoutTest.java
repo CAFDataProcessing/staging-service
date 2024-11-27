@@ -71,7 +71,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
         assertEquals(200, response.getStatusCode().value());
     }
 
-    //@Test
+    @Test
     public void healthCheckTestReadOnly()
     {
         final Path file = folder.toPath().resolve("/test");
