@@ -258,7 +258,7 @@
             <dependency>
                 <groupId>com.github.cafapi.util.spring</groupId>
                 <artifactId>caf-propertysource-spring</artifactId>
-                <version>1.1.0-13</version>
+                <version>2.0.0-18</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
@@ -1244,8 +1244,8 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service</repository>
-                            <tag>8.0.0</tag>
-                            <digest>sha256:673b76ef0fdae71f549921428884ec3008243e488ef1afe9857860685b6dca16</digest>
+                            <tag>9.0.0</tag>
+                            <digest>sha256:49cf0687a391903f274d560241b1c0027024af95618c1fd1b78eb73c23e2fb8b</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service-scheduled-executor</repository>
