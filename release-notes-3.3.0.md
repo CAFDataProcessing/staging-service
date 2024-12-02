@@ -1,5 +1,3 @@
-!not-ready-for-release!
-
 #### Version Number
 ${version-number}
 
@@ -11,3 +9,4 @@ ${version-number}
 - US975260: Refactor to remove HPE references in package names
 
 #### Known Issues
+- None
