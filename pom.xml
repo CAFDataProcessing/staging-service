@@ -63,12 +63,12 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.16</version>
+                <version>1.5.12</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.5.16</version>
+                <version>1.5.12</version>
             </dependency>
             <dependency>
                 <groupId>com.beust</groupId>
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>com.ethlo.time</groupId>
                 <artifactId>itu</artifactId>
-                <version>1.10.2</version>
+                <version>1.10.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml</groupId>
@@ -453,7 +453,7 @@
             <dependency>
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio-jvm</artifactId>
-                <version>3.9.1</version>
+                <version>3.10.0</version>
             </dependency>
             <dependency>
                 <groupId>com.worldturner.medeia</groupId>
@@ -468,7 +468,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.17.1</version>
+                <version>1.17.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -1230,13 +1230,13 @@
                     <imageManagement>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/opensuse-jre11</repository>
-                            <tag>4.2.2</tag>
-                            <digest>sha256:c7a482989a6c24ab0ce7934adc3f93a15dc1c509256010387838f18a16417432</digest>
+                            <tag>4.2.3</tag>
+                            <digest>sha256:5d7ff4b791332ac13f24b6a0670a84c3fef42aae534d7ef5541079f205cccb25</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre21</repository>
-                            <tag>1.1.4</tag>
-                            <digest>sha256:bc2af5c297ff3c6b5633e02cb644fc68a4c82f9cbdaed3151924e6b0cb5bca8d</digest>
+                            <tag>1.1.5</tag>
+                            <digest>sha256:e7a6c3a2b9254bb9d5f87d1ba8231e2f65ccf95186ebd75106a87c5b235c114b</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
