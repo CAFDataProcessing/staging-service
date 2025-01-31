@@ -163,7 +163,7 @@
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.1.8</version>
+                <version>3.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafapi</groupId>
@@ -398,7 +398,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.11.0</version>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
@@ -473,7 +473,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.17.2</version>
+                <version>1.18.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -678,12 +678,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.15.11</version>
+                <version>1.17.0</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.15.11</version>
+                <version>1.17.0</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
@@ -895,73 +895,73 @@
                 <groupId>org.graalvm.js</groupId>
                 <artifactId>js-community</artifactId>
                 <type>pom</type>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.js</groupId>
                 <artifactId>js-language</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.js</groupId>
                 <artifactId>js-scriptengine</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
                 <artifactId>js-community</artifactId>
                 <type>pom</type>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.polyglot</groupId>
                 <artifactId>polyglot</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.regex</groupId>
                 <artifactId>regex</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.sdk</groupId>
                 <artifactId>collections</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.sdk</groupId>
                 <artifactId>jniutils</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.sdk</groupId>
                 <artifactId>nativeimage</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.sdk</groupId>
                 <artifactId>word</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.shadowed</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-api</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-compiler</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.graalvm.truffle</groupId>
                 <artifactId>truffle-runtime</artifactId>
-                <version>24.1.1</version>
+                <version>24.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -991,17 +991,17 @@
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>26.0.1</version>
+                <version>26.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-reflect</artifactId>
-                <version>2.1.0</version>
+                <version>2.1.10</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
-                <version>2.1.0</version>
+                <version>2.1.10</version>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
@@ -1101,97 +1101,97 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jcl</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-json</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-logging</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-tomcat</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -1254,13 +1254,13 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service</repository>
-                            <tag>9.1.0</tag>
-                            <digest>sha256:6890c88454351cefbde397f61fc9a00c8c96aaa8b22d1aa0635f6326a5a1238e</digest>
+                            <tag>9.1.1</tag>
+                            <digest>sha256:a2561874c627b3f2effaea5eccfa0382821a17fc69276c27452d8883046155a7</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service-scheduled-executor</repository>
-                            <tag>9.1.0</tag>
-                            <digest>sha256:35e8b3931eacab1e0e3c2a7a90113129eafa0d4eed0a163701817d3110f3f364</digest>
+                            <tag>9.1.1</tag>
+                            <digest>sha256:37f46ad2a66902bf506dfee03df9febb25ae7e8bbfae9d399969cd6e8ba3f6a9</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/library/postgres</repository>
