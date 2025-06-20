@@ -27,6 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>staging-service-container</artifactId>
+    <name>staging-service-container</name>
 
     <properties>
         <maven.install.skip>true</maven.install.skip>
