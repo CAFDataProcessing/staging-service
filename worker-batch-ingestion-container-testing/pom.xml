@@ -30,6 +30,7 @@
 
     <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
     <artifactId>worker-batch-ingestion-container-testing</artifactId>
+    <name>worker-batch-ingestion-container-testing</name>
 
     <properties>
         <maven.javadoc.skip>true</maven.javadoc.skip>

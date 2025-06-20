@@ -29,6 +29,7 @@
 
     <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
     <artifactId>worker-batch-ingestion-plugin</artifactId>
+    <name>worker-batch-ingestion-plugin</name>
 
     <dependencies>
         <dependency>

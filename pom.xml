@@ -23,6 +23,7 @@
 
     <groupId>com.github.cafdataprocessing.services.staging</groupId>
     <artifactId>staging-service-aggregator</artifactId>
+    <name>staging-service-aggregator</name>
     <packaging>pom</packaging>
     <version>3.3.5-SNAPSHOT</version>
     <modules>

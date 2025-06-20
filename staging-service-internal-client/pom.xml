@@ -28,6 +28,7 @@
     </parent>
 
     <artifactId>staging-service-internal-client</artifactId>
+    <name>staging-service-internal-client</name>
 
     <dependencies>
         <dependency>
