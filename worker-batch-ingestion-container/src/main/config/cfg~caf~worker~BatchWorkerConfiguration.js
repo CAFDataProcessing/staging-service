@@ -19,6 +19,8 @@
   outputQueue: getenv("CAF_BATCH_WORKER_ERROR_QUEUE")
     || getenv("CAF_WORKER_OUTPUT_QUEUE")
     || (getenv("CAF_WORKER_BASE_QUEUE_NAME") || getenv("CAF_WORKER_NAME") || "worker") + "-out",
+  invalidQueue: getenv("CAF_WORKER_INVALID_QUEUE")
+    || (getenv("CAF_WORKER_BASE_QUEUE_NAME") || getenv("CAF_WORKER_NAME") || "worker") + "-invalid",
   threads: getenv("CAF_WORKER_THREADS") || 1,
   cacheExpireTime: 1,
   returnValueBehaviour: getenv("CAF_BATCH_WORKER_ERROR_QUEUE") ? "RETURN_NONE" : undefined
