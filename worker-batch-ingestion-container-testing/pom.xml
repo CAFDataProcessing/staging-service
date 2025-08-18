@@ -386,6 +386,7 @@
                                     <port>${job-service.adminport}:8081</port>
                                 </ports>
                                 <env>
+                                    <CAF_JOB_SERVICE_RESUME_JOB_QUEUE>worker-taskunstowing-in</CAF_JOB_SERVICE_RESUME_JOB_QUEUE>
                                     <CAF_STATUS_CHECK_TIME>5</CAF_STATUS_CHECK_TIME>
                                     <CAF_WEBSERVICE_URL>http://job-service:8080/job-service/v1</CAF_WEBSERVICE_URL>
                                     <CAF_RABBITMQ_USERNAME>guest</CAF_RABBITMQ_USERNAME>
