@@ -3,13 +3,12 @@ ${version-number}
 
 #### New Features
 
-- US1044043: Update CAFDataProcessing/staging-service dependencies
+- None
 
+#### Patch Fixes Included
+
+- This release includes OS package updates only.
 
 #### Known Issues
 
-#### Other Changes
-
-- SEPG Automated Dependency Update
-
-
+- None
