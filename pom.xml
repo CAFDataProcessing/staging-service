@@ -988,7 +988,7 @@
             <dependency>
                 <groupId>org.jcommander</groupId>
                 <artifactId>jcommander</artifactId>
-                <version>2.0</version>
+                <version>3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains</groupId>
@@ -1247,8 +1247,8 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre21</repository>
-                            <tag>1.4.0</tag>
-                            <digest>sha256:5b941332abb4f5eeadc3e05a56a05fb8a1479ba61a7c883feb6c358a50b86d91</digest>
+                            <tag>1.4.1</tag>
+                            <digest>sha256:645019f43cae26eaed8ad8fb9084f632e38f118e16a69c60673c7b6d1ac2b979</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
