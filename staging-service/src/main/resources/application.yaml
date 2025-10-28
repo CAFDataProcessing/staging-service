@@ -79,7 +79,7 @@ staging:
     skipFileCleanUp: ${CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP:false}
     healthcheckTimeoutSeconds: ${CAF_STAGING_SERVICE_HEALTHCHECK_TIMEOUT_SECONDS:10}
     diskSpaceCheckPath: ${CAF_STAGING_SERVICE_BASEPATH:/batches/}
-    diskSpaceCheckThreshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:536870912}
+    diskSpaceCheckThreshold: ${CAF_STAGING_SERVICE_DISK_SIZE_THRESHOLD:268435456}
 logging:
   level:
     ROOT: ${CAF_LOG_LEVEL:WARN}
