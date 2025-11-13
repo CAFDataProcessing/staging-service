@@ -25,7 +25,7 @@
     <artifactId>staging-service-aggregator</artifactId>
     <name>staging-service-aggregator</name>
     <packaging>pom</packaging>
-    <version>3.3.9-SNAPSHOT</version>
+    <version>3.3.9-1368</version>
     <modules>
         <module>staging-service-contract</module>
         <module>staging-service-shared</module>
@@ -264,22 +264,22 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service</artifactId>
-                <version>3.3.9-SNAPSHOT</version>
+                <version>3.3.9-1368</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-contract</artifactId>
-                <version>3.3.9-SNAPSHOT</version>
+                <version>3.3.9-1368</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-internal-client</artifactId>
-                <version>3.3.9-SNAPSHOT</version>
+                <version>3.3.9-1368</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-shared</artifactId>
-                <version>3.3.9-SNAPSHOT</version>
+                <version>3.3.9-1368</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.document</groupId>
@@ -299,7 +299,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
                 <artifactId>worker-batch-ingestion-plugin</artifactId>
-                <version>3.3.9-SNAPSHOT</version>
+                <version>3.3.9-1368</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice</groupId>
