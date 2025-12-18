@@ -59,12 +59,12 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.21</version>
+                <version>1.5.22</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.5.21</version>
+                <version>1.5.22</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback.access</groupId>
@@ -394,7 +394,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.44.0</version>
+                <version>2.45.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -429,27 +429,27 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>json-schema-validator</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
-                <version>5.27.1</version>
+                <version>5.28.0</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>logging-interceptor</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp-jvm</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio-jvm</artifactId>
-                <version>3.16.2</version>
+                <version>3.16.4</version>
             </dependency>
             <dependency>
                 <groupId>com.worldturner.medeia</groupId>
@@ -470,6 +470,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.21.0</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>99.0-does-not-exist</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard</groupId>
@@ -604,77 +609,77 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-commons</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-jakarta9</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-base</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-compression</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-marshalling</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-protobuf</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-resolver</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport-native-unix-common</artifactId>
-                <version>4.2.7.Final</version>
+                <version>4.2.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.activation</groupId>
@@ -724,12 +729,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.0</version>
+                <version>1.18.2</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.18.0</version>
+                <version>1.18.2</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
@@ -754,12 +759,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.19.0</version>
+                <version>3.20.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>1.14.0</version>
+                <version>1.15.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -769,17 +774,17 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>2.25.2</version>
+                <version>2.25.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-to-slf4j</artifactId>
-                <version>2.25.2</version>
+                <version>2.25.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>11.0.14</version>
+                <version>11.0.15</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.tomcat</groupId>
@@ -790,12 +795,12 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-el</artifactId>
-                <version>11.0.14</version>
+                <version>11.0.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-websocket</artifactId>
-                <version>11.0.14</version>
+                <version>11.0.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apiguardian</groupId>
@@ -810,37 +815,37 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-security</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-session</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.ee10</groupId>
                 <artifactId>jetty-ee10-servlet</artifactId>
-                <version>12.1.3</version>
+                <version>12.1.5</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.toolchain.setuid</groupId>
@@ -1053,12 +1058,12 @@
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-reflect</artifactId>
-                <version>2.2.21</version>
+                <version>2.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
-                <version>2.2.21</version>
+                <version>2.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
@@ -1108,7 +1113,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.20.0</version>
+                <version>5.21.0</version>
             </dependency>
             <dependency>
                 <groupId>org.objenesis</groupId>
@@ -1158,97 +1163,147 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>6.2.12</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jcl</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-health</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-http-converter</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-jackson</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-micrometer-metrics</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-micrometer-observation</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-servlet</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-json</artifactId>
-                <version>3.5.7</version>
+                <artifactId>spring-boot-starter-jackson</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-logging</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-micrometer-metrics</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-tomcat</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat-runtime</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-tomcat</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-web-server</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-webmvc</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -1264,6 +1319,16 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>3.0.3</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>3.0.3</version>
             </dependency>
             <dependency>
                 <groupId>uk.org.webcompere</groupId>
@@ -1297,13 +1362,13 @@
                     <imageManagement>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/opensuse-jre11</repository>
-                            <tag>4.3.1</tag>
-                            <digest>sha256:d195b0ef781959a98ddee9d76febc7d0ba7006a615bfb50e80c8c5264e88d1a8</digest>
+                            <tag>5.0.0</tag>
+                            <digest>sha256:1f352ebb00bcbf4522bfbd7e0645160552517aa6f463ccf006a3295eb7280914</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre21</repository>
-                            <tag>1.4.4</tag>
-                            <digest>sha256:593aadb6fdf1f5011e31a5c035c154d145022ff321245d585a04acb761d4d71a</digest>
+                            <tag>2.0.1</tag>
+                            <digest>sha256:29cb3239b9932cfc800fe696cda4abc285fe67500bb6e11cb5008e1840c57b8e</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
@@ -1311,13 +1376,13 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service</repository>
-                            <tag>10.0.0</tag>
-                            <digest>sha256:744717d4afb08050679e66a41ab3e39f6568ebcf233443f01df6ab36c26844e8</digest>
+                            <tag>10.0.1</tag>
+                            <digest>sha256:379a7726c3f8d083510ad97efb5f3aa82f3a5ff58318a0d888395a2d107f3c4a</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/jobservice/job-service-scheduled-executor</repository>
-                            <tag>10.0.0</tag>
-                            <digest>sha256:32006e0b115bef5eb924c5282cd07c623ad3e644636d7f0ef559695edc652ce0</digest>
+                            <tag>10.0.1</tag>
+                            <digest>sha256:29452bde6f1662b177a71340555bbeada8e92fd1d2c902e56789d39f088a27fa</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/library/postgres</repository>
