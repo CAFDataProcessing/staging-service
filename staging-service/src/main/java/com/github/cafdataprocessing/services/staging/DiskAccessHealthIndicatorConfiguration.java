@@ -15,7 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

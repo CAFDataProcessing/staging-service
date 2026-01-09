@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.application.DiskSpaceHealthIndicator;
 import org.springframework.util.unit.DataSize;
 
 final class DiskSpaceHealthIndicatorWithTimeout extends DiskSpaceHealthIndicator
