@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 Open Text.
+ * Copyright 2019-2026 Open Text.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
