@@ -1383,8 +1383,8 @@
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre21</repository>
-                            <tag>2.1.5</tag>
-                            <digest>sha256:13c7f81849d73faae337341c9d5ab116f94f883da75f2ed79125000c8992da67</digest>
+                            <tag>2.1.8</tag>
+                            <digest>sha256:dec867a39438f02e6c05eb67041863b9cf4d43a3bfb5a519d97c7c162a681ca0</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
