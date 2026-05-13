@@ -41,7 +41,7 @@
     <parent>
         <groupId>com.github.cafapi</groupId>
         <artifactId>caf-common-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.0-678</version>
     </parent>
     
     <inceptionYear>2019</inceptionYear>
