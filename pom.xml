@@ -25,7 +25,7 @@
     <artifactId>staging-service-aggregator</artifactId>
     <name>staging-service-aggregator</name>
     <packaging>pom</packaging>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>3.4.0-SNAPSHOT</version>
     <modules>
         <module>staging-service-contract</module>
         <module>staging-service-shared</module>
@@ -269,22 +269,22 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
+                <version>3.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-contract</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
+                <version>3.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-internal-client</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
+                <version>3.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-shared</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
+                <version>3.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.document</groupId>
@@ -304,7 +304,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
                 <artifactId>worker-batch-ingestion-plugin</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
+                <version>3.4.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice</groupId>
@@ -314,22 +314,22 @@
             <dependency>
                 <groupId>com.github.jobservice.workers.batch</groupId>
                 <artifactId>worker-batch</artifactId>
-                <version>4.0.0-452</version>
+                <version>3.4.0-452</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice.workers.batch</groupId>
                 <artifactId>worker-batch-extensibility</artifactId>
-                <version>4.0.0-452</version>
+                <version>3.4.0-452</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice.workers.batch</groupId>
                 <artifactId>worker-batch-shared</artifactId>
-                <version>4.0.0-452</version>
+                <version>3.4.0-452</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice.workers.batch</groupId>
                 <artifactId>worker-batch-testing</artifactId>
-                <version>4.0.0-452</version>
+                <version>3.4.0-452</version>
             </dependency>
             <dependency>
                 <groupId>com.github.workerframework</groupId>
