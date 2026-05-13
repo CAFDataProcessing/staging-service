@@ -4,7 +4,7 @@
 ${version-number}
 
 #### New Features
-- **US1122037**: Java 21 is now the minimum supported version.
+- **US1122037**: Updated to build with Java 21
 
 #### Known Issues
 - None
