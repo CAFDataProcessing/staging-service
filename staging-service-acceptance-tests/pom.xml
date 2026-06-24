@@ -36,6 +36,21 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.cafdataprocessing.workers.document</groupId>
+            <artifactId>worker-document-shared</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
@@ -103,6 +118,7 @@
                             <skip>false</skip>
                             <systemPropertyVariables>
                                 <test.mode>staging-service</test.mode>
+                                <staging.data.host.path>${project.build.directory}/staging-data/batches</staging.data.host.path>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <staging-service>http://${docker.host.address}:${staging.ports.api.http}</staging-service>
@@ -181,12 +197,17 @@
                                     <SSL_KEYSTORE_PATH>/test-keystore</SSL_KEYSTORE_PATH>
                                     <CAF_LOG_LEVEL>DEBUG</CAF_LOG_LEVEL>
                                     <CAF_STAGING_SERVICE_SUBBATCH_SIZE>4</CAF_STAGING_SERVICE_SUBBATCH_SIZE>
+                                    <CAF_STAGING_SERVICE_BASEPATH>/staging-data/batches</CAF_STAGING_SERVICE_BASEPATH>
+                                    <CAF_STAGING_SERVICE_STORAGEPATH>/staging-data/batches</CAF_STAGING_SERVICE_STORAGEPATH>
                                     <!--<CAF_SERVICE_JAVA_OPTS>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:6005</CAF_SERVICE_JAVA_OPTS>-->
                                 </env>
                                 <volumes>
                                     <from>
                                         <image>keystore</image>
                                     </from>
+                                    <bind>
+                                        <volume>${project.build.directory}/staging-data:/staging-data</volume>
+                                    </bind>
                                 </volumes>
                                 <log>
                                     <enabled>true</enabled>

@@ -15,6 +15,8 @@
  */
 package com.github.cafdataprocessing.services.staging;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cafdataprocessing.services.staging.client.ApiClient;
 import com.github.cafdataprocessing.services.staging.client.ApiException;
 import com.github.cafdataprocessing.services.staging.client.MultiPart;
@@ -23,14 +25,21 @@ import com.github.cafdataprocessing.services.staging.client.MultiPartDocument;
 import com.github.cafdataprocessing.services.staging.client.StagingApi;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchList;
 import com.github.cafdataprocessing.services.staging.client.StagingBatchStatusResponse;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerDocument;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldEncoding;
+import com.github.cafdataprocessing.workers.document.DocumentWorkerFieldValue;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -40,6 +49,9 @@ public class StagingServiceIT
 
     private static final String STAGING_SERVICE_URI = System.getenv("staging-service");
 //        private static final String STAGING_SERVICE_URI = "http://localhost:8080";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Path STAGING_BATCHES_PATH
+        = Paths.get(System.getProperty("staging.data.host.path", "target/staging-data/batches"));
     private final StagingApi stagingApi;
 
     public StagingServiceIT()
@@ -74,6 +86,43 @@ public class StagingServiceIT
         assertTrue(batchStatus.getBatchStatus().getBatchComplete(), "Batch completed successfully");
         final StagingBatchList response = stagingApi.getBatches(tenantId, batchId, batchId, 10);
         assertEquals(1, response.getEntries().size(), "uploadDocumentsToBatchTest, 1 batch uploaded");
+    }
+
+    @Test
+    public void uploadLargeTextDocumentAddsStagedSizeMetadataFieldsTest() throws Exception
+    {
+        final String tenantId = "tenant-test-staged-size-metadata";
+        final String batchId = "test-staged-size-metadata";
+        final String content = "a".repeat(8193) + "\n\"\\";
+        final long rawUtf8Bytes = content.getBytes(StandardCharsets.UTF_8).length;
+        final long jsonEscapedUtf8Bytes = "a".repeat(8193).length() + "\\n\\\"\\\\".length();
+        final File documentFile = Files.createTempFile("staged-size-metadata", ".json").toFile();
+        documentFile.deleteOnExit();
+        OBJECT_MAPPER.writeValue(documentFile, Map.of(
+            "document", Map.of(
+                "reference", "large-content.txt",
+                "fields", Map.of(
+                    "CONTENT", List.of(Map.of("data", content))))));
+
+        final List<MultiPart> uploadData = new ArrayList<>();
+        uploadData.add(new MultiPartDocument(documentFile));
+        stagingApi.createOrReplaceBatch(tenantId, batchId, uploadData.stream());
+
+        final StagingBatchStatusResponse batchStatus = stagingApi.getBatchStatus(tenantId, batchId);
+        assertTrue(batchStatus.getBatchStatus().getBatchComplete(), "Batch completed successfully");
+
+        final DocumentWorkerDocument document = readOnlyStagedDocument(tenantId, batchId);
+        final DocumentWorkerFieldValue contentFieldValue = getSingleFieldValue(document, "CONTENT");
+        assertEquals(DocumentWorkerFieldEncoding.storage_ref, contentFieldValue.encoding,
+                     "CONTENT should be converted to a storage reference");
+        assertTrue(contentFieldValue.data.endsWith(".txt"), "CONTENT storage reference should point to staged text");
+
+        assertEquals(Long.toString(rawUtf8Bytes),
+                     getSingleFieldValue(document, "CONTENT_STAGED_RAW_UTF8_BYTES").data,
+                     "Raw UTF-8 byte metadata should be readable as a normal field value");
+        assertEquals(Long.toString(jsonEscapedUtf8Bytes),
+                     getSingleFieldValue(document, "CONTENT_STAGED_JSON_ESCAPED_UTF8_BYTES").data,
+                     "JSON-escaped UTF-8 byte metadata should be readable as a normal field value");
     }
 
     @Test
@@ -421,5 +470,40 @@ public class StagingServiceIT
             uploadData.add(new MultiPartDocument(StagingServiceIT.class.getResource("/" + file)));
         }
         stagingApi.createOrReplaceBatch(tenantId, batchId, uploadData.stream());
+    }
+
+    private static DocumentWorkerDocument readOnlyStagedDocument(final String tenantId, final String batchId) throws IOException
+    {
+        final Path batchDirectory = STAGING_BATCHES_PATH.resolve(tenantId).resolve("completed").resolve(batchId);
+        assertTrue(Files.isDirectory(batchDirectory), "Completed batch directory should exist: " + batchDirectory);
+
+        final Path batchFile;
+        try (final var files = Files.list(batchDirectory)) {
+            batchFile = files
+                .filter(file -> file.getFileName().toString().endsWith("-json.batch"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No staged JSON batch file found in " + batchDirectory));
+        }
+
+        final String batchContents = Files.readString(batchFile, StandardCharsets.UTF_8);
+        System.out.println("Staged JSON batch file: " + batchFile);
+        System.out.println("Staged JSON batch contents:");
+        System.out.println(batchContents);
+
+        final JsonNode documentNode = OBJECT_MAPPER.readTree(batchContents).get("document");
+        assertNotNull(documentNode, "Staged batch file should contain a document");
+        final DocumentWorkerDocument document = OBJECT_MAPPER.treeToValue(documentNode, DocumentWorkerDocument.class);
+        System.out.println("Deserialized staged document:");
+        System.out.println(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(document));
+        return document;
+    }
+
+    private static DocumentWorkerFieldValue getSingleFieldValue(final DocumentWorkerDocument document, final String fieldName)
+    {
+        assertNotNull(document.fields, "Document fields should be present");
+        final List<DocumentWorkerFieldValue> values = document.fields.get(fieldName);
+        assertNotNull(values, "Field should be present: " + fieldName);
+        assertEquals(1, values.size(), "Field should have one value: " + fieldName);
+        return values.get(0);
     }
 }

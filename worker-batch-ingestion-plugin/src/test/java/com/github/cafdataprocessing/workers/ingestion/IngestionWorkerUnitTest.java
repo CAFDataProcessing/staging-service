@@ -247,6 +247,35 @@ public final class IngestionWorkerUnitTest
         }
     }
 
+    @Test
+    @DisplayName("Test staged size metadata fields survive subbatch processing")
+    void testSubbatchPreservesStagedSizeMetadataFields() throws BatchDefinitionException, BatchWorkerTransientException
+    {
+        final List<TaskMessage> constructedMessages = new ArrayList<>();
+
+        final IngestionBatchWorkerPlugin plugin = new IngestionBatchWorkerPlugin();
+        testWorkerServices = createTestBatchWorkerServices(constructedMessages, plugin);
+
+        testTaskMessageParams = null;
+        final String batchDefinition = "subbatch:tenant7/batch11/20260623-100001-t04-json.batch";
+        taskMessageType = "DocumentMessage";
+
+        plugin.processBatch(testWorkerServices, batchDefinition, taskMessageType, testTaskMessageParams);
+
+        assertThat(constructedMessages.size(), is(equalTo(1)));
+        final TaskMessage returnedMessage = constructedMessages.get(0);
+        checkClassifierAndApiVersion(returnedMessage);
+
+        final DocumentWorkerDocumentTask returnedTaskData = (DocumentWorkerDocumentTask) returnedMessage.getTaskData();
+        final DocumentWorkerDocument returnedDocument = returnedTaskData.document;
+
+        assertThat(returnedDocument.fields.containsKey("CONTENT_PRIMARY"), is(equalTo(true)));
+        assertThat(returnedDocument.fields.containsKey("CONTENT_PRIMARY_STAGED_RAW_UTF8_BYTES"), is(equalTo(true)));
+        assertThat(returnedDocument.fields.containsKey("CONTENT_PRIMARY_STAGED_JSON_ESCAPED_UTF8_BYTES"), is(equalTo(true)));
+        assertThat(returnedDocument.fields.get("CONTENT_PRIMARY_STAGED_RAW_UTF8_BYTES").get(0).data, is(equalTo("125829120")));
+        assertThat(returnedDocument.fields.get("CONTENT_PRIMARY_STAGED_JSON_ESCAPED_UTF8_BYTES").get(0).data, is(equalTo("125840211")));
+    }
+
     @ParameterizedTest
     @DisplayName("Test multiple batches with scripts")
     @MethodSource("scriptProvider")

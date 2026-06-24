@@ -74,7 +74,7 @@ public final class DiskSpaceHealthIndicatorWithTimeoutTest
     @Test
     public void healthCheckTestReadOnly()
     {
-        final Path file = folder.toPath().resolve("/test");
+        final Path file = folder.toPath().resolve("test");
 
         stagingProperties.setDiskSpaceCheckPath(file.toFile());
         stagingProperties.setDiskSpaceCheckThreshold(DataSize.ofMegabytes(1L));

@@ -21,6 +21,46 @@ The base storage folder where the content files will be staged. Defaults to /etc
 #### CAF_STAGING_SERVICE_FIELDVALUE_SIZE_THRESHOLD
 The maximum data value size in bytes allowed for a field in a document before it is extracted into a separate file. Defaults to 8192 (which is 8KB)  
 
+When a UTF-8 text field value exceeds this threshold, the service writes the
+field value to a staged `.txt` file and replaces the original value with a
+`storage_ref`. It also emits two sibling metadata fields for each staged text
+field:
+
+```json
+{
+  "CONTENT": [
+    {
+      "data": "/etc/store/batches/acme-com/in_progress/test_batch/files/abc123.txt",
+      "encoding": "storage_ref"
+    }
+  ],
+  "CONTENT_STAGED_RAW_UTF8_BYTES": [
+    {
+      "data": "125829120"
+    }
+  ],
+  "CONTENT_STAGED_JSON_ESCAPED_UTF8_BYTES": [
+    {
+      "data": "125840211"
+    }
+  ]
+}
+```
+
+`<FIELD_NAME>_STAGED_RAW_UTF8_BYTES` is the number of UTF-8 bytes written to the
+staged `.txt` file.
+
+`<FIELD_NAME>_STAGED_JSON_ESCAPED_UTF8_BYTES` is the number of UTF-8 bytes that
+same field value contributes when represented as JSON string content, excluding
+surrounding quotes and other document or message overhead. This can be larger
+than the raw file size because quotes, backslashes, newlines, and control
+characters expand when JSON escaped.
+
+The metadata fields use the same field-value array shape as ordinary document
+fields so downstream components can read them through normal field access. If a
+field has multiple staged text values, the metadata arrays contain one value per
+staged value in the same order.
+
 #### CAF_STAGING_SERVICE_SKIP_FILE_CLEANUP  
 Skip the cleanup of abandoned batches that are no longer being worked on, these batches can be left behind if the service crashes during processing.  
 `Default: false`  

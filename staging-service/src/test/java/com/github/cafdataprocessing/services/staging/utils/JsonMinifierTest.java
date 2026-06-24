@@ -661,4 +661,158 @@ public final class JsonMinifierTest
                 "minifyLargeBase64DataJsonTest");
         assertTrue(minifiedJson.contains(".bin"), "minifyLargeBase64DataJsonTest");
     }
+
+    @Test
+    public void minifyLargeTextDataAddsStagedSizeMetadataTest() throws Exception
+    {
+        System.out.println("minifyLargeTextDataAddsStagedSizeMetadataTest...");
+        String testJson
+            = "{"
+            + "    'document': {"
+            + "      'reference': 'batch2.msg',"
+            + "      'fields': {"
+            + "        'CONTENT': [{'data': 'ab\\n\\\"c\\\\d'}]"
+            + "      }"
+            + "    }"
+            + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                                inprogressContentFolderPath, 1, new HashMap<>());
+
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifyLargeTextDataAddsStagedSizeMetadataTest : Minified Json : " + minifiedJson);
+        assertTrue(minifiedJson.contains("\"CONTENT\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"),
+                   "minifyLargeTextDataAddsStagedSizeMetadataTest");
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_RAW_UTF8_BYTES\":[{\"data\":\"7\"}]"),
+                   "minifyLargeTextDataAddsStagedSizeMetadataTest");
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_JSON_ESCAPED_UTF8_BYTES\":[{\"data\":\"10\"}]"),
+                   "minifyLargeTextDataAddsStagedSizeMetadataTest");
+    }
+
+    @Test
+    public void minifySmallTextDataDoesNotAddStagedSizeMetadataTest() throws Exception
+    {
+        System.out.println("minifySmallTextDataDoesNotAddStagedSizeMetadataTest...");
+        String testJson
+            = "{"
+            + "    'document': {"
+            + "      'reference': 'batch2.msg',"
+            + "      'fields': {"
+            + "        'CONTENT': [{'data': 'small text'}]"
+            + "      }"
+            + "    }"
+            + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                                inprogressContentFolderPath, 100, new HashMap<>());
+
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifySmallTextDataDoesNotAddStagedSizeMetadataTest : Minified Json : " + minifiedJson);
+        assertTrue(minifiedJson.contains("\"CONTENT\":[{\"data\":\"small text\"}]"),
+                   "minifySmallTextDataDoesNotAddStagedSizeMetadataTest");
+        assertFalse(minifiedJson.contains("_STAGED_RAW_UTF8_BYTES"),
+                    "minifySmallTextDataDoesNotAddStagedSizeMetadataTest");
+        assertFalse(minifiedJson.contains("_STAGED_JSON_ESCAPED_UTF8_BYTES"),
+                    "minifySmallTextDataDoesNotAddStagedSizeMetadataTest");
+    }
+
+    @Test
+    public void minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest() throws Exception
+    {
+        System.out.println("minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest...");
+        String testJson
+            = "{"
+            + "    'document': {"
+            + "      'reference': 'batch2.msg',"
+            + "      'fields': {"
+            + "        'COVER_PIC': [{'data': 'QSBC', 'encoding': 'base64'}]"
+            + "      }"
+            + "    }"
+            + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                                inprogressContentFolderPath, 1, new HashMap<>());
+
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest : Minified Json : " + minifiedJson);
+        assertTrue(minifiedJson.contains("\"COVER_PIC\":[{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"),
+                   "minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest");
+        assertTrue(minifiedJson.contains(".bin"), "minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest");
+        assertFalse(minifiedJson.contains("COVER_PIC_STAGED_RAW_UTF8_BYTES"),
+                    "minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest");
+        assertFalse(minifiedJson.contains("COVER_PIC_STAGED_JSON_ESCAPED_UTF8_BYTES"),
+                    "minifyLargeBase64DataDoesNotAddStagedSizeMetadataTest");
+    }
+
+    @Test
+    public void minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest() throws Exception
+    {
+        System.out.println("minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest...");
+        String testJson
+            = "{"
+            + "    'document': {"
+            + "      'reference': 'batch2.msg',"
+            + "      'fields': {"
+            + "        'CONTENT': [{'data': 'a'}, {'data': 'b\\nc'}, {'data': 'd'}]"
+            + "      }"
+            + "    }"
+            + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                                inprogressContentFolderPath, 1, new HashMap<>());
+
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest : Minified Json : " + minifiedJson);
+        assertTrue(minifiedJson.contains("\"CONTENT\":[{\"data\":\"a\"},{\"data\":\"/etc/store/batches/acme-com/completed/test_batch/files/"),
+                   "minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest");
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_RAW_UTF8_BYTES\":[{\"data\":\"3\"}]"),
+                   "minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest");
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_JSON_ESCAPED_UTF8_BYTES\":[{\"data\":\"4\"}]"),
+                   "minifyMultiValueTextFieldAddsMetadataOnlyForStagedValuesTest");
+    }
+
+    @Test
+    public void minifyLargeTextDataAddsSeparateMetadataPerFieldTest() throws Exception
+    {
+        System.out.println("minifyLargeTextDataAddsSeparateMetadataPerFieldTest...");
+        String testJson
+            = "{"
+            + "    'document': {"
+            + "      'reference': 'batch2.msg',"
+            + "      'fields': {"
+            + "        'CONTENT': [{'data': 'aa'}],"
+            + "        'SUMMARY': [{'data': 'x\\\"y'}]"
+            + "      }"
+            + "    }"
+            + "  }";
+        testJson = testJson.replaceAll("'", "\"");
+        final InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("UTF-8"));
+        final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+        JsonMinifier.minifyJson(inputStream, outStream, "/etc/store/batches/acme-com/completed/test_batch/files",
+                                inprogressContentFolderPath, 1, new HashMap<>());
+
+        final String minifiedJson = outStream.toString("UTF-8");
+        System.out.println("minifyLargeTextDataAddsSeparateMetadataPerFieldTest : Minified Json : " + minifiedJson);
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_RAW_UTF8_BYTES\":[{\"data\":\"2\"}]"),
+                   "minifyLargeTextDataAddsSeparateMetadataPerFieldTest");
+        assertTrue(minifiedJson.contains("\"CONTENT_STAGED_JSON_ESCAPED_UTF8_BYTES\":[{\"data\":\"2\"}]"),
+                   "minifyLargeTextDataAddsSeparateMetadataPerFieldTest");
+        assertTrue(minifiedJson.contains("\"SUMMARY_STAGED_RAW_UTF8_BYTES\":[{\"data\":\"3\"}]"),
+                   "minifyLargeTextDataAddsSeparateMetadataPerFieldTest");
+        assertTrue(minifiedJson.contains("\"SUMMARY_STAGED_JSON_ESCAPED_UTF8_BYTES\":[{\"data\":\"4\"}]"),
+                   "minifyLargeTextDataAddsSeparateMetadataPerFieldTest");
+    }
 }

@@ -1,0 +1,1 @@
+{"document":{"reference":"large-content.txt","fields":{"CONTENT_PRIMARY":[{"data":"tenant7/batch11/content-1.txt","encoding":"storage_ref"}],"CONTENT_PRIMARY_STAGED_RAW_UTF8_BYTES":[{"data":"125829120"}],"CONTENT_PRIMARY_STAGED_JSON_ESCAPED_UTF8_BYTES":[{"data":"125840211"}]},"failures":[],"subdocuments":[]}}
