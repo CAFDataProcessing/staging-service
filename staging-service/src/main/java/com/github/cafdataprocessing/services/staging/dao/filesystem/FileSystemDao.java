@@ -298,7 +298,10 @@ public class FileSystemDao implements BatchDao
         try {
             return Files.size(file);
         } catch (final IOException ex) {
-            LOGGER.info("Unable to read staged file size while calculating batch size. File: {}; Error: {}", file, ex.getMessage());
+            LOGGER.info(
+                "Unable to read staged file size while calculating batch size. File: {}; Error: {}",
+                file,
+                ex.getMessage());
             return 0;
         }
     }

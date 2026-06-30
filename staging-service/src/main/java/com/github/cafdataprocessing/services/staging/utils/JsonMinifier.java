@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -258,7 +259,19 @@ public final class JsonMinifier
             return;
         }
 
-        final Path storageReferencePath = Paths.get(storageReference);
+        final Path storageReferencePath;
+        try {
+            storageReferencePath = Paths.get(storageReference);
+        } catch (final InvalidPathException ex) {
+            LOGGER.info(
+                "Staging service observed existing storage_ref JSON field data but the reference is not a local path. "
+                    + "Field: {}; Reference: {}; Error: {}",
+                documentFieldName,
+                storageReference,
+                ex.getMessage());
+            return;
+        }
+
         if (Files.exists(storageReferencePath)) {
             try {
                 LOGGER.info(
