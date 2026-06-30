@@ -184,6 +184,8 @@ public final class JsonMinifier
                             } else {
                                 dataBuffer = storageRefPath + "/" + dataBuffer;
                             }
+                        } else if (STORAGE_REF.equalsIgnoreCase(encodingBuffer)) {
+                            logExistingStorageReference(dataBuffer, currentDocumentFieldName);
                         }
                         gen.writeFieldName(DATA_FIELD);
                         gen.writeString(dataBuffer);
@@ -248,5 +250,37 @@ public final class JsonMinifier
                 targetFile);
         }
         return contentFileName;
+    }
+
+    private static void logExistingStorageReference(final String storageReference, final String documentFieldName)
+    {
+        if (storageReference == null) {
+            return;
+        }
+
+        final Path storageReferencePath = Paths.get(storageReference);
+        if (Files.exists(storageReferencePath)) {
+            try {
+                LOGGER.info(
+                    "Staging service observed existing storage_ref JSON field data. "
+                        + "Field: {}; File bytes: {}; File: {}",
+                    documentFieldName,
+                    Files.size(storageReferencePath),
+                    storageReferencePath);
+            } catch (final IOException ex) {
+                LOGGER.info(
+                    "Staging service observed existing storage_ref JSON field data but could not read file size. "
+                        + "Field: {}; File: {}; Error: {}",
+                    documentFieldName,
+                    storageReferencePath,
+                    ex.getMessage());
+            }
+        } else {
+            LOGGER.info(
+                "Staging service observed existing storage_ref JSON field data but the file was not present. "
+                    + "Field: {}; File: {}",
+                documentFieldName,
+                storageReferencePath);
+        }
     }
 }

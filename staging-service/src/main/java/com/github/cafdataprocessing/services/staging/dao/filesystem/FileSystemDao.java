@@ -134,7 +134,14 @@ public class FileSystemDao implements BatchDao
         }
 
         try {
+            LOGGER.info(
+                "Deleting completed batch with id {} for {}. Batch bytes: {}; Path: {}",
+                batchId,
+                tenantId,
+                calculateDirectorySize(batchPath),
+                batchPath);
             FileUtils.deleteDirectory(batchPath.toFile());
+            LOGGER.info("Deleted completed batch with id {} for {} at {}.", batchId, tenantId, batchPath);
         } catch (IOException ex) {
             throw new StagingException(ex);
         }
@@ -192,7 +199,14 @@ public class FileSystemDao implements BatchDao
                     LOGGER.debug("Reading loose file...");
                     try (final InputStream inStream = fileItemInput.getInputStream()) {
                         FileUtils.copyInputStreamToFile(inStream, targetFile);
-                        LOGGER.debug("Loose file written to {}", targetFile);
+                        LOGGER.info(
+                            "Staging service stored loose file part. Tenant: {}; Batch: {}; Field name: {}; "
+                                + "Stored file: {}; File bytes: {}",
+                            tenantId,
+                            batchId,
+                            filename,
+                            targetFile,
+                            Files.size(targetFile.toPath()));
                         fileNames.add(targetFileName);
                         binaryFilesUploaded.put(filename, targetFileName);
                     } catch (IOException ex) {
@@ -255,7 +269,38 @@ public class FileSystemDao implements BatchDao
             throw new StagingException(ex);
         }
 
-        LOGGER.info("Batch {} completed successfully for {} at {}.", batchId, tenantId, batchFolder);
+        LOGGER.info(
+            "Batch {} completed successfully for {} at {}. Batch bytes: {}",
+            batchId,
+            tenantId,
+            batchFolder,
+            calculateDirectorySize(batchFolder));
+    }
+
+    private static long calculateDirectorySize(final Path directory)
+    {
+        try (final Stream<Path> paths = Files.walk(directory, FileVisitOption.FOLLOW_LINKS)) {
+            return paths
+                .filter(Files::isRegularFile)
+                .mapToLong(FileSystemDao::getFileSizeSafely)
+                .sum();
+        } catch (final IOException ex) {
+            LOGGER.info(
+                "Unable to calculate staged batch size. Directory: {}; Error: {}",
+                directory,
+                ex.getMessage());
+            return 0;
+        }
+    }
+
+    private static long getFileSizeSafely(final Path file)
+    {
+        try {
+            return Files.size(file);
+        } catch (final IOException ex) {
+            LOGGER.info("Unable to read staged file size while calculating batch size. File: {}; Error: {}", file, ex.getMessage());
+            return 0;
+        }
     }
 
     /**
