@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -110,6 +111,7 @@ public final class JsonMinifier
         boolean updateReference = false;
         // mark if the updateReference is for a file that has been uploaded
         boolean isLocalRefFile = false;
+        String currentDocumentFieldName = null;
         while ((token = parser.nextToken()) != null) {
             switch (token) {
                 case FIELD_NAME:
@@ -126,6 +128,7 @@ public final class JsonMinifier
                         bufferData = false;
                         bufferEncoding = false;
                         pauseWriting = false;
+                        currentDocumentFieldName = parser.getText();
                     }
                     break;
                 case VALUE_FALSE:
@@ -157,7 +160,13 @@ public final class JsonMinifier
                         if (dataBuffer != null && dataBuffer.getBytes().length > fieldValueSizeThreshold) {
                             // write it out to a loose file
                             final String fileName = RandomStringUtils.randomAlphanumeric(10);
-                            final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);
+                            final String contentFileName = writeDataToFile(
+                                dataBuffer,
+                                fileName,
+                                inprogressContentFolderPath,
+                                encodingBuffer,
+                                currentDocumentFieldName,
+                                fieldValueSizeThreshold);
                             dataBuffer = contentFileName;
                             encodingBuffer = STORAGE_REF;
                             updateReference = true;
@@ -205,20 +214,38 @@ public final class JsonMinifier
         }
     }
 
-    private static String writeDataToFile(final String data, final String fileName,
-                                          final String inprogressContentFolderPath, final String encoding) throws IOException
+    private static String writeDataToFile(final String data,
+                                          final String fileName,
+                                          final String inprogressContentFolderPath,
+                                          final String encoding,
+                                          final String documentFieldName,
+                                          final int fieldValueSizeThreshold) throws IOException
     {
         String contentFileName = fileName;
+        Path targetFile = null;
+        long inputBytes = data.getBytes(StandardCharsets.UTF_8).length;
         if (encoding == null || encoding.equalsIgnoreCase(UTF8_ENCODING)) {
             contentFileName = fileName + TXT_ENTENSION;
-            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             FileUtils.writeStringToFile(targetFile.toFile(), data, StandardCharsets.UTF_8);
         } else if (encoding.equalsIgnoreCase(BASE64_ENCODING)) {
             contentFileName = fileName + BINARY_ENTENSION;
-            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             // If encoding is base64, write file after base64 decoding the data
             final byte[] decodedData = Base64.decodeBase64(data);
+            inputBytes = decodedData.length;
             FileUtils.writeByteArrayToFile(targetFile.toFile(), decodedData);
+        }
+        if (targetFile != null) {
+            LOGGER.info(
+                "Staging service externalized JSON field data to storage_ref. Field: {}; Encoding: {}; "
+                    + "Input bytes: {}; File bytes: {}; Threshold bytes: {}; File: {}",
+                documentFieldName,
+                encoding == null ? UTF8_ENCODING : encoding,
+                inputBytes,
+                Files.size(targetFile),
+                fieldValueSizeThreshold,
+                targetFile);
         }
         return contentFileName;
     }

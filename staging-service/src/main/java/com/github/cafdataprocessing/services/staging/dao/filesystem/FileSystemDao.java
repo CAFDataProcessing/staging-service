@@ -229,9 +229,13 @@ public class FileSystemDao implements BatchDao
     private void completeInProgressBatch(final TenantId tenantId, final Path inProgressBatchFolderPath, final BatchId batchId)
         throws StagingException
     {
-        LOGGER.info("Completing batch with id {} for {}...", batchId, tenantId);
-
         final Path batchFolder = batchPathProvider.getPathForBatch(tenantId, batchId);
+        LOGGER.info(
+            "Completing batch with id {} for {}. Moving in-progress path {} to completed path {}.",
+            batchId,
+            tenantId,
+            inProgressBatchFolderPath,
+            batchFolder);
         if (batchFolder.toFile().exists()) {
             LOGGER.warn("Batch {} has been previously uploaded.  Removing previously uploaded batch...", batchId);
             try {
@@ -251,7 +255,7 @@ public class FileSystemDao implements BatchDao
             throw new StagingException(ex);
         }
 
-        LOGGER.debug("Batch {} completed successfully.", batchId);
+        LOGGER.info("Batch {} completed successfully for {} at {}.", batchId, tenantId, batchFolder);
     }
 
     /**
