@@ -15,6 +15,8 @@
  */
 package com.github.cafdataprocessing.services.staging.exceptions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,10 +26,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class WebMvcExceptionHandler extends ResponseEntityExceptionHandler
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebMvcExceptionHandler.class);
 
     @ExceptionHandler(WebMvcHandledRuntimeException.class)
     public final ResponseEntity<Object> handleStagingException(Exception ex, WebRequest webRequest)
     {
-        return new ResponseEntity<>(ex.getMessage(), ((WebMvcHandledRuntimeException) ex).getStatus());
+        LOGGER.error("Exception occurred while processing the request: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>("An error occurred while processing the request", ((WebMvcHandledRuntimeException) ex).getStatus());
     }
 }
