@@ -126,9 +126,6 @@ public class StagingApplication implements WebMvcConfigurer
         connector.setScheme("https");
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
-        if (useBouncyCastle) {
-            connector.setProperty("sslImplementationName", BouncyCastleJsseProvider.class.getName());
-        }
         connector.addSslHostConfig(createSSLHostConfig());
         return connector;
     }
@@ -211,7 +208,11 @@ public class StagingApplication implements WebMvcConfigurer
     private static void registerBouncyCastleProviders()
     {
         final BouncyCastleProvider bcProvider = new BouncyCastleProvider();
+        final BouncyCastleJsseProvider bcJsseProvider = new BouncyCastleJsseProvider(bcProvider);
         Security.addProvider(bcProvider);
-        Security.addProvider(new BouncyCastleJsseProvider(bcProvider));
+        // Insert the BouncyCastle JSSE provider at the highest priority so Tomcat's default
+        // JSSEImplementation (SSLContext.getInstance("TLS")) resolves to BouncyCastle, enabling
+        // the X25519MLKEM768 hybrid key exchange on the TLS endpoint.
+        Security.insertProviderAt(bcJsseProvider, 1);
     }
 }
