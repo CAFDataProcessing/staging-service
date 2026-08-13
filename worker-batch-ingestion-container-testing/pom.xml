@@ -157,7 +157,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>com/github/jobservice/contract/swagger.yaml</inputSpec>
+                            <inputSpec>com/github/jobservice/contract/openapi.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.build.directory}/openapi-codegen/job-service</output>
                             <apiPackage>com.github.cafdataprocessing.workers.ingestion.testing.restclients.job_service.api</apiPackage>

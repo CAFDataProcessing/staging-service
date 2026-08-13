@@ -1,8 +1,8 @@
 #### Version Number
 ${version-number}
 
-#### New Features
-- **US1138334**: Updated to run on Java 25.
+#### Bug Fixes
+- **US1212047**: Contract file renamed as `openapi.yaml`.
 
 #### Known Issues
 - None
