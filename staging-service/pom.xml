@@ -22,7 +22,7 @@
     <parent>
         <artifactId>staging-service-aggregator</artifactId>
         <groupId>com.github.cafdataprocessing.services.staging</groupId>
-        <version>3.6.0-SNAPSHOT</version>
+        <version>3.5.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -213,7 +213,7 @@
                         </goals>
                         <configuration>
                             <!-- https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin#general-configuration-parameters -->
-                            <inputSpec>/com/github/cafdataprocessing/services/staging/contract/swagger.yaml</inputSpec>
+                            <inputSpec>/com/github/cafdataprocessing/services/staging/contract/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <output>${project.build.directory}/openapi-codegen</output>
                             <apiPackage>com.github.cafdataprocessing.services.staging.swagger.api</apiPackage>
