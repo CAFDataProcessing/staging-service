@@ -46,6 +46,11 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.cafapi.ssl</groupId>
+            <artifactId>caf-ssl-spring</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.cafapi.correlation</groupId>
             <artifactId>caf-correlation-spring</artifactId>
         </dependency>
@@ -98,14 +103,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bctls-jdk18on</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>

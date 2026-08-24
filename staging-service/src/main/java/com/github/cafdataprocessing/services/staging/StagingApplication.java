@@ -25,16 +25,12 @@ import com.github.cafdataprocessing.services.staging.utils.ServiceIdentifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Provider;
-import java.security.Security;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,14 +58,6 @@ public class StagingApplication implements WebMvcConfigurer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(StagingApplication.class);
 
-    private static final String SSL_JCE_PROVIDER_POLICY = System.getenv("SSL_JCE_PROVIDER_POLICY");
-    private static final String POLICY_USE_BOUNCY_CASTLE = "UseBouncyCastle";
-    private static final String POLICY_USE_BOUNCY_CASTLE_IF_NEEDED_FOR_PQC = "UseBouncyCastleIfNeededForPqc";
-    private static final String POLICY_USE_JVM_DEFAULT = "UseJvmDefault";
-    private static final String ML_KEM_768_PROVIDER_FILTER = "KeyPairGenerator.ML-KEM-768";
-
-    private static boolean useBouncyCastle;
-
     @Value("${https.port}")
     private int httpsPort;
 
@@ -91,10 +79,6 @@ public class StagingApplication implements WebMvcConfigurer
         //TODO Verify this is needed for staging service
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         LOGGER.info("Starting staging service, service id : {}", ServiceIdentifier.getServiceId());
-        useBouncyCastle = shouldUseBouncyCastle();
-        if (useBouncyCastle) {
-            registerBouncyCastleProviders();
-        }
 
         final SpringApplication application = new SpringApplication(StagingApplication.class);
         application.addListeners(new CafConfigEnvironmentListener());
@@ -178,41 +162,4 @@ public class StagingApplication implements WebMvcConfigurer
         registry.addInterceptor(new CorrelationIdInterceptor());
     }
 
-    private static boolean shouldUseBouncyCastle()
-    {
-        final String policy = SSL_JCE_PROVIDER_POLICY == null ? null : SSL_JCE_PROVIDER_POLICY.trim();
-
-        if (policy == null || policy.isEmpty() || POLICY_USE_BOUNCY_CASTLE_IF_NEEDED_FOR_PQC.equalsIgnoreCase(policy)) {
-            return !isRuntimePqcSupported();
-        }
-
-        if (POLICY_USE_BOUNCY_CASTLE.equalsIgnoreCase(policy)) {
-            return true;
-        }
-
-        if (POLICY_USE_JVM_DEFAULT.equalsIgnoreCase(policy)) {
-            return false;
-        }
-
-        throw new IllegalArgumentException("Unknown SSL_JCE_PROVIDER_POLICY value: " + SSL_JCE_PROVIDER_POLICY);
-    }
-
-    private static boolean isRuntimePqcSupported()
-    {
-        // X25519MLKEM768 is a TLS-layer hybrid group (X25519 + ML-KEM-768). ML-KEM-768 is
-        // the PQC indicator since X25519 is always available.
-        final Provider[] providers = Security.getProviders(ML_KEM_768_PROVIDER_FILTER);
-        return providers != null && providers.length > 0;
-    }
-
-    private static void registerBouncyCastleProviders()
-    {
-        final BouncyCastleProvider bcProvider = new BouncyCastleProvider();
-        final BouncyCastleJsseProvider bcJsseProvider = new BouncyCastleJsseProvider(bcProvider);
-        Security.addProvider(bcProvider);
-        // Insert the BouncyCastle JSSE provider at the highest priority so Tomcat's default
-        // JSSEImplementation (SSLContext.getInstance("TLS")) resolves to BouncyCastle, enabling
-        // the X25519MLKEM768 hybrid key exchange on the TLS endpoint.
-        Security.insertProviderAt(bcJsseProvider, 1);
-    }
 }
