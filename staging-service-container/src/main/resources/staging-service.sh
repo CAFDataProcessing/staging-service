@@ -50,6 +50,7 @@ then
 fi
 
 cd /maven
-exec java $CAF_SERVICE_JAVA_OPTS \
+exec java $(${OTEL_GET_JAVA_TOOL_OPTIONS}) \
+  $CAF_SERVICE_JAVA_OPTS \
   -cp "*" \
   com.github.cafdataprocessing.services.staging.StagingApplication

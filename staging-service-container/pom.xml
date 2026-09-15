@@ -109,12 +109,13 @@
                             <alias>staging-service</alias>
                             <name>${dockerSettingsServiceOrg}staging-service${dockerProjectVersion}</name>
                             <build>
-                                <from>${projectDockerRegistry}/cafapi/oraclelinux-jre25</from>
+                                <from>${projectDockerRegistry}/cafapi/oraclelinux-jre25-otel</from>
                                 <healthCheck>
                                     <cmd>curl -f http://localhost:8081/healthcheck/readiness || exit 1</cmd>
                                 </healthCheck>
                                 <env>
                                     <VERSION>${project.version}</VERSION>
+                                    <OTEL_SERVICE_NAME>staging-service</OTEL_SERVICE_NAME>
                                 </env>
                                 <cmd>/maven/staging-service.sh</cmd>
                                 <assembly>
