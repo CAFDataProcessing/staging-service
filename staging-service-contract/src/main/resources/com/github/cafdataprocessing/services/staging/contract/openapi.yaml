@@ -178,6 +178,12 @@ paths:
         "500":
           description: The request failed due to an unexpected server error.
 components:
+  securitySchemes:
+    XTenantId:
+      type: apiKey
+      in: header
+      name: X-TENANT-ID
+      description: Tenant identification header for logical isolation
   schemas:
     StatusResponse:
       title: StatusResponse
@@ -240,3 +246,5 @@ components:
           format: date-time
         isProgressing:
           type: boolean
+security:
+  - XTenantId: []
