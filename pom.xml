@@ -25,7 +25,7 @@
     <artifactId>staging-service-aggregator</artifactId>
     <name>staging-service-aggregator</name>
     <packaging>pom</packaging>
-    <version>3.6.1-SNAPSHOT</version>
+    <version>3.7.0-SNAPSHOT</version>
     <modules>
         <module>staging-service-contract</module>
         <module>staging-service-shared</module>
@@ -279,22 +279,22 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service</artifactId>
-                <version>3.6.1-SNAPSHOT</version>
+                <version>3.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-contract</artifactId>
-                <version>3.6.1-SNAPSHOT</version>
+                <version>3.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-internal-client</artifactId>
-                <version>3.6.1-SNAPSHOT</version>
+                <version>3.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.services.staging</groupId>
                 <artifactId>staging-service-shared</artifactId>
-                <version>3.6.1-SNAPSHOT</version>
+                <version>3.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.document</groupId>
@@ -314,7 +314,7 @@
             <dependency>
                 <groupId>com.github.cafdataprocessing.workers.ingestion</groupId>
                 <artifactId>worker-batch-ingestion-plugin</artifactId>
-                <version>3.6.1-SNAPSHOT</version>
+                <version>3.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jobservice</groupId>
@@ -1370,6 +1370,11 @@
                             <repository>${dockerHubPublic}/cafapi/oraclelinux-jre25</repository>
                             <tag>2.4.0</tag>
                             <digest>sha256:8254d8602db30d23204ff0632d4d992c3005f5f32b7300d72b05675fd44383d2</digest>
+                        </image>
+                        <image>
+                            <repository>${dockerHubPublic}/cafapi/oraclelinux-jre25-otel</repository>
+                            <tag>2.4.1</tag>
+                            <digest>sha256:764895b53d132ace700b8268d3c3dad1531e7c8a14757bb3bdfda0a0cbd29567</digest>
                         </image>
                         <image>
                             <repository>${dockerHubPublic}/cloudesire/webdav</repository>
