@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -110,6 +112,7 @@ public final class JsonMinifier
         boolean updateReference = false;
         // mark if the updateReference is for a file that has been uploaded
         boolean isLocalRefFile = false;
+        String currentDocumentFieldName = null;
         while ((token = parser.nextToken()) != null) {
             switch (token) {
                 case FIELD_NAME:
@@ -126,6 +129,7 @@ public final class JsonMinifier
                         bufferData = false;
                         bufferEncoding = false;
                         pauseWriting = false;
+                        currentDocumentFieldName = parser.getText();
                     }
                     break;
                 case VALUE_FALSE:
@@ -157,7 +161,13 @@ public final class JsonMinifier
                         if (dataBuffer != null && dataBuffer.getBytes().length > fieldValueSizeThreshold) {
                             // write it out to a loose file
                             final String fileName = RandomStringUtils.randomAlphanumeric(10);
-                            final String contentFileName = writeDataToFile(dataBuffer, fileName, inprogressContentFolderPath, encodingBuffer);
+                            final String contentFileName = writeDataToFile(
+                                dataBuffer,
+                                fileName,
+                                inprogressContentFolderPath,
+                                encodingBuffer,
+                                currentDocumentFieldName,
+                                fieldValueSizeThreshold);
                             dataBuffer = contentFileName;
                             encodingBuffer = STORAGE_REF;
                             updateReference = true;
@@ -175,6 +185,8 @@ public final class JsonMinifier
                             } else {
                                 dataBuffer = storageRefPath + "/" + dataBuffer;
                             }
+                        } else if (STORAGE_REF.equalsIgnoreCase(encodingBuffer)) {
+                            logExistingStorageReference(dataBuffer, currentDocumentFieldName);
                         }
                         gen.writeFieldName(DATA_FIELD);
                         gen.writeString(dataBuffer);
@@ -205,21 +217,83 @@ public final class JsonMinifier
         }
     }
 
-    private static String writeDataToFile(final String data, final String fileName,
-                                          final String inprogressContentFolderPath, final String encoding) throws IOException
+    private static String writeDataToFile(final String data,
+                                          final String fileName,
+                                          final String inprogressContentFolderPath,
+                                          final String encoding,
+                                          final String documentFieldName,
+                                          final int fieldValueSizeThreshold) throws IOException
     {
         String contentFileName = fileName;
+        Path targetFile = null;
+        long inputBytes = data.getBytes(StandardCharsets.UTF_8).length;
         if (encoding == null || encoding.equalsIgnoreCase(UTF8_ENCODING)) {
             contentFileName = fileName + TXT_ENTENSION;
-            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             FileUtils.writeStringToFile(targetFile.toFile(), data, StandardCharsets.UTF_8);
         } else if (encoding.equalsIgnoreCase(BASE64_ENCODING)) {
             contentFileName = fileName + BINARY_ENTENSION;
-            final Path targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
+            targetFile = Paths.get(inprogressContentFolderPath, contentFileName);
             // If encoding is base64, write file after base64 decoding the data
             final byte[] decodedData = Base64.decodeBase64(data);
+            inputBytes = decodedData.length;
             FileUtils.writeByteArrayToFile(targetFile.toFile(), decodedData);
         }
+        if (targetFile != null) {
+            LOGGER.info(
+                "Staging service externalized JSON field data to storage_ref. Field: {}; Encoding: {}; "
+                    + "Input bytes: {}; File bytes: {}; Threshold bytes: {}; File: {}",
+                documentFieldName,
+                encoding == null ? UTF8_ENCODING : encoding,
+                inputBytes,
+                Files.size(targetFile),
+                fieldValueSizeThreshold,
+                targetFile);
+        }
         return contentFileName;
+    }
+
+    private static void logExistingStorageReference(final String storageReference, final String documentFieldName)
+    {
+        if (storageReference == null) {
+            return;
+        }
+
+        final Path storageReferencePath;
+        try {
+            storageReferencePath = Paths.get(storageReference);
+        } catch (final InvalidPathException ex) {
+            LOGGER.info(
+                "Staging service observed existing storage_ref JSON field data but the reference is not a local path. "
+                    + "Field: {}; Reference: {}; Error: {}",
+                documentFieldName,
+                storageReference,
+                ex.getMessage());
+            return;
+        }
+
+        if (Files.exists(storageReferencePath)) {
+            try {
+                LOGGER.info(
+                    "Staging service observed existing storage_ref JSON field data. "
+                        + "Field: {}; File bytes: {}; File: {}",
+                    documentFieldName,
+                    Files.size(storageReferencePath),
+                    storageReferencePath);
+            } catch (final IOException ex) {
+                LOGGER.info(
+                    "Staging service observed existing storage_ref JSON field data but could not read file size. "
+                        + "Field: {}; File: {}; Error: {}",
+                    documentFieldName,
+                    storageReferencePath,
+                    ex.getMessage());
+            }
+        } else {
+            LOGGER.info(
+                "Staging service observed existing storage_ref JSON field data but the file was not present. "
+                    + "Field: {}; File: {}",
+                documentFieldName,
+                storageReferencePath);
+        }
     }
 }

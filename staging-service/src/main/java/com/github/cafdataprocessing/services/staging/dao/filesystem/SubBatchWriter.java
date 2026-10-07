@@ -46,6 +46,7 @@ public class SubBatchWriter implements AutoCloseable
     private final File inProgressBatchFolder;
     private final int subbatchSize;
     private OutputStream outStream;
+    private File currentSubBatch;
     //Track number of document files processed
     private int count = 0;
 
@@ -60,6 +61,7 @@ public class SubBatchWriter implements AutoCloseable
         //Make a new subbatch file
         final String subBatchFileName = BatchNameProvider.getSubBatchName();
         final File subBatch = inProgressBatchFolder.toPath().resolve(subBatchFileName).toFile();
+        currentSubBatch = subBatch;
         LOGGER.debug("Created new subbatchFile : {} ", subBatch);
         //Open new stream to start writing to subbatch file
 
@@ -91,10 +93,20 @@ public class SubBatchWriter implements AutoCloseable
             createSubBatchOutStream();
         }
 
+        final long subBatchBytesBeforeWrite = currentSubBatch.length();
         try (final InputStream inStream = inputStreamSupplier.get()) {
             try {
                 JsonMinifier.validateAndMinifyJson(inStream, outStream, storageRefFolderPath,
                                                    inprogressContentFolderPath, fieldValueSizeThreshold, binaryFilesUploaded);
+                outStream.flush();
+                final long subBatchBytesAfterWrite = currentSubBatch.length();
+                LOGGER.info(
+                    "Staging service wrote document JSON to subbatch. Document number in subbatch: {}; "
+                        + "Bytes written: {}; Subbatch bytes: {}; Subbatch file: {}",
+                    count + 1,
+                    subBatchBytesAfterWrite - subBatchBytesBeforeWrite,
+                    subBatchBytesAfterWrite,
+                    currentSubBatch);
                 count++;
             } catch (final JsonProcessingException | InvalidDocumentException ex) {
                 LOGGER.error("Error staging document", ex);
@@ -120,6 +132,7 @@ public class SubBatchWriter implements AutoCloseable
             outStream.close();
         }
         outStream = null;
+        currentSubBatch = null;
     }
 
 }
